@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VoiceEcho — Writer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0b0b12; --panel:#12121c; --panel2:#0c0c15; --ink:#f4f4fa; --muted:#9a9ab0;
+    --line:#22222f; --accent:#7c5cff; --accent2:#00d6c2; --accent-soft:rgba(124,92,255,.14);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,system-ui,sans-serif;
+    -webkit-font-smoothing:antialiased;min-height:100vh}
+  a{color:inherit;text-decoration:none}
+  .grad{background:linear-gradient(100deg,var(--accent),var(--accent2));-webkit-background-clip:text;background-clip:text;color:transparent}
+  .blob{position:fixed;border-radius:50%;filter:blur(100px);opacity:.32;z-index:0;pointer-events:none}
+  .blob.a{width:440px;height:440px;background:#5b3cff;top:-170px;left:-130px;animation:f1 18s ease-in-out infinite}
+  .blob.b{width:400px;height:400px;background:#00b3a4;bottom:-170px;right:-150px;animation:f2 22s ease-in-out infinite}
+  @keyframes f1{50%{transform:translate(50px,40px) scale(1.08)}}
+  @keyframes f2{50%{transform:translate(-40px,30px) scale(1.05)}}
+
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;font-weight:600;
+    font-size:14.5px;padding:10px 18px;border-radius:11px;cursor:pointer;border:none;transition:.2s;font-family:inherit}
+  .btn-primary{background:linear-gradient(120deg,var(--accent),#9d7cff);color:#fff;box-shadow:0 10px 26px -10px var(--accent)}
+  .btn-primary:hover{transform:translateY(-2px);box-shadow:0 16px 32px -12px var(--accent)}
+  .btn-primary:disabled{opacity:.5;cursor:not-allowed;transform:none;box-shadow:none}
+  .btn-ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
+  .btn-ghost:hover{border-color:var(--accent)}
+
+  header{position:relative;z-index:5;border-bottom:1px solid var(--line);background:rgba(11,11,18,.72);backdrop-filter:blur(12px)}
+  .bar{max-width:1180px;margin:0 auto;padding:0 22px;height:64px;display:flex;align-items:center;justify-content:space-between}
+  .logo{display:flex;align-items:center;gap:9px;font-weight:800;font-size:18px;letter-spacing:-.02em}
+  .logo .dot{width:26px;height:26px;border-radius:8px;background:linear-gradient(135deg,var(--accent),var(--accent2));display:grid;place-items:center;font-size:13px}
+  .bar-right{display:flex;align-items:center;gap:10px}
+  .credits{display:flex;align-items:center;gap:7px;font-size:13.5px;font-weight:600;background:var(--panel);border:1px solid var(--line);padding:7px 13px;border-radius:100px}
+  .credits b{color:var(--accent2)}
+  .signout{font-size:13.5px;color:var(--muted);cursor:pointer;padding:0 6px}
+  .signout:hover{color:var(--ink)}
+  @media(max-width:640px){.hide-sm{display:none}}
+
+  main{position:relative;z-index:2;max-width:1180px;margin:0 auto;padding:40px 22px 90px}
+  .h{font-size:28px;font-weight:800;letter-spacing:-.02em;margin:0 0 6px}
+  .hsub{color:var(--muted);font-size:15px;margin:0 0 30px}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start}
+  @media(max-width:860px){.grid{grid-template-columns:1fr}}
+
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:22px}
+  .lbl{display:block;font-size:13.5px;font-weight:600;margin-bottom:9px}
+  .lbl span{font-weight:400;color:var(--muted)}
+  textarea{width:100%;background:var(--panel2);border:1px solid var(--line);border-radius:12px;
+    padding:14px;color:var(--ink);font-family:inherit;font-size:14.5px;line-height:1.55;resize:vertical;transition:.15s}
+  textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+  .tones{display:flex;flex-wrap:wrap;gap:8px;margin:16px 0 18px}
+  .chip{padding:7px 14px;border-radius:100px;font-size:13.5px;font-weight:500;cursor:pointer;background:var(--panel2);border:1px solid var(--line);color:var(--muted);transition:.15s}
+  .chip.on{background:var(--accent);border-color:var(--accent);color:#fff}
+  .chip:not(.on):hover{border-color:var(--accent);color:var(--ink)}
+
+  .out-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+  .out-head .t{font-size:13.5px;font-weight:600}
+  .copy{display:flex;align-items:center;gap:6px;font-size:12.5px;color:var(--muted);cursor:pointer;background:none;border:none;font-family:inherit}
+  .copy:hover{color:var(--accent2)}
+  .out-body{min-height:300px;font-size:14.5px;line-height:1.7;white-space:pre-wrap;color:#e4e4ef}
+  .placeholder{color:#55556a;display:flex;flex-direction:column;align-items:center;justify-content:center;height:300px;text-align:center;gap:10px}
+  .placeholder .em{font-size:32px;opacity:.6}
+  .used{margin-top:14px;font-size:12.5px;color:var(--muted)}
+  .err{color:#ff7a7a;font-size:13.5px;margin-top:10px;line-height:1.5}
+  .spin{width:15px;height:15px;border:2px solid rgba(255,255,255,.35);border-top-color:#fff;border-radius:50%;animation:sp .7s linear infinite}
+  @keyframes sp{to{transform:rotate(360deg)}}
+
+  /* auth */
+  .auth-wrap{position:relative;z-index:2;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:22px}
+  .auth{max-width:400px;width:100%;text-align:center}
+  .auth .logo{justify-content:center;font-size:24px;margin-bottom:10px}
+  .auth h2{font-size:22px;font-weight:800;margin:0 0 6px;letter-spacing:-.02em}
+  .auth p{color:var(--muted);font-size:14.5px;margin:0 0 26px}
+  .auth-card{background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:28px;box-shadow:0 40px 90px -50px #000}
+  .social{display:flex;flex-direction:column;gap:10px;margin-bottom:20px}
+  .social button{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:12px;border-radius:12px;
+    font-family:inherit;font-size:14.5px;font-weight:600;cursor:pointer;border:1px solid var(--line);background:#fff;color:#111;transition:.15s}
+  .social button:hover{transform:translateY(-1px)}
+  .social .apple{background:#000;color:#fff;border-color:#333}
+  .social svg{width:18px;height:18px}
+  .divider{display:flex;align-items:center;gap:12px;color:var(--muted);font-size:12px;margin:4px 0 18px}
+  .divider::before,.divider::after{content:"";height:1px;background:var(--line);flex:1}
+  .auth input{width:100%;background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:13px;color:var(--ink);font-family:inherit;font-size:14.5px;margin-bottom:12px}
+  .auth input:focus{outline:none;border-color:var(--accent)}
+  .auth .btn{width:100%}
+  .auth .swap{margin-top:18px;font-size:13.5px;color:var(--muted)}
+  .auth .swap b{color:var(--accent2);cursor:pointer}
+  .auth .home{margin-top:22px;font-size:13px;color:var(--muted);display:inline-block}
+  .auth .home:hover{color:var(--ink)}
+  .note{color:#8bd6c9;font-size:13px;margin-top:10px;line-height:1.5}
+
+  .overlay{position:fixed;inset:0;background:rgba(5,5,10,.72);backdrop-filter:blur(4px);z-index:50;display:none;align-items:center;justify-content:center;padding:22px}
+  .overlay.show{display:flex}
+  .modal{background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:32px;max-width:440px;width:100%;text-align:center;box-shadow:0 40px 90px -40px #000}
+  .modal .em{font-size:34px;margin-bottom:10px}
+  .modal h3{margin:0 0 8px;font-size:21px;font-weight:800}
+  .modal p{color:var(--muted);font-size:14.5px;margin:0 0 22px}
+  .plans{display:grid;gap:10px;margin-bottom:18px}
+  .plan{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border:1px solid var(--line);border-radius:12px;cursor:pointer;transition:.15s;text-align:left}
+  .plan:hover{border-color:var(--accent);background:var(--accent-soft)}
+  .plan .pn{font-weight:600;font-size:15px}
+  .plan .pc{font-size:12.5px;color:var(--muted)}
+  .plan .pp{font-weight:800;font-size:17px}
+  .modal .close{margin-top:4px;font-size:13px;color:var(--muted);cursor:pointer;background:none;border:none;font-family:inherit}
+</style>
+</head>
+<body>
+
+<div class="blob a"></div>
+<div class="blob b"></div>
+
+<!-- AUTH SCREEN -->
+<div class="auth-wrap" id="authScreen" style="display:none">
+  <div class="auth">
+    <a href="/" class="logo"><span class="dot">◈</span> VoiceEcho</a>
+    <h2>Write in <span class="grad">your</span> voice</h2>
+    <p>Sign in to start rewriting.</p>
+    <div class="auth-card">
+      <div class="social">
+        <button id="googleBtn">
+          <svg viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.76h3.56c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.56-2.76c-.98.66-2.23 1.06-3.72 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84A11 11 0 0 0 12 23z"/><path fill="#FBBC05" d="M5.84 14.11a6.6 6.6 0 0 1 0-4.22V7.05H2.18a11 11 0 0 0 0 9.9l3.66-2.84z"/><path fill="#EA4335" d="M12 4.75c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 1.48 14.97.5 12 .5A11 11 0 0 0 2.18 7.05l3.66 2.84C6.71 6.68 9.14 4.75 12 4.75z"/></svg>
+          Continue with Google
+        </button>
+        <button class="apple" id="appleBtn">
+          <svg viewBox="0 0 24 24" fill="#fff"><path d="M17.05 12.5c-.03-2.6 2.13-3.85 2.22-3.91-1.21-1.77-3.1-2.01-3.77-2.04-1.6-.16-3.13.94-3.94.94-.81 0-2.07-.92-3.4-.9-1.75.03-3.36 1.02-4.26 2.58-1.82 3.16-.47 7.83 1.3 10.4.86 1.25 1.89 2.66 3.24 2.61 1.3-.05 1.79-.84 3.36-.84 1.57 0 2.01.84 3.39.81 1.4-.02 2.29-1.28 3.15-2.54.99-1.45 1.4-2.86 1.42-2.93-.03-.01-2.72-1.04-2.75-4.13-.02-2.59 2.11-3.83 2.21-3.9z"/><path d="M14.5 5.1c.72-.87 1.2-2.08 1.07-3.28-1.03.04-2.28.69-3.02 1.55-.66.77-1.24 2-1.08 3.18 1.15.09 2.32-.58 3.03-1.45z"/></svg>
+          Continue with Apple
+        </button>
+      </div>
+      <div class="divider">or</div>
+      <input id="email" type="email" placeholder="you@email.com" autocomplete="email">
+      <input id="password" type="password" placeholder="Password (min 6 chars)" autocomplete="current-password">
+      <button class="btn btn-primary" id="authBtn">Sign in</button>
+      <div class="err" id="authErr"></div>
+      <div class="note" id="authNote" style="display:none"></div>
+      <div class="swap">New here? <b id="authSwap">Create an account</b></div>
+    </div>
+    <a href="/" class="home">← Back to homepage</a>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app" style="display:none">
+  <header>
+    <div class="bar">
+      <a href="/" class="logo"><span class="dot">◈</span> VoiceEcho</a>
+      <div class="bar-right">
+        <a href="/" class="btn btn-ghost hide-sm" style="padding:8px 14px">Home</a>
+        <span class="credits">⚡ <b id="creditCount">—</b> credits</span>
+        <button class="btn btn-ghost" style="padding:8px 14px" id="buyBtn">Buy credits</button>
+        <span class="signout" id="signout">Sign out</span>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <h1 class="h">Rewrite in <span class="grad">your</span> voice</h1>
+    <p class="hsub">Paste how you write, drop in a draft, get it back sounding like you.</p>
+
+    <div class="grid">
+      <div>
+        <div class="card" style="margin-bottom:20px">
+          <label class="lbl" for="samples">Your voice <span>— 2-3 things you've written</span></label>
+          <textarea id="samples" rows="6" placeholder="Paste past emails, posts, or notes. The more real 'you', the sharper the match."></textarea>
+        </div>
+        <div class="card">
+          <label class="lbl" for="draft">Draft to rewrite</label>
+          <textarea id="draft" rows="4" placeholder="A rough idea, or a stiff AI draft you want to sound like you."></textarea>
+          <div class="tones" id="tones">
+            <span class="chip on" data-t="auto">Match my voice</span>
+            <span class="chip" data-t="casual">Casual</span>
+            <span class="chip" data-t="professional">Professional</span>
+            <span class="chip" data-t="witty">Witty</span>
+            <span class="chip" data-t="editorial">Editorial</span>
+          </div>
+          <button class="btn btn-primary" id="run" style="width:100%">Rewrite in my voice</button>
+          <div class="err" id="err"></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="out-head">
+          <span class="t">In your voice</span>
+          <button class="copy" id="copyBtn" style="display:none">⧉ Copy</button>
+        </div>
+        <div class="out-body" id="output">
+          <div class="placeholder"><span class="em">✍️</span>Your rewrite will appear here.</div>
+        </div>
+        <div class="used" id="used" style="display:none">1 credit used</div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- UPGRADE MODAL -->
+<div class="overlay" id="overlay">
+  <div class="modal">
+    <div class="em">⚡</div>
+    <h3>You're out of credits</h3>
+    <p>Top up to keep rewriting in your voice.</p>
+    <div class="plans">
+      <div class="plan" data-plan="starter"><div><div class="pn">Starter</div><div class="pc">150 rewrites</div></div><div class="pp">$12</div></div>
+      <div class="plan" data-plan="pro"><div><div class="pn">Pro</div><div class="pc">500 rewrites · most popular</div></div><div class="pp">$29</div></div>
+      <div class="plan" data-plan="scale"><div><div class="pn">Scale</div><div class="pc">2,000 rewrites</div></div><div class="pp">$79</div></div>
+    </div>
+    <button class="close" id="closeModal">Maybe later</button>
+  </div>
+</div>
+
+<script type="module">
+  // ── CONFIG ──
+  const SUPABASE_URL = "https://mmokcvvyaoohibtauodv.supabase.co";
+  const SUPABASE_ANON_KEY = "sb_publishable_RT8I_tyEDVY_Wcxhw3yp6A_lTbpRXlP";
+  const CHECKOUT = {
+    starter: "https://YOURSTORE.lemonsqueezy.com/buy/STARTER_ID",
+    pro:     "https://YOURSTORE.lemonsqueezy.com/buy/PRO_ID",
+    scale:   "https://YOURSTORE.lemonsqueezy.com/buy/SCALE_ID",
+  };
+
+  const $ = (id) => document.getElementById(id);
+  let tone = "auto", supabase = null, session = null;
+
+  $("tones").addEventListener("click", (e) => {
+    const c = e.target.closest(".chip"); if (!c) return;
+    document.querySelectorAll(".chip").forEach((x) => x.classList.remove("on"));
+    c.classList.add("on"); tone = c.dataset.t;
+  });
+
+  function setCredits(n){ $("creditCount").textContent = n; }
+
+  const openModal = () => $("overlay").classList.add("show");
+  $("closeModal").onclick = () => $("overlay").classList.remove("show");
+  $("buyBtn").onclick = openModal;
+  document.querySelectorAll(".plan").forEach((p) => {
+    p.onclick = () => {
+      const uid = session?.user?.id || "";
+      window.location = `${CHECKOUT[p.dataset.plan]}?checkout[custom][user_id]=${uid}&checkout[custom][plan]=${p.dataset.plan}`;
+    };
+  });
+
+  // ── REWRITE (with real error messages) ──
+  $("run").onclick = async () => {
+    const samples = $("samples").value.trim();
+    const draft = $("draft").value.trim();
+    $("err").textContent = "";
+    if (samples.length < 40) { $("err").textContent = "Add a bit more sample text for a good match."; return; }
+    if (!draft) { $("err").textContent = "Add a draft to rewrite."; return; }
+    if (!session) { $("err").textContent = "You're not signed in — refresh and sign in again."; return; }
+
+    const btn = $("run");
+    btn.disabled = true; btn.innerHTML = '<span class="spin"></span> Rewriting…';
+    try {
+      const r = await fetch("/api/rewrite", {
+        method: "POST",
+        headers: { "content-type": "application/json", Authorization: `Bearer ${session.access_token}` },
+        body: JSON.stringify({ samples, draft, tone }),
+      });
+      if (r.status === 402) { openModal(); return; }
+
+      // read as text first so we can show a useful message if it isn't JSON
+      const raw = await r.text();
+      let data;
+      try { data = JSON.parse(raw); }
+      catch { throw new Error(`Server returned ${r.status}. The /api/rewrite function isn't responding — check it's deployed and env vars are set.`); }
+
+      if (!r.ok) throw new Error(data.error || `Error ${r.status}`);
+      if (!data.output) throw new Error("Empty response from the model.");
+
+      $("output").textContent = data.output;
+      $("copyBtn").style.display = "flex";
+      $("used").style.display = "block";
+      if (typeof data.creditsLeft === "number") setCredits(data.creditsLeft);
+    } catch (e) {
+      $("err").textContent = e.message || "Rewrite failed — try again.";
+    } finally {
+      btn.disabled = false; btn.textContent = "Rewrite in my voice";
+    }
+  };
+
+  $("copyBtn").onclick = () => {
+    const t = document.createElement("textarea");
+    t.value = $("output").textContent; document.body.appendChild(t); t.select();
+    document.execCommand("copy"); document.body.removeChild(t);
+    $("copyBtn").textContent = "✓ Copied";
+    setTimeout(() => ($("copyBtn").innerHTML = "⧉ Copy"), 1400);
+  };
+
+  // ── BOOT ──
+  async function boot() {
+    try {
+      const { createClient } = await import("https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm");
+      supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+      const { data } = await supabase.auth.getSession();
+      session = data.session;
+      session ? showApp() : showAuth();
+    } catch (e) {
+      showAuth();
+      $("authErr").textContent = "Couldn't reach Supabase: " + e.message;
+    }
+  }
+  function showAuth(){ $("app").style.display="none"; $("authScreen").style.display="flex"; }
+  async function showApp(){
+    $("authScreen").style.display="none"; $("app").style.display="block";
+    try {
+      const { data, error } = await supabase.from("profiles").select("credits").single();
+      if (error) { setCredits("?"); $("err").textContent = "Couldn't load credits (is the profiles table set up?): " + error.message; }
+      else setCredits(data?.credits ?? 0);
+    } catch(e){ setCredits("?"); }
+  }
+
+  // ── SOCIAL AUTH ──
+  async function oauth(provider){
+    $("authErr").textContent = "";
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider, options: { redirectTo: window.location.origin + "/app" },
+    });
+    if (error) $("authErr").textContent = error.message;
+  }
+  $("googleBtn").onclick = () => oauth("google");
+  $("appleBtn").onclick  = () => oauth("apple");
+
+  // ── EMAIL AUTH ──
+  let mode = "signin";
+  $("authSwap").onclick = () => {
+    mode = mode === "signin" ? "signup" : "signin";
+    $("authBtn").textContent = mode === "signin" ? "Sign in" : "Create account";
+    $("authSwap").textContent = mode === "signin" ? "Create an account" : "Have an account? Sign in";
+    $("authErr").textContent = ""; $("authNote").style.display = "none";
+  };
+  $("authBtn").onclick = async () => {
+    $("authErr").textContent = ""; $("authNote").style.display = "none";
+    const email = $("email").value.trim(), password = $("password").value;
+    if (!email || password.length < 6) { $("authErr").textContent = "Enter an email and a 6+ character password."; return; }
+    const fn = mode === "signin" ? "signInWithPassword" : "signUp";
+    const { data, error } = await supabase.auth[fn]({ email, password });
+    if (error) { $("authErr").textContent = error.message; return; }
+    if (data.session) { session = data.session; showApp(); }
+    else { $("authNote").style.display = "block"; $("authNote").textContent = "Account created — check your email to confirm, then sign in."; }
+  };
+  $("signout").onclick = async () => { if (supabase) await supabase.auth.signOut(); session = null; showAuth(); };
+
+  boot();
+</script>
+</body>
+</html>
