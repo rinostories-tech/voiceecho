@@ -21,9 +21,9 @@
     --mono:"JetBrains Mono",ui-monospace,monospace;
   }
   *{box-sizing:border-box}
-  html{-webkit-text-size-adjust:100%}
+  html{-webkit-text-size-adjust:100%;background:var(--paper);overscroll-behavior:none}
   body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:15px;
-    line-height:1.5;-webkit-font-smoothing:antialiased;min-height:100vh}
+    line-height:1.5;-webkit-font-smoothing:antialiased;min-height:100dvh;overscroll-behavior:none}
   a{color:inherit;text-decoration:none}
   ::selection{background:var(--hi);color:var(--ink)}
   body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.45;
@@ -39,6 +39,8 @@
   .btn-outline:hover{border-color:var(--ink)}
   .btn-lime{background:var(--hi);color:var(--ink);font-weight:700}
   .btn-lime:hover{transform:translateY(-1px);filter:brightness(1.05)}
+  .btn-primary.cancelling{background:var(--red)}
+  .btn-primary.cancelling:hover:not(:disabled){background:#d3453b}
   .btn-sm{padding:8px 12px;min-height:auto;font-size:13px;border-radius:9px}
 
   .mono{font-family:var(--mono)}
@@ -564,14 +566,18 @@
   function selectLib(id){ const t=LIBRARY.find(x=>x.id===id); active={type:'lib',id:t.id,name:t.name+" (library)"}; renderVoices(); renderLibrary(); render(); }
 
   // ────────────────────────── REWRITE ──────────────────────────
+  let rewriteCtrl=null;
   async function doRewrite(){
+    // second click while running = cancel
+    if(rewriteCtrl){ rewriteCtrl.abort(); return; }
     $("err").textContent="";
     const draft=$("draft").value.trim();
     if(!active){ $("err").textContent="Pick a voice on the left (or a library tone) first."; return; }
     if(!draft){ $("err").textContent="Add a draft to rewrite."; return; }
     if(!session){ $("err").textContent="You're signed out — refresh and sign in again."; return; }
 
-    const btn=$("run"); btn.disabled=true; btn.innerHTML='<span class="spin"></span> Rewriting…';
+    const ctrl=new AbortController(); rewriteCtrl=ctrl;
+    const btn=$("run"); btn.classList.add("cancelling"); btn.innerHTML='<span class="spin"></span> Rewriting… · tap to cancel';
     $("wave").classList.add("go"); $("output").innerHTML=""; $("outTools").style.display="none"; $("scrubbed").style.display="none";
 
     const payload={ draft, channel: plan().channels?channel:"Auto" };
@@ -580,7 +586,7 @@
     lastRun={...payload};
 
     try{
-      const r=await fetch("/api/rewrite",{method:"POST",
+      const r=await fetch("/api/rewrite",{method:"POST",signal:ctrl.signal,
         headers:{"content-type":"application/json",Authorization:`Bearer ${session.access_token}`},
         body:JSON.stringify(payload)});
 
@@ -588,8 +594,8 @@
       const raw=await r.text(); let data;
       try{ data=JSON.parse(raw); }catch{ throw new Error(`Server returned ${r.status}. Check /api/rewrite is deployed with its env vars.`); }
 
+      if(r.status===499 || data.code==="ABORTED"){ return; } // cancelled — no charge
       if(r.status===409 && data.code==="REFUSAL"){
-        // refusal — no rewrite happened and no quota was spent
         $("output").innerHTML=`<div class="ph"><span style="font-size:24px">🙅</span>${escapeHtml(data.error||"Couldn't rewrite that one — and we didn't count it.")}</div>`;
         return;
       }
@@ -603,8 +609,11 @@
         $("scrubbed").style.display="block"; $("scrubbed").innerHTML=`✓ scrubbed <b>${data.scrubbed}</b> AI-ism${data.scrubbed>1?'s':''}`;
       }
       loadHistory();
-    }catch(e){ $("err").textContent=e.message||"Rewrite failed — try again."; }
-    finally{ btn.disabled=false; btn.textContent="Rewrite in my voice"; $("wave").classList.remove("go"); }
+    }catch(e){
+      if(e.name==="AbortError"){ $("output").innerHTML=`<div class="ph">Cancelled — no rewrite used.</div>`; }
+      else{ $("err").textContent=e.message||"Rewrite failed — try again."; }
+    }
+    finally{ rewriteCtrl=null; btn.disabled=false; btn.classList.remove("cancelling"); btn.textContent="Rewrite in my voice"; $("wave").classList.remove("go"); }
   }
 
   // ────────────────────────── TRAIN VOICE ──────────────────────────
