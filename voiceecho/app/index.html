@@ -137,6 +137,12 @@
   .wave span{flex:1;background:linear-gradient(var(--violet),var(--hi));border-radius:2px;min-height:3px;animation:eq 1s ease-in-out infinite alternate}
   @keyframes eq{from{height:12%}to{height:100%}}
 
+  /* inline recents under the output — mobile only */
+  .recent-inline{display:none;margin-top:20px;border-top:1px dashed var(--line-2);padding-top:16px}
+  .recent-inline .ri-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+  .recent-inline .ri-head .t{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3)}
+  .recent-inline .ri-head .all{font-family:var(--mono);font-size:11px;color:var(--violet);cursor:pointer;background:none;border:none;padding:2px 0}
+
   /* right: history */
   .hitem{padding:11px 12px;border:1px solid var(--line);border-radius:11px;margin-bottom:8px;cursor:pointer;transition:.15s;background:var(--paper)}
   .hitem:hover{border-color:var(--ink)}
@@ -168,6 +174,10 @@
     .quota .q-top span:last-child{display:none}
     .quota .q-top{font-size:12px}
     .pbadge{padding:5px 9px;font-size:10px}
+    /* tapping the voice bar jumps to the Voices tab */
+    .active-voice{cursor:pointer;-webkit-tap-highlight-color:transparent;transition:background .15s}
+    .active-voice:active{background:var(--line)}
+    .recent-inline{display:block}
   }
   @media(max-width:400px){
     .quota{display:none}     /* keep the bar clean on the smallest phones */
@@ -301,7 +311,7 @@
 
     <!-- CENTER: EDITOR -->
     <section class="panel panel-editor show" data-p="editor">
-      <div class="active-voice">
+      <div class="active-voice" id="activeVoiceBar">
         <span>Voice:</span> <b id="activeVoiceName">Pick a voice →</b>
         <span class="swap" id="clearVoice" style="display:none">change</span>
       </div>
@@ -324,6 +334,9 @@
         <div class="out-body" id="output"><div class="ph"><span style="font-size:26px">✍️</span>Your rewrite will appear here.</div></div>
         <div class="scrubbed" id="scrubbed" style="display:none"></div>
       </div>
+
+      <!-- inline recents (mobile only) -->
+      <div class="recent-inline" id="recentInline"></div>
     </section>
 
     <!-- RIGHT: HISTORY -->
@@ -550,6 +563,21 @@
     // history depth nudge for free
     $("histLock").innerHTML = (history.length>depth && depth<50)
       ? `<div class="locked-note">${plan().label} keeps your last ${depth}. <b data-up>Upgrade to keep everything →</b></div>` : "";
+
+    // inline recents under the output (mobile) — mirror of the list, capped
+    const ri=$("recentInline");
+    if(ri){
+      if(!shown.length){ ri.innerHTML=""; }
+      else{
+        ri.innerHTML = `<div class="ri-head"><span class="t">Recent</span>${
+            shown.length>3 ? `<button class="all" data-gorecent>See all →</button>` : ``
+          }</div>` + shown.slice(0,3).map(h=>`
+          <div class="hitem" data-hid="${h.id}">
+            <div class="hh"><span class="hv">${escapeHtml(h.voice_name||h.style||'voice')}</span><span class="ht">${timeAgo(h.created_at)}</span></div>
+            <div class="hp">${escapeHtml(h.output||h.draft||'')}</div>
+          </div>`).join('');
+      }
+    }
   }
 
   // ────────────────────────── RENDER QUOTA ──────────────────────────
@@ -654,25 +682,37 @@
   $("voiceList").addEventListener("click",async(e)=>{
     const del=e.target.closest("[data-del]");
     if(del){ e.stopPropagation(); if(confirm("Delete this voice?")){ try{ await supabase.from("voices").delete().eq("id",del.dataset.del);}catch{} if(active?.id===del.dataset.del) active=null; await loadVoices(); render(); } return; }
-    const row=e.target.closest(".voice"); if(row) selectVoice(row.dataset.id);
+    const row=e.target.closest(".voice"); if(row){ selectVoice(row.dataset.id); if(isMobile()) document.querySelector('.mtab[data-p="editor"]')?.click(); }
   });
   $("library").addEventListener("click",(e)=>{
     const b=e.target.closest("[data-lib]"); if(!b) return;
     if(b.dataset.locked==="true"){ openUpgrade("styles"); return; }
-    selectLib(b.dataset.lib);
+    selectLib(b.dataset.lib); if(isMobile()) document.querySelector('.mtab[data-p="editor"]')?.click();
   });
   $("channels").addEventListener("click",(e)=>{
     const b=e.target.closest("[data-ch]"); if(!b) return;
     if(b.dataset.locked==="true"){ openUpgrade("channels"); return; }
     channel=b.dataset.ch; renderChannels();
   });
-  $("historyList").addEventListener("click",(e)=>{
-    const it=e.target.closest("[data-hid]"); if(!it) return;
-    const h=history.find(x=>x.id===it.dataset.hid); if(!h) return;
+  function goVoices(){ document.querySelector('.mtab[data-p="voices"]')?.click(); window.scrollTo({top:0,behavior:"smooth"}); }
+  function goRecent(){ document.querySelector('.mtab[data-p="history"]')?.click(); window.scrollTo({top:0,behavior:"smooth"}); }
+  const isMobile=()=>matchMedia("(max-width:959px)").matches;
+
+  function openHistoryItem(hid){
+    const h=history.find(x=>x.id===hid); if(!h) return;
     $("draft").value=h.draft||""; $("output").textContent=h.output||""; $("outTools").style.display="flex";
     const v=voices.find(x=>x.name===h.voice_name); if(v) selectVoice(v.id);
     document.querySelector('.mtab[data-p="editor"]')?.click();
     window.scrollTo({top:0,behavior:"smooth"});
+  }
+  $("historyList").addEventListener("click",(e)=>{
+    const it=e.target.closest("[data-hid]"); if(!it) return;
+    openHistoryItem(it.dataset.hid);
+  });
+  $("recentInline").addEventListener("click",(e)=>{
+    if(e.target.closest("[data-gorecent]")){ goRecent(); return; }
+    const it=e.target.closest("[data-hid]"); if(!it) return;
+    openHistoryItem(it.dataset.hid);
   });
   document.body.addEventListener("click",(e)=>{ if(e.target.closest("[data-up]")) openUpgrade(); });
 
@@ -681,7 +721,8 @@
   $("trainSave").onclick=trainVoice;
   $("run").onclick=doRewrite;
   $("regen").onclick=doRewrite;
-  $("clearVoice").onclick=()=>{ active=null; renderVoices(); renderLibrary(); render(); };
+  $("activeVoiceBar").onclick=(e)=>{ if(e.target.closest("#clearVoice")) return; if(isMobile()) goVoices(); };
+  $("clearVoice").onclick=(e)=>{ e.stopPropagation(); if(isMobile()){ goVoices(); return; } active=null; renderVoices(); renderLibrary(); render(); };
   $("copyBtn").onclick=()=>{ navigator.clipboard?.writeText($("output").textContent); $("copyBtn").textContent="✓ Copied"; setTimeout(()=>$("copyBtn").innerHTML="⧉ Copy",1400); };
 
   $("devPlan").onchange=async()=>{ applyPlan(); renderVoices(); renderLibrary(); renderChannels(); render(); await loadHistory(); };
