@@ -58,8 +58,9 @@
   .pbadge{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:600;
     padding:5px 10px;border-radius:100px;border:1px solid var(--line-2);color:var(--ink-2)}
   .pbadge.lifetime{background:var(--ink);color:var(--hi);border-color:var(--ink)}
-  .dev{display:flex;align-items:center;gap:5px;font-family:var(--mono);font-size:10.5px;color:var(--ink-3)}
-  .dev select{font-family:var(--mono);font-size:11px;padding:4px 6px;border-radius:7px;border:1px dashed var(--line-2);background:var(--paper);color:var(--ink-2)}
+  .dev-row{display:flex;flex-direction:column;gap:5px;padding:9px 11px;margin-bottom:4px;border-bottom:1px solid var(--line)}
+  .dev-row .dev-lbl{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3)}
+  .dev-row select{font-family:var(--mono);font-size:12px;padding:6px 8px;border-radius:8px;border:1px dashed var(--violet);background:var(--paper);color:var(--ink)}
   .acct{position:relative}
   .acct .av{width:34px;height:34px;border-radius:50%;background:var(--ink);color:var(--paper);display:grid;place-items:center;font-weight:700;font-size:13px;cursor:pointer;border:none;font-family:inherit}
   .acct .menu-pop{position:absolute;right:0;top:44px;background:var(--card);border:1px solid var(--line-2);border-radius:12px;
@@ -143,6 +144,8 @@
   .hitem .hp{font-size:12.5px;color:var(--ink-2);line-height:1.45;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
   .locked-note{font-size:12px;color:var(--ink-3);border:1px dashed var(--line-2);border-radius:10px;padding:11px;margin-top:8px;line-height:1.5}
   .locked-note b{color:var(--violet);cursor:pointer}
+  .lib-group{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3);margin:14px 0 9px}
+  .lib-group:first-child{margin-top:0}
 
   @media(min-width:960px){
     .mtabs{display:none}
@@ -153,6 +156,20 @@
   @media(max-width:959px){
     .panel{display:none}
     .panel.show{display:block}
+    /* breathing room + safe areas on phones */
+    .topbar-in{padding-left:max(16px,env(safe-area-inset-left));padding-right:max(14px,env(safe-area-inset-right))}
+    .ws{padding:14px max(16px,env(safe-area-inset-left)) 40px max(16px,env(safe-area-inset-right))}
+    .mtabs{padding:12px max(16px,env(safe-area-inset-left)) 0}
+    /* compact quota: number chip only, no long label */
+    .quota{min-width:0;flex-direction:row;align-items:center;gap:7px}
+    .quota .q-bar{width:44px}
+    .quota .q-top span:last-child{display:none}
+    .quota .q-top{font-size:12px}
+    .pbadge{padding:5px 9px;font-size:10px}
+  }
+  @media(max-width:400px){
+    .quota{display:none}     /* keep the bar clean on the smallest phones */
+    .logo{font-size:16px}
   }
 
   /* ============ AUTH ============ */
@@ -239,21 +256,20 @@
         <div class="q-bar"><div class="q-fill" id="qFill"></div></div>
       </div>
       <span class="pbadge" id="planBadge">Free</span>
-      <!-- DEV ONLY: preview tiers. Real plan comes from Supabase; remove before launch. -->
-      <div class="dev" title="Preview a plan's UI. Does not change your real limits — the server enforces those.">
-        <span>dev</span>
-        <select id="devPlan">
-          <option value="">real</option>
-          <option value="free">free</option>
-          <option value="starter">starter</option>
-          <option value="pro">pro</option>
-          <option value="studio">studio</option>
-          <option value="lifetime">lifetime</option>
-        </select>
-      </div>
       <div class="acct">
         <button class="av" id="avBtn">–</button>
         <div class="menu-pop" id="acctMenu">
+          <div class="dev-row" id="devRow" style="display:none">
+            <span class="dev-lbl">Dev · use plan</span>
+            <select id="devPlan">
+              <option value="">real plan</option>
+              <option value="free">free</option>
+              <option value="starter">starter</option>
+              <option value="pro">pro</option>
+              <option value="studio">studio</option>
+              <option value="lifetime">lifetime</option>
+            </select>
+          </div>
           <a href="/">Homepage</a>
           <button id="buyBtn">Upgrade plan</button>
           <button id="signout">Sign out</button>
@@ -278,7 +294,7 @@
       <div id="voiceLock"></div>
 
       <div class="sub-h">Voice library</div>
-      <div class="lib" id="library"></div>
+      <div id="library"></div>
     </section>
 
     <!-- CENTER: EDITOR -->
@@ -358,25 +374,49 @@
     lifetime: "https://YOURSTORE.lemonsqueezy.com/buy/LIFETIME_ID",
   };
 
+  // Only this account sees the dev plan switcher (and can use any plan server-side).
+  const ADMIN_EMAIL = "rinostories@gmail.com";
+
   // Plan matrix — MUST match functions/api/rewrite.js and the pricing page.
   // These drive the UI only. Real limits are enforced server-side.
   const PLANS = {
-    free:     { label:"Free",     voices:1,    channels:false, historyDepth:3,   rewrites:15,     lib:3  },
-    starter:  { label:"Starter",  voices:3,    channels:false, historyDepth:50,  rewrites:200,    lib:6  },
-    pro:      { label:"Pro",      voices:10,   channels:true,  historyDepth:200, rewrites:600,    lib:99 },
-    studio:   { label:"Studio",   voices:25,   channels:true,  historyDepth:500, rewrites:1500,   lib:99 },
-    lifetime: { label:"Lifetime", voices:9999, channels:true,  historyDepth:999, rewrites:100000, lib:99 },
+    free:     { label:"Free",     voices:1,    channels:false, historyDepth:3,   rewrites:15     },
+    starter:  { label:"Starter",  voices:3,    channels:false, historyDepth:50,  rewrites:200    },
+    pro:      { label:"Pro",      voices:10,   channels:true,  historyDepth:200, rewrites:600    },
+    studio:   { label:"Studio",   voices:25,   channels:true,  historyDepth:500, rewrites:1500   },
+    lifetime: { label:"Lifetime", voices:9999, channels:true,  historyDepth:999, rewrites:100000 },
   };
+  // Voice library. free:true = usable on Free; the rest are paywalled.
+  // grp groups them in the UI. Descriptions live server-side in rewrite.js.
   const LIBRARY = [
-    {id:"punchy",name:"Punchy"},{id:"warm",name:"Warm"},{id:"clear",name:"Clear & plain"},
-    {id:"analytical",name:"Analytical"},{id:"witty",name:"Witty"},{id:"story",name:"Storyteller"},
-    {id:"bold",name:"Bold"},{id:"formal",name:"Formal"},
+    // — serious / real use cases —
+    {id:"punchy",       name:"Punchy",            grp:"work", free:true},
+    {id:"warm",         name:"Warm & friendly",   grp:"work", free:true},
+    {id:"clear",        name:"Clear & plain",     grp:"work", free:true},
+    {id:"professional", name:"Professional",      grp:"work", free:true},
+    {id:"analytical",   name:"Analytical",        grp:"work"},
+    {id:"story",        name:"Storyteller",       grp:"work"},
+    {id:"bold",         name:"Bold & opinionated",grp:"work"},
+    {id:"closer",       name:"Persuasive closer", grp:"work"},
+    {id:"technical",    name:"Technical & precise",grp:"work"},
+    {id:"support",      name:"Empathetic support",grp:"work"},
+    {id:"exec",         name:"Executive brief",   grp:"work"},
+    {id:"creator",      name:"Casual creator",    grp:"work"},
+    // — for fun —
+    {id:"pirate",       name:"Pirate 🏴‍☠️",        grp:"fun"},
+    {id:"bard",         name:"Ye Olde Bard 🎭",    grp:"fun"},
+    {id:"buzzword",     name:"Buzzword overlord 📈",grp:"fun"},
+    {id:"genz",         name:"Gen Z 💀",           grp:"fun"},
+    {id:"cowboy",       name:"Cowboy 🤠",          grp:"fun"},
+    {id:"noir",         name:"Noir detective 🕵️",  grp:"fun"},
+    {id:"zen",          name:"Zen master 🧘",      grp:"fun"},
+    {id:"drama",        name:"Theatre kid 🌟",     grp:"fun"},
   ];
   const CHANNELS = ["Auto","LinkedIn","Email","Newsletter","Product","Tweet"];
 
   const $ = (id)=>document.getElementById(id);
   let supabase=null, session=null;
-  let realPlan="free", planKey="free";
+  let realPlan="free", planKey="free", isAdmin=false;
   let voices=[], history=[];
   let active=null;          // {type:'voice', id, name} | {type:'lib', id, name}
   let channel="Auto";
@@ -384,6 +424,7 @@
   let lastRun=null;         // for regenerate
 
   const plan = ()=>PLANS[planKey] || PLANS.free;
+  const devPlanValue = ()=> (isAdmin ? ($("devPlan").value||"") : "");
 
   // ────────────────────────── AUTH BOOT ──────────────────────────
   async function boot(){
@@ -399,8 +440,10 @@
 
   async function showApp(){
     $("authScreen").style.display="none"; $("app").style.display="block";
-    const email = session?.user?.email || "";
+    const email = (session?.user?.email || "").toLowerCase();
     $("avBtn").textContent = (email[0]||"?").toUpperCase();
+    isAdmin = email === ADMIN_EMAIL;
+    $("devRow").style.display = isAdmin ? "flex" : "none";
     await loadProfile();
     renderChannels(); renderLibrary(); render();
     await Promise.all([loadVoices(), loadHistory()]);
@@ -417,8 +460,7 @@
     applyPlan();
   }
   function applyPlan(){
-    const override = $("devPlan").value;
-    planKey = override || realPlan;
+    planKey = devPlanValue() || realPlan;
     usage.limit = plan().rewrites;
     $("planBadge").textContent = plan().label;
     $("planBadge").classList.toggle("lifetime", planKey==="lifetime");
@@ -455,13 +497,20 @@
   }
 
   // ────────────────────────── LIBRARY / CHANNELS ──────────────────────────
+  function libLocked(t){ return !t.free && planKey==="free"; }
   function renderLibrary(){
-    const unlocked = plan().lib;
-    $("library").innerHTML = LIBRARY.map((t,i)=>{
-      const locked = i>=unlocked;
-      const on = active?.type==='lib' && active.id===t.id;
-      return `<button class="ltone ${on?'on':''} ${locked?'lock':''}" data-lib="${t.id}" data-locked="${locked}">${t.name}</button>`;
-    }).join('');
+    const groups = [["work","Serious · real use cases"],["fun","Just for fun"]];
+    let html="";
+    for(const [g,label] of groups){
+      html += `<div class="lib-group">${label}</div><div class="lib">`;
+      html += LIBRARY.filter(t=>t.grp===g).map(t=>{
+        const locked = libLocked(t);
+        const on = active?.type==='lib' && active.id===t.id;
+        return `<button class="ltone ${on?'on':''} ${locked?'lock':''}" data-lib="${t.id}" data-locked="${locked}">${t.name}</button>`;
+      }).join('');
+      html += `</div>`;
+    }
+    $("library").innerHTML = html;
   }
   function renderChannels(){
     const allow = plan().channels;
@@ -527,6 +576,7 @@
 
     const payload={ draft, channel: plan().channels?channel:"Auto" };
     if(active.type==='voice') payload.voiceId=active.id; else payload.libraryStyle=active.id;
+    if(devPlanValue()) payload.overridePlan=devPlanValue();
     lastRun={...payload};
 
     try{
@@ -568,7 +618,7 @@
     try{
       const r=await fetch("/api/train-voice",{method:"POST",
         headers:{"content-type":"application/json",Authorization:`Bearer ${session.access_token}`},
-        body:JSON.stringify({name,samples})});
+        body:JSON.stringify({name,samples,overridePlan:devPlanValue()||undefined})});
       if(r.status===402){ closeTrain(); openUpgrade("voices"); return; }
       const data=await r.json();
       if(!r.ok) throw new Error(data.error||`Error ${r.status}`);
@@ -629,8 +679,9 @@
 
   // account menu
   $("avBtn").onclick=(e)=>{ e.stopPropagation(); $("acctMenu").classList.toggle("open"); };
+  $("acctMenu").addEventListener("click",(e)=>e.stopPropagation()); // don't close when using dev toggle
   document.addEventListener("click",()=>$("acctMenu").classList.remove("open"));
-  $("buyBtn").onclick=()=>openUpgrade();
+  $("buyBtn").onclick=()=>{ $("acctMenu").classList.remove("open"); openUpgrade(); };
   $("closeModal").onclick=closeUpgrade;
   document.querySelectorAll(".plan").forEach(p=>p.onclick=()=>{
     const uid=session?.user?.id||"";
