@@ -1,105 +1,139 @@
-// POST /api/rewrite  —  this Function IS the paywall.
-// It runs on Cloudflare's servers. The user never sees the API key,
-// and can't reach the model without passing the credit check below.
+// POST /api/rewrite  —  the paywall + the rewrite.
+// Enforces a MONTHLY quota (prices are shown weekly, metered monthly),
+// uses a saved voice fingerprint or a library style, never charges for a
+// refusal, and saves each successful rewrite to history.
 
-const MODEL = "claude-haiku-4-5-20251001"; // cheap + fast for high-volume rewrites; bump to sonnet for quality
+const MODEL = "claude-haiku-4-5-20251001";
+
+// Monthly rewrite limits — keep in sync with app/index.html PLANS.
+const MONTHLY = { free:15, starter:200, pro:600, studio:1500, lifetime:100000 };
+const CHANNELS_ALLOWED = { free:false, starter:false, pro:true, studio:true, lifetime:true };
+
+const LIBRARY = {
+  punchy:"Short, direct, high-energy. Cut filler. Lead with the point.",
+  warm:"Warm and human, like talking to a friend. Relaxed, a little informal.",
+  clear:"Plain and clear. Simple words, no jargon, easy to skim.",
+  analytical:"Measured and precise. Evidence-led, careful claims, no hype.",
+  witty:"Light and clever. A dry line is welcome; never forced.",
+  story:"Narrative and vivid. Set a scene, carry a thread.",
+  bold:"Confident and opinionated. Take a clear stance.",
+  formal:"Polished and professional. Complete sentences, respectful register.",
+};
 
 const json = (obj, status = 200) =>
-  new Response(JSON.stringify(obj), {
-    status,
-    headers: { "content-type": "application/json" },
+  new Response(JSON.stringify(obj), { status, headers: { "content-type": "application/json" } });
+
+const sbAdmin = (env, path, body) =>
+  fetch(`${env.SUPABASE_URL}/rest/v1/rpc/${path}`, {
+    method: "POST",
+    headers: { "content-type": "application/json", apikey: env.SUPABASE_SERVICE_KEY },
+    body: JSON.stringify(body),
   });
+
+function looksLikeRefusal(text) {
+  const t = (text || "").trim();
+  if (t.length > 320) return false;                     // real rewrites are longer
+  return /^(i'?m sorry|i am sorry|sorry,|i can'?t|i cannot|i'?m unable|i am unable|i won'?t|i will not|unfortunately,? i)/i.test(t)
+      || /can'?t (help|assist) with (that|this)/i.test(t);
+}
 
 export async function onRequestPost(context) {
   const { request, env } = context;
 
-  // ---- 1. WHO IS THIS? Verify the Supabase login token ----
+  // 1. who is this?
   const token = (request.headers.get("Authorization") || "").replace("Bearer ", "");
   if (!token) return json({ error: "Not signed in" }, 401);
-
   const userRes = await fetch(`${env.SUPABASE_URL}/auth/v1/user`, {
     headers: { Authorization: `Bearer ${token}`, apikey: env.SUPABASE_ANON_KEY },
   });
   if (!userRes.ok) return json({ error: "Invalid session" }, 401);
   const { id: userId } = await userRes.json();
 
-  // ---- 2. THE GATE: spend one credit, atomically ----
-  // spend_credit() subtracts 1 only if credits > 0, and returns the new balance
-  // (or null if they had none). Doing it in the DB avoids race conditions where
-  // someone fires 10 requests at once to get 10 rewrites off 1 credit.
-  const spendRes = await fetch(`${env.SUPABASE_URL}/rest/v1/rpc/spend_credit`, {
-    method: "POST",
-    headers: {
-      "content-type": "application/json",
-      apikey: env.SUPABASE_SERVICE_KEY,
-      Authorization: `Bearer ${env.SUPABASE_SERVICE_KEY}`,
-    },
-    body: JSON.stringify({ uid: userId }),
+  // 2. input
+  const body = await request.json().catch(() => ({}));
+  const { draft = "", voiceId = null, libraryStyle = null, channel = "Auto", samples = "" } = body;
+  if (!draft.trim()) return json({ error: "Add a draft to rewrite." }, 400);
+
+  // 3. plan + limit
+  const planRes = await fetch(`${env.SUPABASE_URL}/rest/v1/profiles?select=plan,usage_month,usage_count&id=eq.${userId}`, {
+    headers: { apikey: env.SUPABASE_SERVICE_KEY, Authorization: `Bearer ${env.SUPABASE_SERVICE_KEY}` },
   });
-  const remaining = await spendRes.json();
-  if (remaining === null || remaining === undefined) {
-    return json({ error: "Out of credits", code: "NO_CREDITS" }, 402); // 402 = Payment Required
-  }
+  const prof = (await planRes.json().catch(() => []))?.[0] || {};
+  const plan = prof.plan || "free";
+  const limit = MONTHLY[plan] ?? 15;
 
-  // ---- 3. DO THE WORK: only reached if a credit was successfully spent ----
-  const { samples = "", draft = "", tone = "auto" } = await request.json();
-  if (samples.trim().length < 40 || !draft.trim()) {
-    // give the credit back if the input was junk
-    await addBack(env, userId);
-    return json({ error: "Need writing samples and a draft" }, 400);
-  }
+  // 3a. pre-check quota (don't call the model if already out)
+  const nowM = new Date().toISOString().slice(0, 7);
+  const usedNow = prof.usage_month === nowM ? (prof.usage_count || 0) : 0;
+  if (usedNow >= limit) return json({ error: "Out of rewrites this month", code: "QUOTA" }, 402);
 
-  const toneLine =
-    tone === "auto"
-      ? "Match the tone, rhythm and register of the samples exactly."
-      : `Bias the voice toward a ${tone} tone, while still honouring the samples.`;
-
-  const system = `You are a voice-matching rewriting engine. Given 2-3 writing samples from one person and a draft, rewrite the draft so it reads as if that person wrote it.
-- Study the samples for sentence length, rhythm, punctuation, vocabulary, and how they open/close thoughts.
-- ${toneLine}
-- Preserve the draft's meaning and every concrete fact. Never invent claims.
-- Strip generic AI phrasing ("in today's landscape", "it's important to note", "delve", "moreover").
-- Return ONLY the rewritten text. No preamble, no quotes.`;
-
-  try {
-    const ai = await fetch("https://api.anthropic.com/v1/messages", {
-      method: "POST",
-      headers: {
-        "content-type": "application/json",
-        "x-api-key": env.ANTHROPIC_API_KEY,
-        "anthropic-version": "2023-06-01",
-      },
-      body: JSON.stringify({
-        model: MODEL,
-        max_tokens: 1000,
-        system,
-        messages: [
-          {
-            role: "user",
-            content: `WRITING SAMPLES:\n"""${samples}"""\n\nDRAFT TO REWRITE:\n"""${draft}"""`,
-          },
-        ],
-      }),
+  // 4. resolve the voice
+  let voiceProfile = "", voiceName = "";
+  if (voiceId) {
+    const vRes = await fetch(`${env.SUPABASE_URL}/rest/v1/voices?select=name,fingerprint&id=eq.${voiceId}&user_id=eq.${userId}`, {
+      headers: { apikey: env.SUPABASE_SERVICE_KEY, Authorization: `Bearer ${env.SUPABASE_SERVICE_KEY}` },
     });
-    const data = await ai.json();
-    const output = (data.content || []).map((b) => b.text || "").join("").trim();
-    if (!output) throw new Error("empty");
-    return json({ output, creditsLeft: remaining });
-  } catch (e) {
-    await addBack(env, userId); // model failed → don't charge them
-    return json({ error: "Rewrite failed, credit refunded" }, 502);
+    const v = (await vRes.json().catch(() => []))?.[0];
+    if (!v) return json({ error: "That voice wasn't found." }, 404);
+    voiceProfile = v.fingerprint; voiceName = v.name;
+  } else if (libraryStyle && LIBRARY[libraryStyle]) {
+    voiceProfile = LIBRARY[libraryStyle]; voiceName = libraryStyle;
+  } else if (samples.trim().length >= 40) {
+    voiceProfile = `Match the tone, rhythm and register of these samples exactly:\n${samples}`;
+    voiceName = "quick";
+  } else {
+    return json({ error: "Pick a voice or a library style." }, 400);
   }
-}
 
-// refund one credit if we took payment but couldn't deliver
-function addBack(env, userId) {
-  return fetch(`${env.SUPABASE_URL}/rest/v1/rpc/add_credits`, {
+  // 5. build prompt
+  const useChannel = CHANNELS_ALLOWED[plan] && channel && channel !== "Auto";
+  const channelLine = useChannel ? `\nTune it for this surface: ${channel}.` : "";
+  const system =
+    "You are VoiceEcho, a voice-matching rewriting engine. Rewrite the user's draft so it reads as if the target voice wrote it. " +
+    "Keep the meaning and every fact, name and number exactly — invent nothing. Strip generic AI-isms (delve, in today's landscape, " +
+    "it's important to note, unlock, seamless, robust, tapestry, testament to, etc.). Return ONLY the rewritten text, no preamble.\n\n" +
+    `TARGET VOICE:\n${voiceProfile}${channelLine}`;
+
+  // 6. call the model
+  const aiRes = await fetch("https://api.anthropic.com/v1/messages", {
+    method: "POST",
+    headers: { "content-type": "application/json", "x-api-key": env.ANTHROPIC_API_KEY, "anthropic-version": "2023-06-01" },
+    body: JSON.stringify({ model: MODEL, max_tokens: 1200, system, messages: [{ role: "user", content: draft }] }),
+  });
+  if (!aiRes.ok) return json({ error: "The model is busy — try again in a moment." }, 502);
+  const ai = await aiRes.json();
+  const output = (ai?.content?.[0]?.text || "").trim();
+  if (!output) return json({ error: "Empty response — try again." }, 502);
+
+  // 7. refusal → no charge, no history
+  if (looksLikeRefusal(output)) {
+    return json({ error: "We couldn't rewrite that one — and we didn't count it against your quota.", code: "REFUSAL" }, 409);
+  }
+
+  // 8. spend one rewrite (atomic, race-safe)
+  const spend = await sbAdmin(env, "use_rewrite", { uid: userId, monthly_limit: limit });
+  const remaining = await spend.json().catch(() => null);
+  if (remaining === null || remaining === undefined) {
+    return json({ error: "Out of rewrites this month", code: "QUOTA" }, 402);
+  }
+
+  // 9. count scrubbed AI-isms (rough, for the UI badge)
+  const isms = /\b(delve|in today's landscape|it's important to note|unlock|seamless|robust|tapestry|testament to|elevate|navigate the complexities)\b/gi;
+  const scrubbed = ((draft.match(isms) || []).length);
+
+  // 10. save history (best-effort)
+  await fetch(`${env.SUPABASE_URL}/rest/v1/history`, {
     method: "POST",
     headers: {
       "content-type": "application/json",
       apikey: env.SUPABASE_SERVICE_KEY,
       Authorization: `Bearer ${env.SUPABASE_SERVICE_KEY}`,
     },
-    body: JSON.stringify({ uid: userId, amount: 1 }),
-  });
+    body: JSON.stringify({
+      user_id: userId, voice_id: voiceId, voice_name: voiceName,
+      style: useChannel ? channel : "Auto", draft, output,
+    }),
+  }).catch(() => {});
+
+  return json({ output, used: limit - remaining, limit, remaining, scrubbed });
 }
