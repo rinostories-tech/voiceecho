@@ -3,6 +3,7 @@
 // free (it doesn't spend a monthly rewrite), but it IS capped per plan.
 
 const MODEL = "claude-haiku-4-5-20251001";
+const ADMIN_EMAIL = "rinostories@gmail.com";
 
 // Keep in sync with app/index.html PLANS and rewrite.js
 const VOICE_CAP = { free:1, starter:3, pro:10, studio:25, lifetime:9999 };
@@ -27,10 +28,10 @@ export async function onRequestPost(context) {
     headers: { Authorization: `Bearer ${token}`, apikey: env.SUPABASE_ANON_KEY },
   });
   if (!userRes.ok) return json({ error: "Invalid session" }, 401);
-  const { id: userId } = await userRes.json();
+  const { id: userId, email } = await userRes.json();
 
   // 2. validate input
-  const { name = "", samples = "" } = await request.json().catch(() => ({}));
+  const { name = "", samples = "", overridePlan = null } = await request.json().catch(() => ({}));
   if (!name.trim()) return json({ error: "Give the voice a name." }, 400);
   if (samples.trim().length < 60) return json({ error: "Add more sample text for a good fingerprint." }, 400);
 
@@ -39,7 +40,9 @@ export async function onRequestPost(context) {
     headers: { apikey: env.SUPABASE_SERVICE_KEY, Authorization: `Bearer ${env.SUPABASE_SERVICE_KEY}` },
   });
   const planRows = await planRes.json().catch(() => []);
-  const userPlan = (planRows?.[0]?.plan) || "free";
+  let userPlan = (planRows?.[0]?.plan) || "free";
+  const isAdmin = (email || "").toLowerCase() === ADMIN_EMAIL;
+  if (isAdmin && overridePlan && VOICE_CAP[overridePlan] != null) userPlan = overridePlan;
   const cap = VOICE_CAP[userPlan] ?? 1;
 
   const countRes = await sbAdmin(env, "voice_count", { uid: userId });

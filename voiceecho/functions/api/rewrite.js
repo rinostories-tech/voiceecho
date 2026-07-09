@@ -4,20 +4,35 @@
 // refusal, and saves each successful rewrite to history.
 
 const MODEL = "claude-haiku-4-5-20251001";
+const ADMIN_EMAIL = "rinostories@gmail.com"; // may use overridePlan to test any tier
 
 // Monthly rewrite limits — keep in sync with app/index.html PLANS.
 const MONTHLY = { free:15, starter:200, pro:600, studio:1500, lifetime:100000 };
 const CHANNELS_ALLOWED = { free:false, starter:false, pro:true, studio:true, lifetime:true };
 
 const LIBRARY = {
-  punchy:"Short, direct, high-energy. Cut filler. Lead with the point.",
-  warm:"Warm and human, like talking to a friend. Relaxed, a little informal.",
-  clear:"Plain and clear. Simple words, no jargon, easy to skim.",
-  analytical:"Measured and precise. Evidence-led, careful claims, no hype.",
-  witty:"Light and clever. A dry line is welcome; never forced.",
-  story:"Narrative and vivid. Set a scene, carry a thread.",
-  bold:"Confident and opinionated. Take a clear stance.",
-  formal:"Polished and professional. Complete sentences, respectful register.",
+  // serious / real use cases
+  punchy:"Short, direct, high-energy. Cut filler, lead with the point, keep sentences tight.",
+  warm:"Warm, human and relaxed, like talking to a friend. A little informal, genuinely kind.",
+  clear:"Plain and clear. Simple words, no jargon, short sentences, easy to skim.",
+  professional:"Polished and professional. Complete sentences, respectful register, no slang.",
+  analytical:"Measured and precise. Evidence-led, careful claims, no hype or exaggeration.",
+  story:"Narrative and vivid. Set a scene, carry one thread, land an ending.",
+  bold:"Confident and opinionated. Take a clear stance, own it, no hedging.",
+  closer:"Persuasive and benefit-led. Build a little tension and drive to one clear call to action.",
+  technical:"Technical and exact. Unambiguous, well-structured, correct terminology, no fluff.",
+  support:"Calm, empathetic customer-support tone. Acknowledge, reassure, give the next step.",
+  exec:"Executive brief. Decision-first, TL;DR up top, ruthless about length.",
+  creator:"Casual social-native creator voice. Snappy, hooky, a strong first line.",
+  // for fun (personas — generic, not real people)
+  pirate:"Rewrite as a swashbuckling pirate: nautical slang, 'arr', 'matey', salty and fun.",
+  bard:"Rewrite in theatrical Elizabethan English: thee/thou/thy, flowery, Shakespearean flourish.",
+  buzzword:"Rewrite as a corporate-jargon overlord: synergy, leverage, circle back, drive alignment — maximum buzzwords, played straight.",
+  genz:"Rewrite in Gen Z internet slang: lowercase, 'no cap', 'lowkey', 'it's giving', playful.",
+  cowboy:"Rewrite as a rugged cowboy: frontier drawl, 'reckon', 'partner', 'much obliged'.",
+  noir:"Rewrite as a hard-boiled 1940s noir detective: moody, clipped, world-weary metaphors.",
+  zen:"Rewrite as a calm zen master: spare, serene, almost koan-like, unhurried.",
+  drama:"Rewrite as an over-dramatic theatre kid: grand, breathless, everything is EVERYTHING.",
 };
 
 const json = (obj, status = 200) =>
@@ -47,11 +62,11 @@ export async function onRequestPost(context) {
     headers: { Authorization: `Bearer ${token}`, apikey: env.SUPABASE_ANON_KEY },
   });
   if (!userRes.ok) return json({ error: "Invalid session" }, 401);
-  const { id: userId } = await userRes.json();
+  const { id: userId, email } = await userRes.json();
 
   // 2. input
   const body = await request.json().catch(() => ({}));
-  const { draft = "", voiceId = null, libraryStyle = null, channel = "Auto", samples = "" } = body;
+  const { draft = "", voiceId = null, libraryStyle = null, channel = "Auto", samples = "", overridePlan = null } = body;
   if (!draft.trim()) return json({ error: "Add a draft to rewrite." }, 400);
 
   // 3. plan + limit
@@ -59,7 +74,10 @@ export async function onRequestPost(context) {
     headers: { apikey: env.SUPABASE_SERVICE_KEY, Authorization: `Bearer ${env.SUPABASE_SERVICE_KEY}` },
   });
   const prof = (await planRes.json().catch(() => []))?.[0] || {};
-  const plan = prof.plan || "free";
+  let plan = prof.plan || "free";
+  // admin-only: let the dev toggle actually exercise any tier end-to-end
+  const isAdmin = (email || "").toLowerCase() === ADMIN_EMAIL;
+  if (isAdmin && overridePlan && MONTHLY[overridePlan] != null) plan = overridePlan;
   const limit = MONTHLY[plan] ?? 15;
 
   // 3a. pre-check quota (don't call the model if already out)
