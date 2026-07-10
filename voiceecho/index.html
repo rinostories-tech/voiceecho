@@ -336,7 +336,7 @@
     <a href="#pricing" onclick="closeMenu()">Pricing</a>
     <a href="#faq" onclick="closeMenu()">FAQ</a>
   </div>
-  <a href="/app?upgrade=1" class="btn btn-primary">Rewrite my first draft free →</a>
+  <a href="/app" class="btn btn-primary">Rewrite my first draft free →</a>
 </div>
 
 <nav>
@@ -364,7 +364,7 @@
     <h1>Sound like <span class="hl">you</span>. Not like everything else.</h1>
     <p class="sub">Train VoiceEcho on a few things you've actually written. Then turn any rough idea — or stiff AI draft — into copy in your rhythm, your phrasing, your voice.</p>
     <div class="hero-cta">
-      <a href="/app?upgrade=1" class="btn btn-primary">Rewrite my first draft free</a>
+      <a href="/app" class="btn btn-primary">Rewrite my first draft free</a>
       <a href="#demo" class="btn btn-outline">See it work ↓</a>
     </div>
     <div class="micro">15 free rewrites · no card required</div>
@@ -496,22 +496,22 @@
       <div class="amt">$2.99<span class="per">/week</span></div>
       <div class="bill">billed monthly</div>
       <ul><li>~200 rewrites / mo</li><li>3 saved voices</li><li>Rewrite history</li><li>AI-ism scrubber</li></ul>
-      <a href="/app?plan=starter" class="btn btn-outline">Choose Starter</a>
+      <a href="/app?plan=starter" data-plan="starter" class="btn btn-outline">Choose Starter</a>
     </div>
     <div class="tier pop rv">
       <div class="tag">Most popular</div>
       <div class="nm">Pro</div>
       <div class="amt">$4.99<span class="per">/week</span></div>
       <div class="bill">billed monthly</div>
-      <ul><li>~600 rewrites / mo</li><li>10 saved voices</li><li>Full voice library</li><li>Multi-channel + priority</li></ul>
-      <a href="/app?plan=pro" class="btn btn-primary">Choose Pro</a>
+      <ul><li>~600 rewrites / mo</li><li>10 saved voices</li><li>Full voice library</li><li>Length control — expand or condense</li><li>Multi-channel + priority</li></ul>
+      <a href="/app?plan=pro" data-plan="pro" class="btn btn-primary">Choose Pro</a>
     </div>
     <div class="tier rv">
       <div class="nm">Studio</div>
       <div class="amt">$7.99<span class="per">/week</span></div>
       <div class="bill">billed monthly</div>
       <ul><li>~1,500 rewrites / mo</li><li>25 saved voices</li><li>Everything in Pro</li><li>Fastest speed</li></ul>
-      <a href="/app?plan=studio" class="btn btn-outline">Choose Studio</a>
+      <a href="/app?plan=studio" data-plan="studio" class="btn btn-outline">Choose Studio</a>
     </div>
   </div>
 
@@ -523,7 +523,7 @@
       <ul><li>Everything in Studio</li><li>Unlimited saved voices</li><li>Highest rewrite limits</li><li>Every future feature</li><li>Founding-member badge</li></ul>
     </div>
     <div class="life-buy">
-      <a href="/app?plan=lifetime" class="btn btn-lime">Get Lifetime →</a>
+      <a href="/app?plan=lifetime" data-plan="lifetime" class="btn btn-lime">Get Lifetime →</a>
     </div>
   </div>
 </section>
@@ -549,7 +549,7 @@
   <div class="final rv">
     <h2>Stop sounding like everyone's <span class="hl v">AI</span>.</h2>
     <p>Train your voice in a minute. Ship copy that sounds like you for the rest of the year.</p>
-    <a href="/app?upgrade=1" class="btn btn-lime">Rewrite my first draft free →</a>
+    <a href="/app" class="btn btn-lime">Rewrite my first draft free →</a>
   </div>
 </section>
 
@@ -620,6 +620,38 @@
   demo.addEventListener('mouseenter',()=>paused=true);
   demo.addEventListener('mouseleave',()=>paused=false);
   if(reduce){ci=voices[0].text.length;render();} else tick();
+</script>
+<script>
+  // Pricing buttons: if the visitor already has a session, skip the /app hop and
+  // go straight to their plan's checkout. If not signed in, fall back to /app,
+  // which handles login and then forwards to checkout.
+  (function(){
+    const SUPABASE_URL="https://mmokcvvyaoohibtauodv.supabase.co";
+    const SUPABASE_ANON_KEY="sb_publishable_RT8I_tyEDVY_Wcxhw3yp6A_lTbpRXlP";
+    const CHECKOUT={
+      starter:"https://voiceecho.lemonsqueezy.com/checkout/buy/60385cba-1183-48cc-a6b5-e96c3afa0475",
+      pro:"https://voiceecho.lemonsqueezy.com/checkout/buy/214e0d81-fee2-4764-b3ca-1fdb42b0c34d",
+      studio:"https://voiceecho.lemonsqueezy.com/checkout/buy/756bd835-e6dc-41a8-a8ee-6ec4d6810230",
+      lifetime:"https://voiceecho.lemonsqueezy.com/checkout/buy/d242ce20-9050-4692-8e75-4edce893ce10",
+    };
+    async function goPlan(plan, e){
+      if(e) e.preventDefault();
+      try{
+        const { createClient } = await import("https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm");
+        const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        const { data } = await sb.auth.getSession();
+        const uid = data?.session?.user?.id;
+        if(uid && CHECKOUT[plan]){
+          window.location = `${CHECKOUT[plan]}?checkout[custom][user_id]=${encodeURIComponent(uid)}&checkout[custom][plan]=${plan}`;
+          return;
+        }
+      }catch(err){}
+      window.location = `/app?plan=${plan}`;   // not signed in → log in first, then checkout
+    }
+    document.querySelectorAll("[data-plan]").forEach(el=>{
+      el.addEventListener("click",(e)=>goPlan(el.dataset.plan, e));
+    });
+  })();
 </script>
 </body>
 </html>
