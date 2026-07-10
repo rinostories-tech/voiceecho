@@ -223,6 +223,20 @@
   .plan .pc{font-family:var(--mono);font-size:11px;color:var(--ink-3)}
   .plan .pp{font-family:var(--disp);font-weight:700;font-size:17px}
   .plan .pp small{font-family:var(--mono);font-size:10px;color:var(--ink-3);font-weight:500}
+  .plan.pick{border-color:var(--violet);box-shadow:0 0 0 3px rgba(91,60,255,.12)}
+  .modal{position:relative}
+  .modal .x{position:absolute;top:14px;right:14px;width:30px;height:30px;border-radius:9px;border:1px solid var(--line-2);
+    background:var(--paper);color:var(--ink-2);font-size:18px;line-height:1;cursor:pointer;display:grid;place-items:center;font-family:inherit;padding:0}
+  .modal .x:hover{border-color:var(--ink);color:var(--ink)}
+
+  /* top-bar upgrade button */
+  .tb-upgrade{margin-right:2px}
+  @media(max-width:520px){ .tb-upgrade{padding:8px 11px} .tb-upgrade .lbl{display:none} }
+
+  /* length tuner */
+  .tune{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:2px 0 12px}
+  .tune-lbl{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3)}
+  .length{display:flex;gap:7px;flex-wrap:wrap}
 </style>
 </head>
 <body>
@@ -263,6 +277,7 @@
         <div class="q-bar"><div class="q-fill" id="qFill"></div></div>
       </div>
       <span class="pbadge" id="planBadge">Free</span>
+      <button class="btn btn-lime btn-sm tb-upgrade" id="tbUpgrade">✦ <span class="lbl">Upgrade</span></button>
       <div class="acct">
         <button class="av" id="avBtn">–</button>
         <div class="menu-pop" id="acctMenu">
@@ -312,6 +327,7 @@
       </div>
       <textarea id="draft" rows="7" placeholder="Paste a rough idea, or a stiff AI draft you want to sound like you."></textarea>
       <div class="channels" id="channels"></div>
+      <div class="tune" id="tuneRow"><span class="tune-lbl">Length</span><div class="length" id="length"></div></div>
       <div class="run-row">
         <button class="btn btn-primary" id="run">Rewrite in my voice</button>
       </div>
@@ -361,6 +377,7 @@
 <!-- ============ UPGRADE MODAL ============ -->
 <div class="overlay" id="overlay">
   <div class="modal">
+    <button class="x" id="modalX" aria-label="Close">×</button>
     <h3 id="upTitle">Upgrade your plan</h3>
     <p id="upBody">Move up when you're writing more. Prices are per week.</p>
     <div class="plans">
@@ -423,6 +440,8 @@
     {id:"drama",        name:"Theatre kid 🌟",     grp:"fun"},
   ];
   const CHANNELS = ["Auto","LinkedIn","Email","Newsletter","Product","Tweet"];
+  // Length tuner (Pro+). "default" is always allowed; the rest are gated like channels.
+  const LENGTHS = [["shorter","Shorter"],["default","Default"],["longer","Longer"]];
 
   const $ = (id)=>document.getElementById(id);
   let supabase=null, session=null;
@@ -430,6 +449,7 @@
   let voices=[], history=[];
   let active=null;          // {type:'voice', id, name} | {type:'lib', id, name}
   let channel="Auto";
+  let length="default";
   let usage={used:0, limit:15};
   let lastRun=null;         // for regenerate
 
@@ -438,6 +458,15 @@
 
   // ────────────────────────── AUTH BOOT ──────────────────────────
   async function boot(){
+    // Capture purchase intent passed from the landing page (?plan=pro / ?upgrade=1).
+    // Stash it so it survives the OAuth round-trip, then clean the URL.
+    try{
+      const params=new URLSearchParams(location.search);
+      const pl=params.get("plan"), up=params.get("upgrade");
+      if(pl) sessionStorage.setItem("ve_plan", pl);
+      if(up) sessionStorage.setItem("ve_upgrade", "1");
+      if(pl||up) history.replaceState({}, "", location.pathname);
+    }catch(e){}
     try{
       const { createClient } = await import("https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm");
       supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -455,8 +484,27 @@
     isAdmin = email === ADMIN_EMAIL;
     $("devRow").style.display = isAdmin ? "flex" : "none";
     await loadProfile();
-    renderChannels(); renderLibrary(); render();
+    renderChannels(); renderLength(); renderLibrary(); render();
     await Promise.all([loadVoices(), loadHistory()]);
+    handlePendingIntent();
+  }
+
+  // After a signed-in user lands from a landing-page CTA:
+  //  ?plan=<paid>  → straight to that plan's checkout (the "payment thing")
+  //  ?upgrade=1    → open the plan popup so they can choose
+  function handlePendingIntent(){
+    let p=null,u=null;
+    try{ p=sessionStorage.getItem("ve_plan"); u=sessionStorage.getItem("ve_upgrade"); }catch(e){}
+    if(p){ try{sessionStorage.removeItem("ve_plan");}catch(e){}
+      if(p!=="free" && CHECKOUT[p]){ goToCheckout(p); return; }
+    }
+    if(u){ try{sessionStorage.removeItem("ve_upgrade");}catch(e){} openUpgrade(); }
+  }
+
+  function goToCheckout(planId){
+    if(!CHECKOUT[planId]) return openUpgrade();
+    const uid=session?.user?.id||"";
+    window.location=`${CHECKOUT[planId]}?checkout[custom][user_id]=${encodeURIComponent(uid)}&checkout[custom][plan]=${planId}`;
   }
 
   async function loadProfile(){
@@ -474,6 +522,7 @@
     usage.limit = plan().rewrites;
     $("planBadge").textContent = plan().label;
     $("planBadge").classList.toggle("lifetime", planKey==="lifetime");
+    const tb=$("tbUpgrade"); if(tb) tb.style.display = planKey==="lifetime" ? "none" : "inline-flex";
   }
 
   // ────────────────────────── VOICES ──────────────────────────
@@ -527,6 +576,14 @@
     $("channels").innerHTML = CHANNELS.map((c,i)=>{
       const locked = i>0 && !allow;
       return `<button class="ch ${c===channel?'on':''} ${locked?'lock':''}" data-ch="${c}" data-locked="${locked}">${c}</button>`;
+    }).join('');
+  }
+  function renderLength(){
+    const allow = plan().channels;          // length control unlocks on Pro+ (same tier as channels)
+    if(!allow) length="default";            // keep locked plans on the neutral default
+    $("length").innerHTML = LENGTHS.map(([id,label])=>{
+      const locked = !allow && id!=="default";
+      return `<button class="ch ${id===length?'on':''} ${locked?'lock':''}" data-len="${id}" data-locked="${locked}">${label}</button>`;
     }).join('');
   }
 
@@ -604,6 +661,7 @@
     $("wave").classList.add("go"); $("output").innerHTML=""; $("outTools").style.display="none"; $("scrubbed").style.display="none";
 
     const payload={ draft, channel: plan().channels?channel:"Auto" };
+    if(plan().channels && length!=="default") payload.length=length;
     if(active.type==='voice') payload.voiceId=active.id; else payload.libraryStyle=active.id;
     if(devPlanValue()) payload.overridePlan=devPlanValue();
     lastRun={...payload};
@@ -667,6 +725,7 @@
   function openUpgrade(reason){
     if(reason==="out"){ $("upTitle").textContent="You're out of rewrites this month"; $("upBody").textContent="Upgrade to keep rewriting. Prices are per week, billed monthly."; }
     else if(reason==="voices"){ $("upTitle").textContent="Need more voices"; $("upBody").textContent="Higher plans unlock more saved voices. Prices are per week."; }
+    else if(reason==="length"){ $("upTitle").textContent="Length control is a Pro feature"; $("upBody").textContent="Upgrade to Pro or above to expand or condense any rewrite on the fly. Prices are per week."; }
     else { $("upTitle").textContent="Upgrade your plan"; $("upBody").textContent="Unlock more voices, styles and rewrites. Prices are per week."; }
     $("overlay").classList.add("show");
   }
@@ -688,6 +747,11 @@
     const b=e.target.closest("[data-ch]"); if(!b) return;
     if(b.dataset.locked==="true"){ openUpgrade("channels"); return; }
     channel=b.dataset.ch; renderChannels();
+  });
+  $("length").addEventListener("click",(e)=>{
+    const b=e.target.closest("[data-len]"); if(!b) return;
+    if(b.dataset.locked==="true"){ openUpgrade("length"); return; }
+    length=b.dataset.len; renderLength();
   });
   function goVoices(){ document.querySelector('.mtab[data-p="voices"]')?.click(); window.scrollTo({top:0,behavior:"smooth"}); }
   function goRecent(){ document.querySelector('.mtab[data-p="history"]')?.click(); window.scrollTo({top:0,behavior:"smooth"}); }
@@ -720,18 +784,17 @@
   $("clearVoice").onclick=(e)=>{ e.stopPropagation(); if(isMobile()){ goVoices(); return; } active=null; renderVoices(); renderLibrary(); render(); };
   $("copyBtn").onclick=()=>{ navigator.clipboard?.writeText($("output").textContent); $("copyBtn").textContent="✓ Copied"; setTimeout(()=>$("copyBtn").innerHTML="⧉ Copy",1400); };
 
-  $("devPlan").onchange=async()=>{ applyPlan(); renderVoices(); renderLibrary(); renderChannels(); render(); await loadHistory(); };
+  $("devPlan").onchange=async()=>{ applyPlan(); renderVoices(); renderLibrary(); renderChannels(); renderLength(); render(); await loadHistory(); };
 
   // account menu
   $("avBtn").onclick=(e)=>{ e.stopPropagation(); $("acctMenu").classList.toggle("open"); };
   $("acctMenu").addEventListener("click",(e)=>e.stopPropagation()); // don't close when using dev toggle
   document.addEventListener("click",()=>$("acctMenu").classList.remove("open"));
   $("buyBtn").onclick=()=>{ $("acctMenu").classList.remove("open"); openUpgrade(); };
+  $("tbUpgrade").onclick=()=>openUpgrade();
   $("closeModal").onclick=closeUpgrade;
-  document.querySelectorAll(".plan").forEach(p=>p.onclick=()=>{
-    const uid=session?.user?.id||"";
-    window.location=`${CHECKOUT[p.dataset.plan]}?checkout[custom][user_id]=${uid}&checkout[custom][plan]=${p.dataset.plan}`;
-  });
+  $("modalX").onclick=closeUpgrade;
+  document.querySelectorAll(".plan").forEach(p=>p.onclick=()=>goToCheckout(p.dataset.plan));
 
   // mobile tabs
   document.querySelectorAll(".mtab").forEach(t=>t.onclick=()=>{
