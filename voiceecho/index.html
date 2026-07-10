@@ -211,7 +211,7 @@
   .feats{display:grid;gap:10px}
   .feat{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;transition:border-color .2s}
   .feat[open]{border-color:var(--line-2)}
-  .feat summary{list-style:none;cursor:pointer;padding:16px 18px;font-family:var(--disp);font-weight:600;font-size:16.5px;display:flex;align-items:center;gap:11px}
+  .feat summary{list-style:none;cursor:pointer;padding:16px 18px;font-family:var(--disp);font-weight:600;font-size:16.5px;display:flex;align-items:center;justify-content:flex-start;gap:11px}
   .feat summary::-webkit-details-marker{display:none}
   .feat summary .g{font-size:19px}
   .feat summary::after{content:"+";margin-left:auto;font-family:var(--mono);color:var(--violet);font-size:20px;line-height:1}
@@ -228,7 +228,24 @@
   .hist .r .d{width:6px;height:6px;border-radius:50%;background:var(--violet)}
   .scrub{margin-top:12px;font-family:var(--mono);font-size:12.5px;line-height:1.9;color:var(--ink-2)}
   .scrub s{color:var(--ink-3);text-decoration-color:var(--red)}
-  @media(min-width:720px){.feats{grid-template-columns:1fr 1fr;align-items:start}}
+  /* tablet+ : cards become always-expanded (no accordion) */
+  @media(min-width:720px){
+    .feat>summary{pointer-events:none;cursor:default}
+    .feat>summary::after{display:none}
+    .feat[open] .feat-body{animation:none}
+    .feats{grid-template-columns:1fr 1fr;gap:16px;align-items:stretch}
+  }
+  /* desktop : original bento arrangement */
+  @media(min-width:900px){
+    .feats{grid-template-columns:repeat(6,1fr)}
+    .feat:nth-child(1){order:1;grid-column:span 4}  /* Saved voice profiles */
+    .feat:nth-child(5){order:2;grid-column:span 2}  /* Style fingerprint */
+    .feat:nth-child(3){order:3;grid-column:span 3}  /* Rewrite history */
+    .feat:nth-child(4){order:4;grid-column:span 3}  /* AI-ism scrubber */
+    .feat:nth-child(2){order:5;grid-column:span 2}  /* Voice library */
+    .feat:nth-child(7){order:6;grid-column:span 2}  /* Fact-safe rewrites */
+    .feat:nth-child(6){order:7;grid-column:span 2}  /* Multi-channel tuning */
+  }
 
   .quotes{display:flex;flex-direction:column;gap:28px}
   .quote{border-left:3px solid var(--hi);padding:4px 0 4px 20px}
@@ -246,6 +263,7 @@
   .tier .nm{font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-2);margin-bottom:10px}
   .tier .amt{font-family:var(--disp);font-weight:700;font-size:40px;letter-spacing:-.02em;line-height:1}
   .tier .amt .per{font-family:var(--mono);font-size:12px;font-weight:500;color:var(--ink-3);letter-spacing:0}
+  .tier .bill{font-family:var(--mono);font-size:11px;color:var(--ink-3);letter-spacing:.04em;margin-top:7px}
   .tier ul{list-style:none;padding:0;margin:18px 0 22px;display:flex;flex-direction:column;gap:9px;font-size:13.5px;color:var(--ink-2);flex:1}
   .tier li{display:flex;gap:9px;line-height:1.4}.tier li::before{content:"✓";color:var(--violet);font-weight:700;flex:none}
   .tier .btn{width:100%}
@@ -460,7 +478,7 @@
 <section id="pricing" class="wrap">
   <div class="sec-head rv">
     <div class="kicker"><span class="idx">04</span> Pricing</div>
-    <h2>Simple weekly pricing.</h2>
+    <h2>Simple, flexible pricing.</h2>
     <p class="lead">Start free. Move up when you're writing every day — or pay once and keep it for life.</p>
   </div>
 
@@ -468,26 +486,30 @@
   <div class="weekly">
     <div class="tier rv">
       <div class="nm">Free</div>
-      <div class="amt">$0<span class="per">/wk</span></div>
+      <div class="amt">$0<span class="per">/week</span></div>
+      <div class="bill">free forever</div>
       <ul><li>15 rewrites to start</li><li>1 saved voice</li><li>Core voice-matching</li><li>3 starter styles</li></ul>
       <a href="/app" class="btn btn-outline">Start free</a>
     </div>
     <div class="tier rv">
       <div class="nm">Starter</div>
-      <div class="amt">$2.99<span class="per">/wk</span></div>
+      <div class="amt">$2.99<span class="per">/week</span></div>
+      <div class="bill">billed monthly</div>
       <ul><li>~200 rewrites / mo</li><li>3 saved voices</li><li>Rewrite history</li><li>AI-ism scrubber</li></ul>
       <a href="/app" class="btn btn-outline">Choose Starter</a>
     </div>
     <div class="tier pop rv">
       <div class="tag">Most popular</div>
       <div class="nm">Pro</div>
-      <div class="amt">$4.99<span class="per">/wk</span></div>
+      <div class="amt">$4.99<span class="per">/week</span></div>
+      <div class="bill">billed monthly</div>
       <ul><li>~600 rewrites / mo</li><li>10 saved voices</li><li>Full voice library</li><li>Multi-channel + priority</li></ul>
       <a href="/app" class="btn btn-primary">Choose Pro</a>
     </div>
     <div class="tier rv">
       <div class="nm">Studio</div>
-      <div class="amt">$7.99<span class="per">/wk</span></div>
+      <div class="amt">$7.99<span class="per">/week</span></div>
+      <div class="bill">billed monthly</div>
       <ul><li>~1,500 rewrites / mo</li><li>25 saved voices</li><li>Everything in Pro</li><li>Fastest speed</li></ul>
       <a href="/app" class="btn btn-outline">Choose Studio</a>
     </div>
@@ -542,6 +564,15 @@
 
 <script>
   function closeMenu(){ document.getElementById('menu').classList.remove('open'); }
+
+  // Feature cards: expanded bento on desktop, tap-to-open accordion on mobile.
+  const featMQ = window.matchMedia('(min-width:720px)');
+  function syncFeatures(){
+    const desktop = featMQ.matches;
+    document.querySelectorAll('.feat').forEach((d,i)=>{ d.open = desktop ? true : (i===0); });
+  }
+  syncFeatures();
+  featMQ.addEventListener('change', syncFeatures);
 
   if('IntersectionObserver' in window){
     const io=new IntersectionObserver((es)=>{es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target);}});},{threshold:.14});
