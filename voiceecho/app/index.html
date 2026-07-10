@@ -224,10 +224,6 @@
   .plan .pp{font-family:var(--disp);font-weight:700;font-size:17px}
   .plan .pp small{font-family:var(--mono);font-size:10px;color:var(--ink-3);font-weight:500}
   .plan.pick{border-color:var(--violet);box-shadow:0 0 0 3px rgba(91,60,255,.12)}
-  .modal{position:relative}
-  .modal .x{position:absolute;top:14px;right:14px;width:30px;height:30px;border-radius:9px;border:1px solid var(--line-2);
-    background:var(--paper);color:var(--ink-2);font-size:18px;line-height:1;cursor:pointer;display:grid;place-items:center;font-family:inherit;padding:0}
-  .modal .x:hover{border-color:var(--ink);color:var(--ink)}
 
   /* top-bar upgrade button */
   .tb-upgrade{margin-right:2px}
@@ -377,7 +373,6 @@
 <!-- ============ UPGRADE MODAL ============ -->
 <div class="overlay" id="overlay">
   <div class="modal">
-    <button class="x" id="modalX" aria-label="Close">×</button>
     <h3 id="upTitle">Upgrade your plan</h3>
     <p id="upBody">Move up when you're writing more. Prices are per week.</p>
     <div class="plans">
@@ -458,14 +453,13 @@
 
   // ────────────────────────── AUTH BOOT ──────────────────────────
   async function boot(){
-    // Capture purchase intent passed from the landing page (?plan=pro / ?upgrade=1).
+    // Capture purchase intent passed from the landing page (?plan=pro).
     // Stash it so it survives the OAuth round-trip, then clean the URL.
     try{
       const params=new URLSearchParams(location.search);
-      const pl=params.get("plan"), up=params.get("upgrade");
+      const pl=params.get("plan");
       if(pl) sessionStorage.setItem("ve_plan", pl);
-      if(up) sessionStorage.setItem("ve_upgrade", "1");
-      if(pl||up) history.replaceState({}, "", location.pathname);
+      if(pl) history.replaceState({}, "", location.pathname);
     }catch(e){}
     try{
       const { createClient } = await import("https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm");
@@ -489,16 +483,17 @@
     handlePendingIntent();
   }
 
-  // After a signed-in user lands from a landing-page CTA:
-  //  ?plan=<paid>  → straight to that plan's checkout (the "payment thing")
-  //  ?upgrade=1    → open the plan popup so they can choose
+  // After a signed-in user lands here:
+  //  ?plan=<paid>  → forward straight to that plan's checkout (the "payment thing")
+  //  free plan     → show the upgrade popup on every load
   function handlePendingIntent(){
-    let p=null,u=null;
-    try{ p=sessionStorage.getItem("ve_plan"); u=sessionStorage.getItem("ve_upgrade"); }catch(e){}
+    let p=null;
+    try{ p=sessionStorage.getItem("ve_plan"); }catch(e){}
     if(p){ try{sessionStorage.removeItem("ve_plan");}catch(e){}
-      if(p!=="free" && CHECKOUT[p]){ goToCheckout(p); return; }
+      if(p!=="free" && CHECKOUT[p]){ goToCheckout(p); return; }   // straight to their chosen checkout, no popup
     }
-    if(u){ try{sessionStorage.removeItem("ve_upgrade");}catch(e){} openUpgrade(); }
+    // Free-plan users see the upgrade popup on every load. Paid plans never see it.
+    if(planKey==="free") openUpgrade();
   }
 
   function goToCheckout(planId){
@@ -793,7 +788,6 @@
   $("buyBtn").onclick=()=>{ $("acctMenu").classList.remove("open"); openUpgrade(); };
   $("tbUpgrade").onclick=()=>openUpgrade();
   $("closeModal").onclick=closeUpgrade;
-  $("modalX").onclick=closeUpgrade;
   document.querySelectorAll(".plan").forEach(p=>p.onclick=()=>goToCheckout(p.dataset.plan));
 
   // mobile tabs
