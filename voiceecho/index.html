@@ -90,7 +90,7 @@
   body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.5;
     background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.35'/%3E%3C/svg%3E")}
 
-  .wrap{width:100%;max-width:1160px;margin:0 auto;padding:0 max(22px,env(safe-area-inset-left)) 0 max(22px,env(safe-area-inset-right));position:relative;z-index:2}
+  .wrap{width:100%;max-width:1160px;margin:0 auto;padding-left:max(22px,env(safe-area-inset-left));padding-right:max(22px,env(safe-area-inset-right));position:relative;z-index:2}
 
   .kicker{font-family:var(--mono);font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-3);
     display:flex;align-items:center;gap:10px}
@@ -140,7 +140,7 @@
   }
 
   /* hero */
-  .hero{padding:44px 0 12px}
+  .hero{padding-block:44px 12px}
   .hero .kicker{margin-bottom:22px}
   h1{font-family:var(--disp);font-weight:700;font-size:clamp(40px,10.5vw,92px);line-height:.98;
     letter-spacing:-.03em;margin:0 0 20px;max-width:15ch}
@@ -173,7 +173,7 @@
   @keyframes eq{from{height:12%}to{height:100%}}
 
   @media(min-width:900px){
-    .hero{padding:70px 0 20px;display:grid;grid-template-columns:1.05fr .95fr;gap:54px;align-items:center}
+    .hero{padding-block:70px 20px;display:grid;grid-template-columns:1.05fr .95fr;gap:54px;align-items:center}
     .hero-cta{flex-direction:row}.hero-cta .btn{width:auto}.print{margin-top:0}
   }
 
@@ -186,13 +186,13 @@
   @keyframes scroll{to{transform:translateX(-50%)}}
 
   /* sections */
-  section{padding:64px 0}
+  section{padding-block:64px}
   .sec-head{margin-bottom:38px}
   @media(max-width:640px){
-    section{padding:60px 0}
+    section{padding-block:56px}
     .sec-head{margin-bottom:32px}
     .ticker{margin-top:40px}
-    .hero{padding:40px 0 10px}
+    .hero{padding-block:36px 10px}
     .final{padding:48px 24px}
     /* more air between the stacked steps so 02 / 03 don't crowd */
     .steps{gap:36px}
