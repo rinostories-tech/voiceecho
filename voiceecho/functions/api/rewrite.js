@@ -115,31 +115,39 @@ export async function onRequestPost(context) {
   const channelLine = useChannel ? `\n\nSURFACE FORMAT:\n${CHANNEL_GUIDE[channel]}` : "";
 
   // Length tuner — Pro+ only (same gate as channels). Never invents facts.
-  const LENGTH_GUIDE = {
-    shorter: "LENGTH: Make it noticeably more concise than the draft — cut redundancy and filler, tighten every line, keep only what earns its place. Preserve every fact, name and number.",
-    longer:  "LENGTH: Expand and develop the draft — add natural detail, texture and connective flow so it reads fuller and more complete. Do NOT invent new facts, names or numbers; only elaborate on what's already there.",
-  };
   const lengthAllowed = !!CHANNELS_ALLOWED[plan];
-  // Optional word-count target (typed range). Range takes precedence over the chip.
+  const draftWords = (draft.trim().match(/\S+/g) || []).length;   // gives the model a concrete anchor
+
+  // A typed word range takes precedence over the Shorter/Longer chips.
   const wmin = lengthAllowed && Number.isFinite(+wordMin) && +wordMin > 0 ? Math.round(+wordMin) : null;
   const wmax = lengthAllowed && Number.isFinite(+wordMax) && +wordMax > 0 ? Math.round(+wordMax) : null;
+
   let lengthLine = "";
+  let tokenTarget = 0;                                            // largest likely output → sizes max_tokens
+
   if (wmin && wmax) {
     const lo = Math.min(wmin, wmax), hi = Math.max(wmin, wmax);
-    lengthLine = `\n\nLENGTH: The rewrite MUST be between ${lo} and ${hi} words. Expand with natural, relevant detail or trim redundancy as needed to land in that range — but keep every fact, name and number and invent nothing.`;
+    lengthLine = `\n\nLENGTH: The rewrite MUST land between ${lo} and ${hi} words — count as you write and stay inside that range. Expand with natural, relevant detail or trim redundancy to hit it, but keep every fact, name and number and invent nothing.`;
+    tokenTarget = hi;
   } else if (wmax) {
-    lengthLine = `\n\nLENGTH: Keep the rewrite to at most ${wmax} words. Tighten and cut redundancy as needed while preserving every fact, name and number.`;
+    lengthLine = `\n\nLENGTH: The rewrite MUST be at most ${wmax} words. Tighten and cut redundancy as needed while preserving every fact, name and number.`;
+    tokenTarget = wmax;
   } else if (wmin) {
-    lengthLine = `\n\nLENGTH: Make the rewrite at least ${wmin} words, expanding with natural, relevant detail — never padding with filler and never inventing facts, names or numbers.`;
-  } else if (lengthAllowed && LENGTH_GUIDE[length]) {
-    lengthLine = `\n\n${LENGTH_GUIDE[length]}`;
+    lengthLine = `\n\nLENGTH: The rewrite MUST be at least ${wmin} words. Expand with natural, relevant detail — never pad with filler and never invent facts, names or numbers.`;
+    tokenTarget = wmin;
+  } else if (lengthAllowed && length === "shorter") {
+    const target = Math.max(1, Math.round(draftWords / 2));
+    lengthLine = `\n\nLENGTH: Make the rewrite about HALF the length of the draft — aim for roughly ${target} words (the draft is about ${draftWords}). Get there by cutting redundancy, filler and repetition, never by dropping information. Keep every fact, name and number.`;
+    // shorter output → default budget is plenty
+  } else if (lengthAllowed && length === "longer") {
+    const target = draftWords * 2;
+    lengthLine = `\n\nLENGTH: Make the rewrite about DOUBLE the length of the draft — aim for roughly ${target} words (the draft is about ${draftWords}). Expand with natural detail, elaboration, examples and connective flow that suit the voice. Do NOT invent new facts, names or numbers; only develop what's already there.`;
+    tokenTarget = target;
   }
 
-  // give the model enough room when a long target is requested
+  // give the model room when a long output is expected
   let maxTokens = 1200;
-  if (wmax)      maxTokens = Math.min(4096, Math.max(1200, Math.ceil(wmax * 2.2) + 150));
-  else if (wmin) maxTokens = Math.min(4096, Math.max(1200, Math.ceil(wmin * 2.6) + 200));
-  else if (lengthAllowed && length === "longer") maxTokens = 1800;
+  if (tokenTarget > 0) maxTokens = Math.min(4096, Math.max(1200, Math.ceil(tokenTarget * 2.4) + 200));
 
   const system =
     "You are VoiceEcho, a voice-matching rewriting ENGINE — not a chat assistant. " +
