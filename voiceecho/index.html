@@ -114,6 +114,12 @@
   .btn-outline:hover{border-color:var(--ink)}
   .btn-lime{background:var(--hi);color:var(--ink);font-weight:700}
   .btn-lime:hover{transform:translateY(-2px);filter:brightness(1.05)}
+  /* plan buttons light up + spin while resolving the checkout */
+  .btn.loading{pointer-events:none;animation:btnglow 1.1s ease-in-out infinite}
+  .btn.loading::after{content:"";width:15px;height:15px;margin-left:2px;border:2px solid currentColor;
+    border-right-color:transparent;border-radius:50%;animation:btnspin .6s linear infinite;flex:0 0 auto}
+  @keyframes btnspin{to{transform:rotate(360deg)}}
+  @keyframes btnglow{0%,100%{filter:brightness(1)}50%{filter:brightness(1.14)}}
 
   /* nav */
   nav{position:sticky;top:0;z-index:50;background:rgba(250,248,242,.82);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
@@ -634,8 +640,11 @@
       studio:"https://voiceecho.lemonsqueezy.com/checkout/buy/756bd835-e6dc-41a8-a8ee-6ec4d6810230",
       lifetime:"https://voiceecho.lemonsqueezy.com/checkout/buy/d242ce20-9050-4692-8e75-4edce893ce10",
     };
-    async function goPlan(plan, e){
+    async function goPlan(el, e){
       if(e) e.preventDefault();
+      if(el.classList.contains("loading")) return;   // ignore double-taps
+      el.classList.add("loading");                    // light up + spinner until we navigate away
+      const plan = el.dataset.plan;
       try{
         const { createClient } = await import("https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm");
         const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -649,7 +658,7 @@
       window.location = `/app?plan=${plan}`;   // not signed in → log in first, then checkout
     }
     document.querySelectorAll("[data-plan]").forEach(el=>{
-      el.addEventListener("click",(e)=>goPlan(el.dataset.plan, e));
+      el.addEventListener("click",(e)=>goPlan(el, e));
     });
   })();
 </script>
