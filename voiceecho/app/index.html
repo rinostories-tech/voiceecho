@@ -233,7 +233,12 @@
 
   /* top-bar upgrade button */
   .tb-upgrade{margin-right:2px}
-  @media(max-width:520px){ .tb-upgrade{padding:8px 11px} .tb-upgrade .lbl{display:none} }
+  @media(max-width:520px){
+    .topbar-in{gap:8px}
+    .logo .logo-txt{display:none}            /* shrink brand to the mark so the button fits */
+    .tb-upgrade{padding:8px 13px}
+    .tb-upgrade .star{display:none}          /* drop the ✦ but keep the "Upgrade" label */
+  }
 
   /* length tuner */
   .tune{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:2px 0 12px}
@@ -280,14 +285,14 @@
 <div id="app" style="display:none">
   <div class="topbar">
     <div class="topbar-in">
-      <a href="/" class="logo"><span class="mark">◈</span> VoiceEcho</a>
+      <a href="/" class="logo"><span class="mark">◈</span> <span class="logo-txt">VoiceEcho</span></a>
       <div class="tb-spacer"></div>
       <div class="quota" id="quota" title="Rewrites used this month">
         <div class="q-top"><span id="qLabel">— / —</span><span>this month</span></div>
         <div class="q-bar"><div class="q-fill" id="qFill"></div></div>
       </div>
       <span class="pbadge" id="planBadge">Free</span>
-      <button class="btn btn-lime btn-sm tb-upgrade" id="tbUpgrade">✦ <span class="lbl">Upgrade</span></button>
+      <button class="btn btn-lime btn-sm tb-upgrade" id="tbUpgrade"><span class="star">✦</span> <span class="lbl">Upgrade</span></button>
       <div class="acct">
         <button class="av" id="avBtn">–</button>
         <div class="menu-pop" id="acctMenu">
