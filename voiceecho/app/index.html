@@ -161,7 +161,10 @@
   @media(min-width:960px){
     .mtabs{display:none}
     .ws{grid-template-columns:270px 1fr 300px;align-items:start}
-    .panel{position:sticky;top:76px}
+    /* side rails scroll on their own so the full voice list + library (and history) are reachable */
+    .panel-voices,.panel-history{position:sticky;top:76px;max-height:calc(100dvh - 92px);overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--line-2) transparent}
+    .panel-voices::-webkit-scrollbar,.panel-history::-webkit-scrollbar{width:8px}
+    .panel-voices::-webkit-scrollbar-thumb,.panel-history::-webkit-scrollbar-thumb{background:var(--line-2);border-radius:8px}
     .panel-editor{position:static}
   }
   @media(max-width:959px){
@@ -394,11 +397,12 @@
 <div class="overlay" id="editOverlay">
   <div class="modal">
     <h3>Edit voice</h3>
-    <p>This is the voice prompt VoiceEcho uses to rewrite in this voice. Rename it, or fine-tune the prompt itself and save.</p>
+    <p>These are the writing samples this voice is built from. Edit them and we'll rebuild the voice from your changes.</p>
     <label for="eName">Name</label>
     <input id="eName" type="text" placeholder="Voice name" style="width:100%;background:var(--paper);border:1px solid var(--line-2);border-radius:11px;padding:12px;font-family:inherit;font-size:14.5px;margin-bottom:14px;color:var(--ink)">
-    <label for="eFingerprint">Voice prompt</label>
-    <textarea id="eFingerprint" rows="9" placeholder="The voice instructions VoiceEcho follows."></textarea>
+    <label for="eSamples">Your writing samples</label>
+    <textarea id="eSamples" rows="9" placeholder="Paste the emails, posts or notes this voice should sound like."></textarea>
+    <div id="editNote" style="display:none;font-size:12.5px;color:var(--ink-3);line-height:1.5;margin-top:8px">This voice was trained before we started saving your original text. Paste your writing samples here and save to rebuild it.</div>
     <div class="err" id="editErr"></div>
     <button class="btn btn-primary" id="editSave" style="width:100%;margin-top:14px">Save changes</button>
     <button class="close" id="editClose">Cancel</button>
@@ -785,41 +789,52 @@
   }
   const closeUpgrade=()=>$("overlay").classList.remove("show");
 
-  // ── edit an existing custom voice: load its prompt, let the user change it ──
-  let editingVoiceId=null;
+  // ── edit an existing custom voice: show the ORIGINAL samples, rebuild on save ──
+  let editingVoiceId=null, editOriginalSamples="";
   async function openEditVoice(id){
-    editingVoiceId=id;
-    $("editErr").textContent="";
-    $("eName").value=""; $("eFingerprint").value="Loading…"; $("eFingerprint").disabled=true;
-    $("editSave").disabled=true;
+    editingVoiceId=id; editOriginalSamples="";
+    $("editErr").textContent=""; $("editNote").style.display="none";
+    $("eName").value=""; $("eSamples").value="Loading…"; $("eSamples").disabled=true; $("editSave").disabled=true;
     $("editOverlay").classList.add("show");
     try{
-      const { data, error } = await supabase.from("voices").select("name,fingerprint").eq("id",id).single();
-      if(error) throw error;
+      let data;
+      const r1 = await supabase.from("voices").select("name,samples").eq("id",id).single();
+      if(r1.error){                                   // samples column may not exist yet → fall back
+        const r2 = await supabase.from("voices").select("name").eq("id",id).single();
+        if(r2.error) throw r2.error;
+        data = r2.data;
+      } else data = r1.data;
       $("eName").value = data?.name || "";
-      $("eFingerprint").value = data?.fingerprint || "";
+      const s = data?.samples || "";
+      editOriginalSamples = s.trim();
+      $("eSamples").value = s;
+      if(!s) $("editNote").style.display="block";     // legacy voice: no stored samples
     }catch(e){
-      $("eFingerprint").value="";
+      $("eSamples").value=""; editOriginalSamples="";
       $("editErr").textContent="Couldn't load this voice — try again.";
     }finally{
-      $("eFingerprint").disabled=false; $("editSave").disabled=false;
+      $("eSamples").disabled=false; $("editSave").disabled=false;
     }
   }
   const closeEdit=()=>$("editOverlay").classList.remove("show");
   async function saveVoiceEdit(){
     $("editErr").textContent="";
-    const name=$("eName").value.trim(), fingerprint=$("eFingerprint").value.trim();
+    const name=$("eName").value.trim(), samples=$("eSamples").value.trim();
     if(!name){ $("editErr").textContent="Give this voice a name."; return; }
-    if(fingerprint.length<20){ $("editErr").textContent="The voice prompt looks too short — add a bit more detail."; return; }
-    const btn=$("editSave"); btn.disabled=true; btn.innerHTML='<span class="spin"></span> Saving…';
+    const samplesChanged = samples !== editOriginalSamples;
+    if(samplesChanged && samples.length<60){ $("editErr").textContent="Add a bit more sample text (2–3 paragraphs) to rebuild the voice."; return; }
+    const btn=$("editSave"); btn.disabled=true; btn.innerHTML='<span class="spin"></span> '+(samplesChanged?"Rebuilding voice…":"Saving…");
     try{
-      const { error } = await supabase.from("voices").update({ name, fingerprint }).eq("id",editingVoiceId);
-      if(error) throw error;
+      const r=await fetch("/api/train-voice",{method:"POST",
+        headers:{"content-type":"application/json",Authorization:`Bearer ${session.access_token}`},
+        body:JSON.stringify({ voiceId:editingVoiceId, name, samples, regenerate:samplesChanged, overridePlan:devPlanValue()||undefined })});
+      const data=await r.json().catch(()=>({}));
+      if(!r.ok) throw new Error(data.error||`Error ${r.status}`);
       if(active?.type==='voice' && active.id===editingVoiceId){ active.name=name; }
       closeEdit();
       await loadVoices(); render();
     }catch(e){
-      $("editErr").textContent=(e.message||"Couldn't save — try again.")+" (If this keeps failing, the voices table may need an UPDATE policy.)";
+      $("editErr").textContent=e.message||"Couldn't save — try again.";
     }finally{
       btn.disabled=false; btn.textContent="Save changes"; editingVoiceId=null;
     }
