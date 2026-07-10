@@ -90,9 +90,12 @@
   .voice .vi{width:30px;height:30px;border-radius:8px;background:var(--ink);color:var(--paper);display:grid;place-items:center;font-weight:700;font-size:12px;flex:none}
   .voice .vn{font-weight:600;font-size:14px;line-height:1.2}
   .voice .vm{font-family:var(--mono);font-size:10.5px;color:var(--ink-3)}
-  .voice .vx{margin-left:auto;color:var(--ink-3);font-size:16px;opacity:0;transition:.15s;background:none;border:none;cursor:pointer;padding:2px 4px}
-  .voice:hover .vx{opacity:1}
+  .voice .vactions{margin-left:auto;display:flex;gap:1px;align-items:center;opacity:0;transition:.15s}
+  .voice:hover .vactions{opacity:1}
+  .voice .vx{color:var(--ink-3);font-size:15px;transition:.15s;background:none;border:none;cursor:pointer;padding:3px 5px;line-height:1;border-radius:6px}
   .voice .vx:hover{color:var(--red)}
+  .voice .vedit:hover{color:var(--violet)}
+  @media(hover:none){ .voice .vactions{opacity:1} }
   .empty{font-size:13px;color:var(--ink-3);line-height:1.5;padding:8px 2px 14px}
   .sub-h{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3);margin:18px 0 10px}
   .lib{display:flex;flex-wrap:wrap;gap:7px}
@@ -233,6 +236,14 @@
   .tune{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:2px 0 12px}
   .tune-lbl{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3)}
   .length{display:flex;gap:7px;flex-wrap:wrap}
+  .tune-range{display:flex;align-items:center;gap:6px;transition:.15s}
+  .tune-range.lock{opacity:.5}
+  .wnum{width:58px;background:var(--paper);border:1px solid var(--line-2);border-radius:9px;padding:7px 8px;
+    font-family:var(--mono);font-size:12px;color:var(--ink);text-align:center;-moz-appearance:textfield}
+  .wnum:focus{outline:none;border-color:var(--violet);box-shadow:0 0 0 3px rgba(91,60,255,.12)}
+  .wnum::-webkit-outer-spin-button,.wnum::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+  .tr-dash{color:var(--ink-3);font-family:var(--mono);font-size:12px}
+  .tr-lbl{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3)}
 </style>
 </head>
 <body>
@@ -323,7 +334,16 @@
       </div>
       <textarea id="draft" rows="7" placeholder="Paste a rough idea, or a stiff AI draft you want to sound like you."></textarea>
       <div class="channels" id="channels"></div>
-      <div class="tune" id="tuneRow"><span class="tune-lbl">Length</span><div class="length" id="length"></div></div>
+      <div class="tune" id="tuneRow">
+        <span class="tune-lbl">Length</span>
+        <div class="length" id="length"></div>
+        <span class="tune-range" id="tuneRange">
+          <input id="wordMin" class="wnum" type="number" min="1" inputmode="numeric" placeholder="min">
+          <span class="tr-dash">–</span>
+          <input id="wordMax" class="wnum" type="number" min="1" inputmode="numeric" placeholder="max">
+          <span class="tr-lbl">words</span>
+        </span>
+      </div>
       <div class="run-row">
         <button class="btn btn-primary" id="run">Rewrite in my voice</button>
       </div>
@@ -367,6 +387,21 @@
     <div class="err" id="trainErr"></div>
     <button class="btn btn-primary" id="trainSave" style="width:100%;margin-top:14px">Build my voice</button>
     <button class="close" id="trainClose">Cancel</button>
+  </div>
+</div>
+
+<!-- ============ EDIT VOICE MODAL ============ -->
+<div class="overlay" id="editOverlay">
+  <div class="modal">
+    <h3>Edit voice</h3>
+    <p>This is the voice prompt VoiceEcho uses to rewrite in this voice. Rename it, or fine-tune the prompt itself and save.</p>
+    <label for="eName">Name</label>
+    <input id="eName" type="text" placeholder="Voice name" style="width:100%;background:var(--paper);border:1px solid var(--line-2);border-radius:11px;padding:12px;font-family:inherit;font-size:14.5px;margin-bottom:14px;color:var(--ink)">
+    <label for="eFingerprint">Voice prompt</label>
+    <textarea id="eFingerprint" rows="9" placeholder="The voice instructions VoiceEcho follows."></textarea>
+    <div class="err" id="editErr"></div>
+    <button class="btn btn-primary" id="editSave" style="width:100%;margin-top:14px">Save changes</button>
+    <button class="close" id="editClose">Cancel</button>
   </div>
 </div>
 
@@ -540,7 +575,10 @@
         <div class="voice ${active?.type==='voice'&&active.id===v.id?'on':''}" data-id="${v.id}">
           <div class="vi">${escapeHtml((v.name||'V')[0].toUpperCase())}</div>
           <div><div class="vn">${escapeHtml(v.name)}</div><div class="vm">saved voice</div></div>
-          <button class="vx" data-del="${v.id}" title="Delete">×</button>
+          <div class="vactions">
+            <button class="vx vedit" data-edit="${v.id}" title="Edit voice">✎</button>
+            <button class="vx" data-del="${v.id}" title="Delete">×</button>
+          </div>
         </div>`).join('');
     }
     // voice cap / upgrade nudge
@@ -580,6 +618,22 @@
       const locked = !allow && id!=="default";
       return `<button class="ch ${id===length?'on':''} ${locked?'lock':''}" data-len="${id}" data-locked="${locked}">${label}</button>`;
     }).join('');
+    // word-range inputs: locked (and cleared) on non-Pro plans
+    const tr=$("tuneRange"), wmin=$("wordMin"), wmax=$("wordMax");
+    if(tr){
+      tr.classList.toggle("lock", !allow);
+      if(!allow){ if(wmin) wmin.value=""; if(wmax) wmax.value=""; }
+    }
+  }
+  // Read a valid word range from the inputs (Pro+ only). Auto-orders min/max.
+  function getWordRange(){
+    if(!plan().channels) return {};
+    const a=parseInt($("wordMin").value,10), b=parseInt($("wordMax").value,10);
+    const out={};
+    if(Number.isFinite(a)&&a>0) out.wordMin=a;
+    if(Number.isFinite(b)&&b>0) out.wordMax=b;
+    if(out.wordMin&&out.wordMax&&out.wordMin>out.wordMax){ const t=out.wordMin; out.wordMin=out.wordMax; out.wordMax=t; }
+    return out;
   }
 
   // ────────────────────────── HISTORY ──────────────────────────
@@ -656,7 +710,12 @@
     $("wave").classList.add("go"); $("output").innerHTML=""; $("outTools").style.display="none"; $("scrubbed").style.display="none";
 
     const payload={ draft, channel: plan().channels?channel:"Auto" };
-    if(plan().channels && length!=="default") payload.length=length;
+    if(plan().channels){
+      if(length!=="default") payload.length=length;
+      const wr=getWordRange();
+      if(wr.wordMin) payload.wordMin=wr.wordMin;
+      if(wr.wordMax) payload.wordMax=wr.wordMax;
+    }
     if(active.type==='voice') payload.voiceId=active.id; else payload.libraryStyle=active.id;
     if(devPlanValue()) payload.overridePlan=devPlanValue();
     lastRun={...payload};
@@ -726,9 +785,51 @@
   }
   const closeUpgrade=()=>$("overlay").classList.remove("show");
 
+  // ── edit an existing custom voice: load its prompt, let the user change it ──
+  let editingVoiceId=null;
+  async function openEditVoice(id){
+    editingVoiceId=id;
+    $("editErr").textContent="";
+    $("eName").value=""; $("eFingerprint").value="Loading…"; $("eFingerprint").disabled=true;
+    $("editSave").disabled=true;
+    $("editOverlay").classList.add("show");
+    try{
+      const { data, error } = await supabase.from("voices").select("name,fingerprint").eq("id",id).single();
+      if(error) throw error;
+      $("eName").value = data?.name || "";
+      $("eFingerprint").value = data?.fingerprint || "";
+    }catch(e){
+      $("eFingerprint").value="";
+      $("editErr").textContent="Couldn't load this voice — try again.";
+    }finally{
+      $("eFingerprint").disabled=false; $("editSave").disabled=false;
+    }
+  }
+  const closeEdit=()=>$("editOverlay").classList.remove("show");
+  async function saveVoiceEdit(){
+    $("editErr").textContent="";
+    const name=$("eName").value.trim(), fingerprint=$("eFingerprint").value.trim();
+    if(!name){ $("editErr").textContent="Give this voice a name."; return; }
+    if(fingerprint.length<20){ $("editErr").textContent="The voice prompt looks too short — add a bit more detail."; return; }
+    const btn=$("editSave"); btn.disabled=true; btn.innerHTML='<span class="spin"></span> Saving…';
+    try{
+      const { error } = await supabase.from("voices").update({ name, fingerprint }).eq("id",editingVoiceId);
+      if(error) throw error;
+      if(active?.type==='voice' && active.id===editingVoiceId){ active.name=name; }
+      closeEdit();
+      await loadVoices(); render();
+    }catch(e){
+      $("editErr").textContent=(e.message||"Couldn't save — try again.")+" (If this keeps failing, the voices table may need an UPDATE policy.)";
+    }finally{
+      btn.disabled=false; btn.textContent="Save changes"; editingVoiceId=null;
+    }
+  }
+
   // ────────────────────────── EVENTS ──────────────────────────
-  // voice list (select / delete)
+  // voice list (select / edit / delete)
   $("voiceList").addEventListener("click",async(e)=>{
+    const ed=e.target.closest("[data-edit]");
+    if(ed){ e.stopPropagation(); openEditVoice(ed.dataset.edit); return; }
     const del=e.target.closest("[data-del]");
     if(del){ e.stopPropagation(); if(confirm("Delete this voice?")){ try{ await supabase.from("voices").delete().eq("id",del.dataset.del);}catch{} if(active?.id===del.dataset.del) active=null; await loadVoices(); render(); } return; }
     const row=e.target.closest(".voice"); if(row){ selectVoice(row.dataset.id); if(isMobile()) document.querySelector('.mtab[data-p="editor"]')?.click(); }
@@ -773,6 +874,13 @@
   $("trainBtn").onclick=openTrain;
   $("trainClose").onclick=closeTrain;
   $("trainSave").onclick=trainVoice;
+  $("editClose").onclick=closeEdit;
+  $("editSave").onclick=saveVoiceEdit;
+  // typing a word range is Pro+; on locked plans, nudge to upgrade instead
+  ["wordMin","wordMax"].forEach(id=>{
+    const el=$(id); if(!el) return;
+    el.addEventListener("focus",()=>{ if(!plan().channels){ el.blur(); openUpgrade("length"); } });
+  });
   $("run").onclick=doRewrite;
   $("regen").onclick=doRewrite;
   $("activeVoiceBar").onclick=(e)=>{ if(e.target.closest("#clearVoice")) return; if(isMobile()) goVoices(); };
