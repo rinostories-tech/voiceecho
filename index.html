@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Contact — EchoWrite</title>
+<meta name="theme-color" content="#faf8f2">
+<meta name="robots" content="index, follow">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+  :root{--paper:#faf8f2;--card:#fffdf8;--ink:#17150e;--ink-2:#57534a;--ink-3:#8a877b;--line:#e5e0d1;--violet:#5b3cff;--hi:#ddf24a;
+    --disp:"Bricolage Grotesque",sans-serif;--sans:"Inter",system-ui,sans-serif;--mono:"JetBrains Mono",monospace}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);line-height:1.6;font-size:16px}
+  a{color:var(--violet);text-decoration:none}a:hover{text-decoration:underline}
+  .wrap{max-width:640px;margin:0 auto;padding:0 max(22px,env(safe-area-inset-left))}
+  nav{border-bottom:1px solid var(--line);background:rgba(250,248,242,.85);backdrop-filter:blur(10px);position:sticky;top:0}
+  .nav-in{max-width:640px;margin:0 auto;padding:0 22px;height:62px;display:flex;align-items:center;justify-content:space-between}
+  .logo{display:flex;align-items:center;gap:9px;font-family:var(--disp);font-weight:700;font-size:18px}
+  .logo .mark{width:26px;height:26px;border-radius:7px;display:grid;place-items:center;font-size:13px;color:var(--paper);background:var(--ink)}
+  .nav-in a.home{font-size:14px;color:var(--ink-2)}
+  h1{font-family:var(--disp);font-weight:700;font-size:clamp(32px,8vw,48px);letter-spacing:-.02em;margin:52px 0 10px}
+  .lead{color:var(--ink-2);font-size:18px;margin-bottom:34px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:24px;margin-bottom:14px}
+  .card .k{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3);margin-bottom:8px}
+  .card .v{font-family:var(--disp);font-weight:600;font-size:20px}
+  .card p{margin:8px 0 0;color:var(--ink-2);font-size:14.5px}
+  .hl{background:linear-gradient(transparent 60%,var(--hi) 60%);padding:0 3px}
+  footer{border-top:1px solid var(--line);margin-top:52px;padding:30px 0;font-size:13.5px;color:var(--ink-3)}
+  footer a{color:var(--ink-2)}
+</style>
+</head>
+<body>
+<nav><div class="nav-in"><a href="/" class="logo"><span class="mark">◈</span> EchoWrite</a><a href="/" class="home">← Home</a></div></nav>
+<main class="wrap">
+  <h1>Get in <span class="hl">touch</span></h1>
+  <p class="lead">Questions, feedback, billing, or a bug — we read everything.</p>
+
+  <div class="card">
+    <div class="k">Email us</div>
+    <div class="v"><a href="mailto:[support email]">[support email]</a></div>
+    <p>Best for support, account help, refunds, and privacy requests. We aim to reply within [1–2 business days].</p>
+  </div>
+
+  <div class="card">
+    <div class="k">Billing &amp; plans</div>
+    <div class="v"><a href="/#pricing">See pricing →</a></div>
+    <p>Manage or cancel your subscription from your account, or email us and we'll sort it.</p>
+  </div>
+
+  <div class="card">
+    <div class="k">Legal</div>
+    <div class="v"><a href="/privacy">Privacy</a> · <a href="/terms">Terms</a></div>
+    <p>Operated by [your legal entity], [location].</p>
+  </div>
+
+  <footer>© 2026 EchoWrite · <a href="/">Home</a> · <a href="/privacy">Privacy</a> · <a href="/terms">Terms</a></footer>
+</main>
+</body>
+</html>
