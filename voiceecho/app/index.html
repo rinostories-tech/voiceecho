@@ -116,6 +116,9 @@
   textarea{width:100%;background:var(--paper);border:1px solid var(--line-2);border-radius:12px;padding:14px;
     color:var(--ink);font-family:inherit;font-size:15px;line-height:1.55;resize:vertical;transition:.15s}
   textarea:focus{outline:none;border-color:var(--violet);box-shadow:0 0 0 3px rgba(91,60,255,.12)}
+  .charcount{font-family:var(--mono);font-size:11.5px;color:var(--ink-3);text-align:right;margin-top:6px;letter-spacing:.02em}
+  .charcount.over{color:var(--red)}
+  .charcount b{color:var(--violet);cursor:pointer;text-decoration:underline;text-underline-offset:2px}
   .channels{display:flex;flex-wrap:wrap;gap:7px;margin:14px 0}
   .ch{font-family:var(--mono);font-size:12px;padding:7px 11px;border-radius:9px;border:1px solid var(--line-2);
     background:var(--paper);color:var(--ink-2);cursor:pointer;transition:.15s}
@@ -343,6 +346,7 @@
         <span class="swap" id="clearVoice" style="display:none">change</span>
       </div>
       <textarea id="draft" rows="7" placeholder="Paste a rough idea, or a stiff AI draft you want to sound like you."></textarea>
+      <div class="charcount" id="charcount"></div>
       <div class="channels" id="channels"></div>
       <div class="tune" id="tuneRow">
         <span class="tune-lbl">Length</span>
@@ -448,11 +452,11 @@
   // Plan matrix — MUST match functions/api/rewrite.js and the pricing page.
   // These drive the UI only. Real limits are enforced server-side.
   const PLANS = {
-    free:     { label:"Free",     voices:1,    channels:false, historyDepth:3,   rewrites:15     },
-    starter:  { label:"Starter",  voices:3,    channels:false, historyDepth:50,  rewrites:200    },
-    pro:      { label:"Pro",      voices:10,   channels:true,  historyDepth:200, rewrites:600    },
-    studio:   { label:"Studio",   voices:25,   channels:true,  historyDepth:500, rewrites:1500   },
-    lifetime: { label:"Lifetime", voices:9999, channels:true,  historyDepth:999, rewrites:100000 },
+    free:     { label:"Free",     voices:1,    channels:false, historyDepth:3,   rewrites:15,     chars:200      },
+    starter:  { label:"Starter",  voices:3,    channels:false, historyDepth:50,  rewrites:200,    chars:1000     },
+    pro:      { label:"Pro",      voices:10,   channels:true,  historyDepth:200, rewrites:600,    chars:3000     },
+    studio:   { label:"Studio",   voices:25,   channels:true,  historyDepth:500, rewrites:1500,   chars:Infinity },
+    lifetime: { label:"Lifetime", voices:9999, channels:true,  historyDepth:999, rewrites:100000, chars:Infinity },
   };
   // Voice library. free:true = usable on Free; the rest are paywalled.
   // grp groups them in the UI. Descriptions live server-side in rewrite.js.
@@ -699,6 +703,19 @@
     $("qFill").style.width = limit>=100000 ? "8%" : Math.min(100,(used/limit)*100)+"%";
     $("activeVoiceName").textContent = active ? active.name : "Pick a voice →";
     $("clearVoice").style.display = active ? "inline" : "none";
+    renderChars();
+  }
+
+  // live character counter under the draft — reflects the plan's per-rewrite limit
+  function renderChars(){
+    const el=$("charcount"); if(!el) return;
+    const cap=plan().chars, n=$("draft").value.length;
+    if(cap===Infinity){ el.classList.remove("over"); el.textContent = n ? `${n.toLocaleString()} characters · no limit` : ""; return; }
+    const over = n>cap;
+    el.classList.toggle("over", over);
+    el.innerHTML = over
+      ? `${n.toLocaleString()} / ${cap.toLocaleString()} — over your ${plan().label} limit. <b data-up>Upgrade →</b>`
+      : `${n.toLocaleString()} / ${cap.toLocaleString()}`;
   }
 
   // ────────────────────────── SELECTION ──────────────────────────
@@ -714,6 +731,8 @@
     const draft=$("draft").value.trim();
     if(!active){ $("err").textContent="Pick a voice on the left (or a library tone) first."; return; }
     if(!draft){ $("err").textContent="Add a draft to rewrite."; return; }
+    const cap=plan().chars;
+    if(cap!==Infinity && draft.length>cap){ openUpgrade("chars"); return; }
     if(!session){ $("err").textContent="You're signed out — refresh and sign in again."; return; }
 
     const ctrl=new AbortController(); rewriteCtrl=ctrl;
@@ -741,6 +760,7 @@
       try{ data=JSON.parse(raw); }catch{ throw new Error(`Server returned ${r.status}. Check /api/rewrite is deployed with its env vars.`); }
 
       if(r.status===499 || data.code==="ABORTED"){ return; } // cancelled — no charge
+      if(r.status===403 && data.code==="CHAR_LIMIT"){ openUpgrade("chars"); return; }
       if(r.status===409 && data.code==="REFUSAL"){
         $("output").innerHTML=`<div class="ph"><span style="font-size:24px">🙅</span>${escapeHtml(data.error||"Couldn't rewrite that one — and we didn't count it.")}</div>`;
         return;
@@ -791,6 +811,7 @@
     if(reason==="out"){ $("upTitle").textContent="You're out of rewrites this month"; $("upBody").textContent="Upgrade to keep rewriting. Prices are per week, billed monthly."; }
     else if(reason==="voices"){ $("upTitle").textContent="Need more voices"; $("upBody").textContent="Higher plans unlock more saved voices. Prices are per week."; }
     else if(reason==="length"){ $("upTitle").textContent="Length control is a Pro feature"; $("upBody").textContent="Upgrade to Pro or above to expand or condense any rewrite on the fly. Prices are per week."; }
+    else if(reason==="chars"){ $("upTitle").textContent="This draft is over your length limit"; $("upBody").textContent="Free rewrites are capped at 200 characters. Upgrade to paste longer drafts — Starter 1,000, Pro 3,000, Studio & Lifetime unlimited."; }
     else { $("upTitle").textContent="Upgrade your plan"; $("upBody").textContent="Unlock more voices, styles and rewrites. Prices are per week."; }
     $("overlay").classList.add("show");
   }
@@ -904,6 +925,7 @@
     el.addEventListener("focus",()=>{ if(!plan().channels){ el.blur(); openUpgrade("length"); } });
   });
   $("run").onclick=doRewrite;
+  $("draft").addEventListener("input", renderChars);
   $("regen").onclick=doRewrite;
   $("activeVoiceBar").onclick=(e)=>{ if(e.target.closest("#clearVoice")) return; if(isMobile()) goVoices(); };
   $("clearVoice").onclick=(e)=>{ e.stopPropagation(); if(isMobile()){ goVoices(); return; } active=null; renderVoices(); renderLibrary(); render(); };
