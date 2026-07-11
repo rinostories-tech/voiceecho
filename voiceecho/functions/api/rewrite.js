@@ -8,6 +8,8 @@ const ADMIN_EMAIL = "rinostories@gmail.com"; // may use overridePlan to test any
 
 // Monthly rewrite limits — keep in sync with app/index.html PLANS.
 const MONTHLY = { free:15, starter:200, pro:600, studio:1500, lifetime:100000 };
+// Per-rewrite input character limits — keep in sync with app/index.html + pricing cards.
+const CHARLIMIT = { free:200, starter:1000, pro:3000, studio:Infinity, lifetime:Infinity };
 const CHANNELS_ALLOWED = { free:false, starter:false, pro:true, studio:true, lifetime:true };
 
 const LIBRARY = {
@@ -80,7 +82,17 @@ export async function onRequestPost(context) {
   if (isAdmin && overridePlan && MONTHLY[overridePlan] != null) plan = overridePlan;
   const limit = MONTHLY[plan] ?? 15;
 
-  // 3a. pre-check quota (don't call the model if already out)
+  // 3a. per-plan character limit on the draft (checked before the model is called)
+  const charLimit = CHARLIMIT[plan] ?? 200;
+  if (draft.trim().length > charLimit) {
+    return json({
+      error: `Your plan allows up to ${charLimit} characters per rewrite. Upgrade to rewrite longer drafts.`,
+      code: "CHAR_LIMIT",
+      charLimit,
+    }, 403);
+  }
+
+  // 3b. pre-check quota (don't call the model if already out)
   const nowM = new Date().toISOString().slice(0, 7);
   const usedNow = prof.usage_month === nowM ? (prof.usage_count || 0) : 0;
   if (usedNow >= limit) return json({ error: "Out of rewrites this month", code: "QUOTA" }, 402);
@@ -211,5 +223,5 @@ export async function onRequestPost(context) {
     }),
   }).catch(() => {});
 
-  return json({ output, used: limit - remaining, limit, remaining, scrubbed });
+  return json({ output, used: limit - remaining, limit, remaining, scrubbed, charLimit: charLimit === Infinity ? null : charLimit });
 }
