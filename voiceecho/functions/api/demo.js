@@ -1,6 +1,6 @@
-// POST /api/demo — public homepage demo. No auth, no history, no quota.
-// Guarded by Cloudflare Turnstile, capped at 200 characters, runs on Haiku
-// with a tight token budget so it can't be abused into a big bill.
+// POST /api/demo — public homepage demo. No auth, no login, no history, no quota.
+// Capped at 200 characters and run on Haiku with a tiny token budget, so each
+// call costs a fraction of a cent even if someone hammers it.
 
 const MODEL = "claude-haiku-4-5-20251001";
 
@@ -12,25 +12,9 @@ export async function onRequestPost(context) {
 
   const body = await request.json().catch(() => ({}));
   const draft = (body.draft || "").toString().slice(0, 200).trim(); // hard cap the input
-  const token = (body.token || "").toString();
-
   if (!draft) return json({ error: "Type a sentence first." }, 400);
-  if (!token) return json({ error: "Verification needed — refresh and try again." }, 400);
 
-  // 1. verify the Turnstile token so bots can't hit this endpoint
-  const ip = request.headers.get("CF-Connecting-IP") || "";
-  const form = new FormData();
-  form.append("secret", env.TURNSTILE_SECRET);
-  form.append("response", token);
-  if (ip) form.append("remoteip", ip);
-  const vRes = await fetch("https://challenges.cloudflare.com/turnstile/v0/siteverify", {
-    method: "POST",
-    body: form,
-  }).catch(() => null);
-  const verify = vRes ? await vRes.json().catch(() => ({ success: false })) : { success: false };
-  if (!verify.success) return json({ error: "Couldn't verify you're human — refresh and try again." }, 403);
-
-  // 2. rewrite into a natural, human default voice (no personal profile in the demo)
+  // rewrite into a natural, human default voice (no personal profile in the demo)
   const system =
     "You are EchoWrite, a voice-matching rewriting ENGINE — not a chat assistant. " +
     "The user message contains a DRAFT wrapped in <draft> tags and nothing else. Rewrite that draft so it reads like a real, " +
