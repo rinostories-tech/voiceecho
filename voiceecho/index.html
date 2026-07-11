@@ -88,6 +88,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Permanent+Marker&display=swap" rel="stylesheet">
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 <style>
   :root{
     --paper:#faf8f2; --paper-2:#f2eee2; --card:#fffdf8;
@@ -351,6 +353,47 @@
     *{animation-duration:.001s!important;animation-iteration-count:1!important;transition-duration:.01s!important}
     .rv{opacity:1;transform:none}.hl::before{--draw:1}.ticker .track{animation:none}
   }
+
+  /* ── interactive demo: hand-drawn "try me" + editable rewrite box ── */
+  #demo{position:relative}
+  #demo:not(.live){cursor:pointer}
+  #demo:not(.live):hover{box-shadow:0 26px 60px -34px rgba(91,60,255,.45)}
+  .tryme{position:absolute;top:-36px;right:20px;z-index:6;display:flex;flex-direction:column;align-items:flex-end;
+    pointer-events:none;transition:opacity .35s ease, transform .35s ease}
+  .tryme.gone{opacity:0;transform:translateY(-6px) rotate(-4deg)}
+  .tryme .lbl{font-family:"Permanent Marker",var(--disp);color:var(--red);font-size:21px;line-height:1;
+    transform:rotate(-7deg);margin:0 6px 1px 0;white-space:nowrap}
+  .tryme svg{display:block;width:60px;height:54px;overflow:visible}
+  .tryme svg path{stroke:var(--red);stroke-width:3;fill:none;stroke-linecap:round;stroke-linejoin:round}
+  .tryme svg .a1{stroke-dasharray:140;stroke-dashoffset:140;animation:drawArrow .7s .3s ease forwards}
+  .tryme svg .a2{opacity:0;animation:showHead .01s .95s forwards}
+  @keyframes drawArrow{to{stroke-dashoffset:0}}
+  @keyframes showHead{to{opacity:1}}
+
+  .tryui{padding-top:2px}
+  #tryInput{width:100%;background:var(--paper);border:1px dashed var(--line-2);border-radius:12px;padding:14px;
+    font-family:var(--disp);font-weight:500;font-size:clamp(18px,5vw,22px);line-height:1.42;color:var(--ink);
+    min-height:112px;resize:none;outline:none;-webkit-appearance:none}
+  #tryInput:focus{border-style:solid;border-color:var(--violet);box-shadow:0 0 0 3px rgba(91,60,255,.12)}
+  .try-bar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:12px;flex-wrap:wrap}
+  .try-count{font-family:var(--mono);font-size:12px;color:var(--ink-3);letter-spacing:.02em}
+  .try-count.over{color:var(--red)}
+  .btn-sm{padding:11px 18px;min-height:44px;font-size:14px}
+  #tryCaptcha{margin-top:12px;min-height:1px}
+  #tryCaptcha:empty{margin-top:0}
+  .try-out{margin-top:16px;font-family:var(--disp);font-weight:500;font-size:clamp(18px,5vw,22px);line-height:1.5;color:var(--ink)}
+  .try-out .mk{background:linear-gradient(transparent 62%,var(--hi) 62%);-webkit-box-decoration-break:clone;
+    box-decoration-break:clone;padding:0 1px}
+  .try-out.loading{opacity:.45}
+  .try-cta{margin-top:16px;font-family:var(--mono);font-size:13px;color:var(--ink-2);line-height:1.5}
+  .try-cta a{color:var(--violet);text-decoration:underline;text-underline-offset:2px}
+  .try-err{margin-top:10px;color:var(--red);font-size:13px;font-family:var(--mono)}
+  @media(max-width:640px){
+    .tryme{top:-30px;right:12px}
+    .tryme .lbl{font-size:18px}
+    .tryme svg{width:50px;height:46px}
+    .try-bar .btn-sm{flex:1}
+  }
 </style>
 <noscript><style>.rv{opacity:1!important;transform:none!important}</style></noscript>
 </head>
@@ -403,6 +446,10 @@
 
   <!-- signature: marked-up manuscript -->
   <div class="print rv" id="demo">
+    <div class="tryme" id="tryme" aria-hidden="true">
+      <span class="lbl">try me!</span>
+      <svg viewBox="0 0 70 54"><path class="a1" d="M60 2 C 66 20, 52 30, 24 44"/><path class="a2" d="M24 44 L 40 42 M24 44 L 29 29"/></svg>
+    </div>
     <div class="print-top"><b></b><b></b><b></b><span class="fn">your-voice.md</span></div>
     <div class="print-body">
       <div class="vtabs" id="vtabs"></div>
@@ -411,6 +458,17 @@
       </div>
       <div class="out-line"><span id="typed"></span></div>
       <div class="wave" id="wave"></div>
+      <div class="tryui" id="tryui" hidden>
+        <textarea id="tryInput" maxlength="200" rows="3" placeholder="Write or paste a sentence you'd actually write…"></textarea>
+        <div class="try-bar">
+          <span class="try-count" id="tryCount">0 / 200</span>
+          <button class="btn btn-primary btn-sm" id="tryRun">Rewrite it →</button>
+        </div>
+        <div id="tryCaptcha"></div>
+        <div class="try-out" id="tryOut" hidden></div>
+        <div class="try-cta" id="tryCta" hidden>That's a generic human voice. <a href="/app">Train it on <b>your</b> writing → it sounds like you →</a></div>
+        <div class="try-err" id="tryErr"></div>
+      </div>
     </div>
   </div>
 </header>
@@ -655,6 +713,68 @@
   demo.addEventListener('mouseenter',()=>paused=true);
   demo.addEventListener('mouseleave',()=>paused=false);
   if(reduce){ci=voices[0].text.length;render();} else tick();
+
+  // ── interactive "try it yourself" mode ──
+  const SITEKEY="0x4AAAAAADzyLGVOxAsO0rwT";     // ← paste your Cloudflare Turnstile SITE key here
+  let demoLive=false, tsId=null, tryToken="";
+  const tryme=document.getElementById('tryme');
+  const printEl=document.getElementById('demo');
+
+  function activateTry(){
+    if(demoLive) return; demoLive=true;
+    printEl.classList.add('live');
+    if(tryme) tryme.classList.add('gone');
+    clearTimeout(timer); tick=function(){};        // stop the looping animation for good
+    if(reduce){ typed.textContent=''; openTry(); return; }
+    (function del(){                               // reverse-typewriter erase
+      const s=typed.textContent;
+      if(!s){ openTry(); return; }
+      typed.textContent=s.slice(0,-1);
+      setTimeout(del, 11);
+    })();
+  }
+  function openTry(){
+    document.getElementById('vtabs').style.display='none';
+    const sr=printEl.querySelector('.strike-row'); if(sr) sr.style.display='none';
+    printEl.querySelector('.out-line').style.display='none';
+    document.getElementById('wave').style.display='none';
+    document.getElementById('tryui').hidden=false;
+    document.getElementById('tryInput').focus();
+    if(window.turnstile && tsId===null){
+      try{ tsId=turnstile.render('#tryCaptcha',{sitekey:SITEKEY,callback:(t)=>{tryToken=t;}}); }catch(e){}
+    }
+  }
+  // clicking anywhere on the card (the arrow has pointer-events:none, so it passes through) starts it
+  if(printEl) printEl.addEventListener('click',()=>{ if(!demoLive) activateTry(); });
+
+  const tInput=document.getElementById('tryInput'), tCount=document.getElementById('tryCount'),
+        tRun=document.getElementById('tryRun'), tOut=document.getElementById('tryOut'),
+        tCta=document.getElementById('tryCta'), tErr=document.getElementById('tryErr');
+  if(tInput){
+    tInput.addEventListener('input',()=>{
+      const n=tInput.value.length; tCount.textContent=n+' / 200'; tCount.classList.toggle('over',n>=200);
+    });
+    tInput.addEventListener('click',(e)=>e.stopPropagation());
+  }
+  async function runTry(){
+    const draft=(tInput.value||'').trim(); tErr.textContent='';
+    if(!draft){ tErr.textContent='Type a sentence first.'; return; }
+    const token = tryToken || (window.turnstile && tsId!==null ? turnstile.getResponse(tsId) : '');
+    if(!token){ tErr.textContent='One sec — finishing the human check, then hit rewrite again.'; return; }
+    tRun.disabled=true; tRun.textContent='Rewriting…';
+    tOut.hidden=false; tOut.classList.add('loading'); tOut.innerHTML='<span class="mk">…</span>'; tCta.hidden=true;
+    try{
+      const r=await fetch('/api/demo',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({draft,token})});
+      const data=await r.json().catch(()=>({}));
+      if(!r.ok){ tErr.textContent=data.error||'Something went wrong — try again.'; tOut.hidden=true; }
+      else{ tOut.innerHTML='<span class="mk">'+esc(data.output||'')+'</span>'; tCta.hidden=false; }
+    }catch(e){ tErr.textContent='Network hiccup — try again.'; tOut.hidden=true; }
+    finally{
+      tOut.classList.remove('loading'); tRun.disabled=false; tRun.textContent='Rewrite again →';
+      if(window.turnstile && tsId!==null){ try{ turnstile.reset(tsId); tryToken=''; }catch(e){} }
+    }
+  }
+  if(tRun) tRun.addEventListener('click',(e)=>{ e.stopPropagation(); runTry(); });
 </script>
 <script>
   // Pricing buttons: if the visitor already has a session, skip the /app hop and
