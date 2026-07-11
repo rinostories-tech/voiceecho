@@ -443,11 +443,11 @@
   <!-- signature: marked-up manuscript -->
   <div class="demo-wrap">
     <div class="tryme" id="tryme" aria-hidden="true">
-      <svg viewBox="0 0 275 180">
-        <path class="a1" d="M26 118 C 6 78, 46 40, 96 42 C 140 44, 150 74, 132 96"/>
-        <path class="a2" d="M26 118 L 54 112 M26 118 L 33 90"/>
-        <text x="104" y="120" font-size="50" transform="rotate(-8 104 120)">TRY</text>
-        <text x="120" y="166" font-size="50" transform="rotate(-8 120 166)">ME</text>
+      <svg viewBox="0 0 280 175">
+        <path class="a1" d="M172 78 C 176 26, 96 6, 52 30 C 22 46, 20 88, 44 110"/>
+        <path class="a2" d="M44 110 L 26 99 M44 110 L 55 91"/>
+        <text x="112" y="122" font-size="48" transform="rotate(-7 112 122)">TRY</text>
+        <text x="128" y="166" font-size="48" transform="rotate(-7 128 166)">ME</text>
       </svg>
     </div>
     <div class="print rv" id="demo">
@@ -465,6 +465,7 @@
           <span class="try-count" id="tryCount">0 / 200</span>
           <button class="btn btn-primary btn-sm" id="tryRun">Rewrite it →</button>
         </div>
+        <div class="wave" id="tryWave" hidden></div>
         <div class="try-out" id="tryOut" hidden></div>
         <div class="try-cta" id="tryCta" hidden>That's a generic human voice. <a href="/app">Train it on <b>your</b> writing → it sounds like you →</a></div>
         <div class="try-err" id="tryErr"></div>
@@ -746,7 +747,15 @@
 
   const tInput=document.getElementById('tryInput'), tCount=document.getElementById('tryCount'),
         tRun=document.getElementById('tryRun'), tOut=document.getElementById('tryOut'),
-        tCta=document.getElementById('tryCta'), tErr=document.getElementById('tryErr');
+        tCta=document.getElementById('tryCta'), tErr=document.getElementById('tryErr'),
+        tWave=document.getElementById('tryWave');
+  function buildWave(){                          // same audio-wave effect as the page's ambient bars
+    if(tWave.childElementCount) return;
+    for(let i=0;i<48;i++){ const s=document.createElement('span');
+      s.style.animationDelay=(Math.random()*-1.1)+'s';
+      s.style.animationDuration=(.7+Math.random()*.8)+'s';
+      tWave.appendChild(s); }
+  }
   if(tInput){
     tInput.addEventListener('input',()=>{
       const n=tInput.value.length; tCount.textContent=n+' / 200'; tCount.classList.toggle('over',n>=200);
@@ -757,15 +766,15 @@
     const draft=(tInput.value||'').trim(); tErr.textContent='';
     if(!draft){ tErr.textContent='Type a sentence first.'; return; }
     tRun.disabled=true; tRun.textContent='Rewriting…';
-    tOut.hidden=false; tOut.classList.add('loading'); tOut.innerHTML='<span class="mk">…</span>'; tCta.hidden=true;
+    buildWave(); tWave.hidden=false; tOut.hidden=true; tCta.hidden=true;   // show the spectrum wave while it generates
     try{
       const r=await fetch('/api/demo',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({draft})});
       const data=await r.json().catch(()=>({}));
-      if(!r.ok){ tErr.textContent=data.error||'Something went wrong — try again.'; tOut.hidden=true; }
-      else{ tOut.innerHTML='<span class="mk">'+esc(data.output||'')+'</span>'; tCta.hidden=false; }
-    }catch(e){ tErr.textContent='Network hiccup — try again.'; tOut.hidden=true; }
+      if(!r.ok){ tErr.textContent=data.error||'Something went wrong — try again.'; }
+      else{ tOut.innerHTML='<span class="mk">'+esc(data.output||'')+'</span>'; tOut.hidden=false; tCta.hidden=false; }
+    }catch(e){ tErr.textContent='Network hiccup — try again.'; }
     finally{
-      tOut.classList.remove('loading'); tRun.disabled=false; tRun.textContent='Rewrite again →';
+      tWave.hidden=true; tRun.disabled=false; tRun.textContent='Rewrite again →';
     }
   }
   if(tRun) tRun.addEventListener('click',(e)=>{ e.stopPropagation(); runTry(); });
