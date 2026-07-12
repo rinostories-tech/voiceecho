@@ -47,7 +47,7 @@
     "@type": "AggregateOffer",
     "priceCurrency": "USD",
     "lowPrice": "0",
-    "highPrice": "240",
+    "highPrice": "319",
     "offerCount": "5"
   }
 }
@@ -302,6 +302,29 @@
   .swipe-hint{display:none}
   @media(min-width:560px){.weekly{display:grid;grid-template-columns:repeat(2,1fr);overflow:visible;margin:0 0 16px;padding:0}.tier{flex:none}.swipe-hint{display:none}}
   @media(min-width:1000px){.weekly{grid-template-columns:repeat(4,1fr);gap:16px}}
+
+  /* billing cycle toggle — iOS-style switch */
+  .billtoggle{display:flex;align-items:center;justify-content:center;gap:14px;margin:0 0 26px;flex-wrap:wrap}
+  .bt-opt{font-family:var(--mono);font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);
+    background:none;border:0;cursor:pointer;padding:6px 2px;transition:color .2s;display:inline-flex;align-items:center;gap:8px}
+  .bt-opt.on{color:var(--ink)}
+  .bt-opt .save{font-family:var(--mono);font-size:10px;letter-spacing:.04em;text-transform:none;font-weight:600;
+    background:var(--violet);color:var(--paper);padding:3px 8px;border-radius:100px}
+  .switch{position:relative;display:inline-block;width:52px;height:30px;flex:none;cursor:pointer}
+  .switch input{position:absolute;opacity:0;width:0;height:0}
+  .switch .track{position:absolute;inset:0;background:var(--line-2);border-radius:100px;
+    transition:background .25s cubic-bezier(.2,.8,.2,1)}
+  .switch .knob{position:absolute;top:3px;left:3px;width:24px;height:24px;background:#fff;border-radius:50%;
+    box-shadow:0 1px 3px rgba(0,0,0,.28);transition:transform .25s cubic-bezier(.2,.8,.2,1)}
+  .switch input:checked + .track{background:var(--violet)}      /* colour change on switch */
+  .switch input:checked + .track .knob{transform:translateX(22px)}
+  .switch input:focus-visible + .track{outline:2px solid var(--violet);outline-offset:2px}
+
+  /* annual-only savings cues on the cards */
+  .tier .amt .was{font-family:var(--mono);font-size:15px;font-weight:500;color:var(--ink-3);letter-spacing:0;
+    vertical-align:3px;margin-left:9px;text-decoration:line-through;text-decoration-color:var(--red);text-decoration-thickness:2px}
+  .tier .savetag{display:inline-block;font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:.04em;
+    background:var(--hi);color:var(--ink);padding:3px 8px;border-radius:100px;margin-left:8px;vertical-align:1px}
 
   .life{background:var(--dark);color:var(--paper);border-radius:var(--radius-lg);padding:30px 26px;overflow:hidden;position:relative}
   .life::after{content:"◈";position:absolute;right:-6px;bottom:-46px;font-size:180px;color:rgba(221,242,74,.09);line-height:1;pointer-events:none}
@@ -573,6 +596,15 @@
     <p class="lead">Start free. Move up when you're writing every day — or pay once and keep it for life.</p>
   </div>
 
+  <div class="billtoggle rv" role="group" aria-label="Billing period">
+    <button type="button" class="bt-opt on" data-cycle="monthly">Monthly</button>
+    <label class="switch">
+      <input type="checkbox" id="cycleToggle" aria-label="Switch to annual billing">
+      <span class="track"><span class="knob"></span></span>
+    </label>
+    <button type="button" class="bt-opt" data-cycle="annual">Annual <span class="save">2 months free</span></button>
+  </div>
+
   <div class="swipe-hint">‹ swipe plans ›</div>
   <div class="weekly">
     <div class="tier rv">
@@ -582,27 +614,27 @@
       <ul><li>200-character rewrites</li><li>15 rewrites to start</li><li>1 saved voice</li><li>Core voice-matching</li><li>3 starter styles</li></ul>
       <a href="/app" class="btn btn-outline">Start free</a>
     </div>
-    <div class="tier rv">
+    <div class="tier rv" data-m-price="$11.99" data-m-per="/mo" data-m-bill="billed monthly · ~$2.99/week" data-a-price="$9.92" data-a-per="/mo" data-a-bill="billed annually · $119/yr" data-a-save="$25/yr">
       <div class="nm">Starter</div>
       <div class="amt">$11.99<span class="per">/mo</span></div>
       <div class="bill">billed monthly · ~$2.99/week</div>
       <ul><li>1,000-character rewrites</li><li>~200 rewrites / mo</li><li>3 saved voices</li><li>Rewrite history</li><li>AI-ism scrubber</li></ul>
-      <a href="/app?plan=starter" data-plan="starter" class="btn btn-outline">Choose Starter</a>
+      <a href="/app?plan=starter" data-plan="starter" data-base="starter" class="btn btn-outline">Choose Starter</a>
     </div>
-    <div class="tier pop rv">
+    <div class="tier pop rv" data-m-price="$19.99" data-m-per="/mo" data-m-bill="billed monthly · ~$4.99/week" data-a-price="$16.58" data-a-per="/mo" data-a-bill="billed annually · $199/yr" data-a-save="$41/yr">
       <div class="tag">Most popular</div>
       <div class="nm">Pro</div>
       <div class="amt">$19.99<span class="per">/mo</span></div>
       <div class="bill">billed monthly · ~$4.99/week</div>
       <ul><li>3,000-character rewrites</li><li>~600 rewrites / mo</li><li>10 saved voices</li><li>Full voice library</li><li>Length control — expand or condense</li><li>Multi-channel + priority</li></ul>
-      <a href="/app?plan=pro" data-plan="pro" class="btn btn-primary">Choose Pro</a>
+      <a href="/app?plan=pro" data-plan="pro" data-base="pro" class="btn btn-primary">Choose Pro</a>
     </div>
-    <div class="tier rv">
+    <div class="tier rv" data-m-price="$31.99" data-m-per="/mo" data-m-bill="billed monthly · ~$7.99/week" data-a-price="$26.58" data-a-per="/mo" data-a-bill="billed annually · $319/yr" data-a-save="$65/yr">
       <div class="nm">Studio</div>
       <div class="amt">$31.99<span class="per">/mo</span></div>
       <div class="bill">billed monthly · ~$7.99/week</div>
       <ul><li>Unlimited length</li><li>~1,500 rewrites / mo</li><li>25 saved voices</li><li>Everything in Pro</li><li>Fastest speed</li></ul>
-      <a href="/app?plan=studio" data-plan="studio" class="btn btn-outline">Choose Studio</a>
+      <a href="/app?plan=studio" data-plan="studio" data-base="studio" class="btn btn-outline">Choose Studio</a>
     </div>
   </div>
 
@@ -791,6 +823,10 @@
       pro:"https://echowritestore.lemonsqueezy.com/checkout/buy/214e0d81-fee2-4764-b3ca-1fdb42b0c34d",
       studio:"https://echowritestore.lemonsqueezy.com/checkout/buy/756bd835-e6dc-41a8-a8ee-6ec4d6810230",
       lifetime:"https://echowritestore.lemonsqueezy.com/checkout/buy/d242ce20-9050-4692-8e75-4edce893ce10",
+      // ↓↓↓ PASTE ANNUAL LEMON SQUEEZY LINKS HERE (leave "" until you have them) ↓↓↓
+      starter_annual:"",
+      pro_annual:"",
+      studio_annual:"",
     };
     async function goPlan(el, e){
       if(e) e.preventDefault();
@@ -812,6 +848,34 @@
     document.querySelectorAll("[data-plan]").forEach(el=>{
       el.addEventListener("click",(e)=>goPlan(el, e));
     });
+  })();
+
+  // Billing-cycle toggle: swap price / bill line / checkout target for the 3 paid tiers.
+  (function(){
+    const cyc=document.getElementById("cycleToggle");
+    if(!cyc) return;
+    const tiers=document.querySelectorAll(".weekly .tier[data-a-price]");
+    const optM=document.querySelector('.bt-opt[data-cycle="monthly"]');
+    const optA=document.querySelector('.bt-opt[data-cycle="annual"]');
+    function apply(annual){
+      tiers.forEach(t=>{
+        const amt=t.querySelector(".amt"), bill=t.querySelector(".bill"), btn=t.querySelector("[data-base]");
+        if(annual){
+          amt.innerHTML=t.dataset.aPrice+'<span class="per">'+t.dataset.aPer+'</span>'
+            +'<span class="was">'+t.dataset.mPrice+'</span>';
+          bill.innerHTML=t.dataset.aBill+'<span class="savetag">Save 17% · '+t.dataset.aSave+'</span>';
+        }else{
+          amt.innerHTML=t.dataset.mPrice+'<span class="per">'+t.dataset.mPer+'</span>';
+          bill.textContent=t.dataset.mBill;
+        }
+        if(btn) btn.dataset.plan=annual?btn.dataset.base+"_annual":btn.dataset.base;
+      });
+      optM.classList.toggle("on",!annual);
+      optA.classList.toggle("on",annual);
+    }
+    cyc.addEventListener("change",()=>apply(cyc.checked));
+    optM.addEventListener("click",()=>{cyc.checked=false; apply(false);});
+    optA.addEventListener("click",()=>{cyc.checked=true;  apply(true);});
   })();
 </script>
 </body>
