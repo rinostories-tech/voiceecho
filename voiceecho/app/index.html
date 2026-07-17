@@ -234,6 +234,27 @@
   .plan .pc{font-family:var(--mono);font-size:11px;color:var(--ink-3)}
   .plan .pp{font-family:var(--disp);font-weight:700;font-size:17px}
   .plan .pp small{font-family:var(--mono);font-size:10px;color:var(--ink-3);font-weight:500}
+  .plan .pp .was{font-family:var(--mono);font-size:11px;font-weight:500;color:var(--ink-3);letter-spacing:0;
+    margin-left:6px;text-decoration:line-through;text-decoration-color:var(--red);text-decoration-thickness:2px}
+  .modal .billtoggle{display:flex;align-items:center;justify-content:center;gap:12px;margin:0 0 16px;flex-wrap:wrap}
+  .modal .bt-opt{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);
+    background:none;border:0;cursor:pointer;padding:6px 2px;transition:color .2s;display:inline-flex;align-items:center;gap:7px}
+  .modal .bt-opt.on{color:var(--ink)}
+  .modal .bt-opt .save{font-family:var(--mono);font-size:9px;letter-spacing:.04em;text-transform:none;font-weight:600;
+    background:var(--violet);color:var(--paper);padding:3px 7px;border-radius:100px}
+  .modal .switch{position:relative;display:inline-block;width:46px;height:26px;flex:none;cursor:pointer}
+  .modal .switch input{position:absolute;opacity:0;width:0;height:0}
+  .modal .switch .track{position:absolute;inset:0;background:var(--line-2);border-radius:100px;
+    transition:background .25s cubic-bezier(.2,.8,.2,1)}
+  .modal .switch .knob{position:absolute;top:3px;left:3px;width:20px;height:20px;background:#fff;border-radius:50%;
+    box-shadow:0 1px 3px rgba(0,0,0,.28);transition:transform .25s cubic-bezier(.2,.8,.2,1)}
+  .modal .switch input:checked + .track{background:var(--violet)}
+  .modal .switch input:checked + .track .knob{transform:translateX(20px)}
+  .modal .switch input:focus-visible + .track{outline:2px solid var(--violet);outline-offset:2px}
+  .plan.loading{opacity:.55;pointer-events:none}
+  .modal .manage{margin-top:10px;font-size:12px;color:var(--ink-3);text-align:center}
+  .modal .manage button{background:none;border:0;font-family:inherit;font-size:12px;color:var(--violet);
+    cursor:pointer;text-decoration:underline;padding:0}
   .plan.pick{border-color:var(--violet);box-shadow:0 0 0 3px rgba(91,60,255,.12)}
 
   /* top-bar upgrade button */
@@ -424,14 +445,43 @@
 <div class="overlay" id="overlay">
   <div class="modal">
     <h3 id="upTitle">Upgrade your plan</h3>
-    <p id="upBody">Move up when you're writing more. Prices are per week.</p>
+    <p id="upBody">Move up when you're writing more. Cancel any time.</p>
+
+    <div class="billtoggle" role="group" aria-label="Billing period">
+      <button type="button" class="bt-opt on" data-cycle="monthly">Monthly</button>
+      <label class="switch">
+        <input type="checkbox" id="mCycleToggle" aria-label="Switch to annual billing">
+        <span class="track"><span class="knob"></span></span>
+      </label>
+      <button type="button" class="bt-opt" data-cycle="annual">Annual <span class="save">2 months free</span></button>
+    </div>
+
     <div class="plans">
-      <div class="plan" data-plan="starter"><div><div class="pn">Starter</div><div class="pc">200 rewrites / mo · 3 voices</div></div><div class="pp">$2.99<small>/wk</small></div></div>
-      <div class="plan hot" data-plan="pro"><div><div class="pn">Pro · popular</div><div class="pc">600 rewrites / mo · 10 voices</div></div><div class="pp">$4.99<small>/wk</small></div></div>
-      <div class="plan" data-plan="studio"><div><div class="pn">Studio</div><div class="pc">1,500 rewrites / mo · 25 voices</div></div><div class="pp">$7.99<small>/wk</small></div></div>
-      <div class="plan" data-plan="lifetime"><div><div class="pn">Lifetime</div><div class="pc">Unlimited voices · pay once</div></div><div class="pp">$240<small>once</small></div></div>
+      <div class="plan" data-plan="starter" data-base="starter"
+           data-m-note="200 rewrites / mo · 3 voices" data-m-price="$11.99" data-m-per="/mo"
+           data-a-note="$119.99/yr · save $23.89"     data-a-price="$10.00" data-a-per="/mo">
+        <div><div class="pn">Starter</div><div class="pc">200 rewrites / mo · 3 voices</div></div>
+        <div class="pp">$11.99<small>/mo</small></div>
+      </div>
+      <div class="plan hot" data-plan="pro" data-base="pro"
+           data-m-note="600 rewrites / mo · 10 voices" data-m-price="$19.99" data-m-per="/mo"
+           data-a-note="$199.99/yr · save $39.89"      data-a-price="$16.67" data-a-per="/mo">
+        <div><div class="pn">Pro · popular</div><div class="pc">600 rewrites / mo · 10 voices</div></div>
+        <div class="pp">$19.99<small>/mo</small></div>
+      </div>
+      <div class="plan" data-plan="studio" data-base="studio"
+           data-m-note="1,500 rewrites / mo · 25 voices" data-m-price="$31.99" data-m-per="/mo"
+           data-a-note="$319.99/yr · save $63.89"        data-a-price="$26.67" data-a-per="/mo">
+        <div><div class="pn">Studio</div><div class="pc">1,500 rewrites / mo · 25 voices</div></div>
+        <div class="pp">$31.99<small>/mo</small></div>
+      </div>
+      <div class="plan" data-plan="lifetime">
+        <div><div class="pn">Lifetime</div><div class="pc">Unlimited voices · pay once</div></div>
+        <div class="pp">$240<small>once</small></div>
+      </div>
     </div>
     <button class="close" id="closeModal">Maybe later</button>
+    <div class="manage" id="manageRow" style="display:none">Already subscribed? <button type="button" id="manageBilling">Manage billing</button></div>
   </div>
 </div>
 
@@ -439,16 +489,11 @@
   // ────────────────────────── CONFIG ──────────────────────────
   const SUPABASE_URL = "https://mmokcvvyaoohibtauodv.supabase.co";
   const SUPABASE_ANON_KEY = "sb_publishable_RT8I_tyEDVY_Wcxhw3yp6A_lTbpRXlP";
-  const CHECKOUT = {
-    starter:  "https://echowritestore.lemonsqueezy.com/checkout/buy/60385cba-1183-48cc-a6b5-e96c3afa0475",
-    pro:      "https://echowritestore.lemonsqueezy.com/checkout/buy/214e0d81-fee2-4764-b3ca-1fdb42b0c34d",
-    studio:   "https://echowritestore.lemonsqueezy.com/checkout/buy/756bd835-e6dc-41a8-a8ee-6ec4d6810230",
-    lifetime: "https://echowritestore.lemonsqueezy.com/checkout/buy/d242ce20-9050-4692-8e75-4edce893ce10",
-    // ↓↓↓ PASTE THE SAME ANNUAL LINKS YOU PUT IN index.html (annual variant buy links) ↓↓↓
-    starter_annual: "https://echowritestore.lemonsqueezy.com/checkout/buy/fd997c1e-2339-40f4-a65a-2740657cb249",
-    pro_annual:     "https://echowritestore.lemonsqueezy.com/checkout/buy/2557be9c-2fcd-4a08-ac18-0148eb34db11",
-    studio_annual:  "https://echowritestore.lemonsqueezy.com/checkout/buy/cadad2bc-9784-4b1e-bf21-f7fc7b22a6ab",
-  };
+  // Plan keys the server will accept. Price IDs live in functions/api/checkout.js
+  // ONLY — never here, so they can be rotated without a deploy and a visitor
+  // can't tamper with what they're charged.
+  const PLANS_BUYABLE = ["starter","pro","studio","lifetime",
+                         "starter_annual","pro_annual","studio_annual"];
 
   // Only this account sees the dev plan switcher (and can use any plan server-side).
   const ADMIN_EMAIL = "rinostories@gmail.com";
@@ -513,7 +558,7 @@
       const params=new URLSearchParams(location.search);
       const pl=params.get("plan");
       if(pl) sessionStorage.setItem("ve_plan", pl);
-      if(pl) history.replaceState({}, "", location.pathname);
+      if(pl) window.history.replaceState({}, "", location.pathname);   // `history` is shadowed by our array — must qualify
     }catch(e){}
     try{
       const { createClient } = await import("https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm");
@@ -540,20 +585,58 @@
   // After a signed-in user lands here:
   //  ?plan=<paid>  → forward straight to that plan's checkout (the "payment thing")
   //  free plan     → show the upgrade popup on every load
+  // Stripe redirects back the instant payment succeeds, which can beat the
+  // webhook by a second or two. Without this the user lands on ?upgraded=1 and
+  // still sees "Free" — looks broken, generates a support email. Poll briefly.
+  async function settleUpgrade(){
+    const before=realPlan;
+    for(let i=0;i<8;i++){
+      await new Promise(r=>setTimeout(r,900));
+      await loadProfile();
+      if(realPlan!==before && realPlan!=="free"){ render(); return true; }
+    }
+    return false;
+  }
+
   function handlePendingIntent(){
+    try{
+      const q=new URLSearchParams(location.search);
+      if(q.get("upgraded")){
+        window.history.replaceState({}, "", location.pathname);
+        settleUpgrade();
+        return;   // never show the upgrade popup to someone who just paid
+      }
+    }catch(e){}
     let p=null;
     try{ p=sessionStorage.getItem("ve_plan"); }catch(e){}
     if(p){ try{sessionStorage.removeItem("ve_plan");}catch(e){}
-      if(p!=="free" && CHECKOUT[p]){ goToCheckout(p); return; }   // straight to their chosen checkout, no popup
+      if(p!=="free" && PLANS_BUYABLE.includes(p)){ goToCheckout(p); return; }   // straight to their chosen checkout, no popup
     }
     // Free-plan users see the upgrade popup on every load. Paid plans never see it.
     if(planKey==="free") openUpgrade();
   }
 
-  function goToCheckout(planId){
-    if(!CHECKOUT[planId]) return openUpgrade();
-    const uid=session?.user?.id||"";
-    window.location=`${CHECKOUT[planId]}?checkout[custom][user_id]=${encodeURIComponent(uid)}&checkout[custom][plan]=${planId}`;
+  async function goToCheckout(planId, el){
+    if(!PLANS_BUYABLE.includes(planId)) return openUpgrade();
+    const token = session?.access_token;
+    if(!token) return openUpgrade();
+    if(el){ if(el.classList.contains("loading")) return; el.classList.add("loading"); }
+    try{
+      const res = await fetch("/api/checkout",{
+        method:"POST",
+        headers:{"Content-Type":"application/json","Authorization":"Bearer "+token},
+        body:JSON.stringify({plan:planId})
+      });
+      const data = await res.json();
+      if(res.ok && data.url){ window.location = data.url; return; }
+      throw new Error(data.error||"checkout failed");
+    }catch(err){
+      if(el) el.classList.remove("loading");
+      // Don't strand them on a dead click — say what happened.
+      const b=$("upBody");
+      if(b) b.textContent="Couldn't open checkout just then. Give it another go, or email support@echowrite.net.";
+      openUpgrade();
+    }
   }
 
   async function loadProfile(){
@@ -568,6 +651,8 @@
   }
   function applyPlan(){
     planKey = devPlanValue() || realPlan;
+    const mr=$("manageRow");
+    if(mr) mr.style.display = (realPlan!=="free" && realPlan!=="lifetime") ? "block" : "none";
     usage.limit = plan().rewrites;
     $("planBadge").textContent = plan().label;
     $("planBadge").classList.toggle("lifetime", planKey==="lifetime");
@@ -944,7 +1029,51 @@
   $("buyBtn").onclick=()=>{ $("acctMenu").classList.remove("open"); openUpgrade(); };
   $("tbUpgrade").onclick=()=>openUpgrade();
   $("closeModal").onclick=closeUpgrade;
-  document.querySelectorAll(".plan").forEach(p=>p.onclick=()=>goToCheckout(p.dataset.plan));
+  document.querySelectorAll(".plan").forEach(p=>p.onclick=()=>goToCheckout(p.dataset.plan, p));
+
+  // Modal billing-cycle toggle — swaps price, note and checkout target on the
+  // three paid tiers. Lifetime has no data-base, so it's left alone.
+  (function(){
+    const cyc=$("mCycleToggle");
+    if(!cyc) return;
+    const tiers=document.querySelectorAll(".modal .plan[data-a-price]");
+    const optM=document.querySelector('.modal .bt-opt[data-cycle="monthly"]');
+    const optA=document.querySelector('.modal .bt-opt[data-cycle="annual"]');
+    function apply(annual){
+      tiers.forEach(t=>{
+        const pp=t.querySelector(".pp"), pc=t.querySelector(".pc");
+        if(annual){
+          pp.innerHTML=t.dataset.aPrice+'<span class="was">'+t.dataset.mPrice+'</span><small>'+t.dataset.aPer+'</small>';
+          pc.textContent=t.dataset.aNote;
+        }else{
+          pp.innerHTML=t.dataset.mPrice+'<small>'+t.dataset.mPer+'</small>';
+          pc.textContent=t.dataset.mNote;
+        }
+        t.dataset.plan = annual ? t.dataset.base+"_annual" : t.dataset.base;
+      });
+      optM.classList.toggle("on",!annual);
+      optA.classList.toggle("on",annual);
+    }
+    cyc.addEventListener("change",()=>apply(cyc.checked));
+    optM.addEventListener("click",()=>{cyc.checked=false; apply(false);});
+    optA.addEventListener("click",()=>{cyc.checked=true;  apply(true);});
+  })();
+
+  // "Manage billing" → Stripe Customer Portal. This is what makes the promise
+  // in /terms and /refunds ("cancel any time from your account") actually true.
+  $("manageBilling")?.addEventListener("click", async ()=>{
+    const token=session?.access_token; if(!token) return;
+    const btn=$("manageBilling"); btn.disabled=true; btn.textContent="Opening…";
+    try{
+      const res=await fetch("/api/portal",{method:"POST",headers:{"Authorization":"Bearer "+token}});
+      const data=await res.json();
+      if(res.ok && data.url){ window.location=data.url; return; }
+      throw new Error();
+    }catch(e){
+      btn.disabled=false; btn.textContent="Manage billing";
+      $("manageRow").innerHTML='Trouble opening billing — email <a href="mailto:support@echowrite.net">support@echowrite.net</a>.';
+    }
+  });
 
   // mobile tabs
   document.querySelectorAll(".mtab").forEach(t=>t.onclick=()=>{
