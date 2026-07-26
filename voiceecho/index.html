@@ -483,9 +483,9 @@
       <div class="out-line"><span id="typed"></span></div>
       <div class="wave" id="wave"></div>
       <div class="tryui" id="tryui" hidden>
-        <textarea id="tryInput" maxlength="200" rows="3" placeholder="Write or paste a sentence you'd actually write…"></textarea>
+        <textarea id="tryInput" maxlength="1000" rows="3" placeholder="Write or paste a sentence you'd actually write…"></textarea>
         <div class="try-bar">
-          <span class="try-count" id="tryCount">0 / 200</span>
+          <span class="try-count" id="tryCount">0 / 1,000</span>
           <button class="btn btn-primary btn-sm" id="tryRun">Rewrite it →</button>
         </div>
         <div class="wave" id="tryWave" hidden></div>
@@ -611,14 +611,14 @@
       <div class="nm">Free</div>
       <div class="amt">$0<span class="per">/mo</span></div>
       <div class="bill">free forever</div>
-      <ul><li>200-character rewrites</li><li>15 rewrites to start</li><li>1 saved voice</li><li>Core voice-matching</li><li>3 starter styles</li></ul>
+      <ul><li>1,000-character rewrites</li><li>15 rewrites to start</li><li>1 saved voice</li><li>Core voice-matching</li><li>3 starter styles</li></ul>
       <a href="/app" class="btn btn-outline">Start free</a>
     </div>
     <div class="tier rv" data-m-price="$11.99" data-m-per="/mo" data-m-bill="billed monthly · ~$2.99/week" data-a-price="$10.00" data-a-per="/mo" data-a-bill="billed annually · $119.99/yr" data-a-save="$23.89/yr">
       <div class="nm">Starter</div>
       <div class="amt">$11.99<span class="per">/mo</span></div>
       <div class="bill">billed monthly · ~$2.99/week</div>
-      <ul><li>1,000-character rewrites</li><li>~200 rewrites / mo</li><li>3 saved voices</li><li>Rewrite history</li><li>AI-ism scrubber</li></ul>
+      <ul><li>3,000-character rewrites</li><li>~200 rewrites / mo</li><li>3 saved voices</li><li>Rewrite history</li><li>AI-ism scrubber</li></ul>
       <a href="/app?plan=starter" data-plan="starter" data-base="starter" class="btn btn-outline">Choose Starter</a>
     </div>
     <div class="tier pop rv" data-m-price="$19.99" data-m-per="/mo" data-m-bill="billed monthly · ~$4.99/week" data-a-price="$16.67" data-a-per="/mo" data-a-bill="billed annually · $199.99/yr" data-a-save="$39.89/yr">
@@ -626,7 +626,7 @@
       <div class="nm">Pro</div>
       <div class="amt">$19.99<span class="per">/mo</span></div>
       <div class="bill">billed monthly · ~$4.99/week</div>
-      <ul><li>3,000-character rewrites</li><li>~600 rewrites / mo</li><li>10 saved voices</li><li>Full voice library</li><li>Length control — expand or condense</li><li>Multi-channel + priority</li></ul>
+      <ul><li>8,000-character rewrites</li><li>~600 rewrites / mo</li><li>10 saved voices</li><li>Full voice library</li><li>Length control — expand or condense</li><li>Multi-channel + priority</li></ul>
       <a href="/app?plan=pro" data-plan="pro" data-base="pro" class="btn btn-primary">Choose Pro</a>
     </div>
     <div class="tier rv" data-m-price="$31.99" data-m-per="/mo" data-m-bill="billed monthly · ~$7.99/week" data-a-price="$26.67" data-a-per="/mo" data-a-bill="billed annually · $319.99/yr" data-a-save="$63.89/yr">
@@ -791,7 +791,7 @@
   }
   if(tInput){
     tInput.addEventListener('input',()=>{
-      const n=tInput.value.length; tCount.textContent=n+' / 200'; tCount.classList.toggle('over',n>=200);
+      const n=tInput.value.length; tCount.textContent=n+' / 1,000'; tCount.classList.toggle('over',n>=1000);
     });
     tInput.addEventListener('click',(e)=>e.stopPropagation());
   }
