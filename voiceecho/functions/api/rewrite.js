@@ -9,7 +9,7 @@ const ADMIN_EMAIL = "rinostories@gmail.com"; // may use overridePlan to test any
 // Monthly rewrite limits — keep in sync with app/index.html PLANS.
 const MONTHLY = { free:15, starter:200, pro:600, studio:1500, lifetime:100000 };
 // Per-rewrite input character limits — keep in sync with app/index.html + pricing cards.
-const CHARLIMIT = { free:200, starter:1000, pro:3000, studio:Infinity, lifetime:Infinity };
+const CHARLIMIT = { free:1000, starter:3000, pro:8000, studio:Infinity, lifetime:Infinity };
 const CHANNELS_ALLOWED = { free:false, starter:false, pro:true, studio:true, lifetime:true };
 
 const LIBRARY = {
