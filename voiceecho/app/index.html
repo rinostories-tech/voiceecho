@@ -501,9 +501,9 @@
   // Plan matrix — MUST match functions/api/rewrite.js and the pricing page.
   // These drive the UI only. Real limits are enforced server-side.
   const PLANS = {
-    free:     { label:"Free",     voices:1,    channels:false, historyDepth:3,   rewrites:15,     chars:200      },
-    starter:  { label:"Starter",  voices:3,    channels:false, historyDepth:50,  rewrites:200,    chars:1000     },
-    pro:      { label:"Pro",      voices:10,   channels:true,  historyDepth:200, rewrites:600,    chars:3000     },
+    free:     { label:"Free",     voices:1,    channels:false, historyDepth:3,   rewrites:15,     chars:1000     },
+    starter:  { label:"Starter",  voices:3,    channels:false, historyDepth:50,  rewrites:200,    chars:3000     },
+    pro:      { label:"Pro",      voices:10,   channels:true,  historyDepth:200, rewrites:600,    chars:8000     },
     studio:   { label:"Studio",   voices:25,   channels:true,  historyDepth:500, rewrites:1500,   chars:Infinity },
     lifetime: { label:"Lifetime", voices:9999, channels:true,  historyDepth:999, rewrites:100000, chars:Infinity },
   };
@@ -900,7 +900,7 @@
     if(reason==="out"){ $("upTitle").textContent="You're out of rewrites this month"; $("upBody").textContent="Upgrade to keep rewriting. Prices are per week, billed monthly."; }
     else if(reason==="voices"){ $("upTitle").textContent="Need more voices"; $("upBody").textContent="Higher plans unlock more saved voices. Prices are per week."; }
     else if(reason==="length"){ $("upTitle").textContent="Length control is a Pro feature"; $("upBody").textContent="Upgrade to Pro or above to expand or condense any rewrite on the fly. Prices are per week."; }
-    else if(reason==="chars"){ $("upTitle").textContent="This draft is over your length limit"; $("upBody").textContent="Free rewrites are capped at 200 characters. Upgrade to paste longer drafts — Starter 1,000, Pro 3,000, Studio & Lifetime unlimited."; }
+    else if(reason==="chars"){ $("upTitle").textContent="This draft is over your length limit"; $("upBody").textContent="Free rewrites are capped at 1,000 characters. Upgrade to paste longer drafts — Starter 3,000, Pro 8,000, Studio & Lifetime unlimited."; }
     else { $("upTitle").textContent="Upgrade your plan"; $("upBody").textContent="Unlock more voices, styles and rewrites. Prices are per week."; }
     $("overlay").classList.add("show");
   }
