@@ -1041,12 +1041,12 @@
   // three very different rhythms — if they all came out similar the demo would
   // be proving the opposite of what we want.
   const SAMPLES = [
-    { name:'Clipped',
-      text:"Shipped the new pricing page last night. Took four hours, most of it arguing with myself about the middle tier. It's live. It's fine. I'll rewrite it in a month like I always do.\n\nTwo things I got wrong. The annual toggle was buried. And nobody read the third bullet, ever." },
-    { name:'Rambling',
-      text:"I've been thinking about this for a while now — probably longer than it deserves, honestly — and I keep coming back to the same thing, which is that most of the advice out there assumes you already have an audience, and if you don't (and I didn't, for about two years) then almost none of it actually applies to your situation in any useful way." },
+    { name:'Analytical',
+      text:"The drop-off is real, but I'd be careful reading too much into it yet. We changed two things in the same week, which means we can't cleanly attribute the movement to either one. My working assumption is that it's mostly the checkout change — partly because the timing lines up, and partly because the mobile cohort moved further than desktop, which is what you'd expect if that were the cause. I'd want another week of data before acting on it." },
+    { name:'Joking',
+      text:"So the launch went great, if by great you mean the payment page was broken for six hours and nobody told me. Found out from a customer. On Twitter. Anyway! Fixed now. I've added a monitor, which is the professional way of saying I panicked and googled how to add a monitor. Small business, big dreams, zero uptime alerts until roughly 4pm yesterday." },
     { name:'Formal',
-      text:"Following the quarterly review, we have identified three areas requiring attention. The first concerns onboarding completion, which has declined by a margin that warrants investigation. The second relates to support response times. The third is documentation coverage, which remains incomplete in several modules." },
+      text:"Following the quarterly review, we have identified three areas that require attention. The first concerns onboarding completion, which has declined by a margin that warrants further investigation. The second relates to support response times, particularly during periods of elevated volume. The third is documentation coverage, which remains incomplete across several modules and should be prioritised accordingly." },
   ];
 
   SAMPLES.forEach((s,i)=>{
@@ -1057,7 +1057,7 @@
       [...chipsEl.children].forEach((c,j)=>c.classList.toggle('on', i===j));
       count(sampleEl, $('pfSampleCount'), 1200);
       if(!draftEl.value.trim()){
-        draftEl.value = "we are excited to announce that our new feature is now available. it leverages cutting edge technology to deliver a seamless experience for all users.";
+        draftEl.value = "We are thrilled to announce that our new feature is now live. It leverages cutting-edge technology to deliver a seamless, robust experience that we believe will unlock significant value for all users.";
         count(draftEl, $('pfDraftCount'), 600);
       }
     };
