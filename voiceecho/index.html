@@ -413,98 +413,170 @@
     .tryme{width:124px}
     .try-bar .btn-sm{flex:1}
   }
-<!-- ═══════════════════════════════════════════════════════════════════════
-     PASTE 1 of 3 — CSS
-     Goes inside the existing <style> block, just before its closing </style>
-     (line 416). Uses only tokens already in :root — no new colours.
-     ═══════════════════════════════════════════════════════════════════ -->
+/* ── proof: side-by-side voice match ── */
+.pf-grid{display:grid;gap:14px;margin-bottom:16px}
+.pf-pane{background:var(--card);border:1px solid var(--line-2);border-radius:var(--radius);overflow:hidden}
+.pf-pane-top{display:flex;align-items:center;justify-content:space-between;gap:10px;
+  padding:11px 14px;border-bottom:1px solid var(--line);background:var(--paper-2)}
+.pf-pane-top .lbl{font-family:var(--mono);font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-2)}
+.pf-pane-top .lbl b{color:var(--violet);font-weight:400;margin-right:7px}
+.pf-pane textarea{width:100%;display:block;background:transparent;border:0;resize:vertical;
+  padding:15px 14px;font-family:var(--sans);font-size:15px;line-height:1.6;color:var(--ink);min-height:132px}
+.pf-pane textarea:focus{outline:0}
+.pf-pane:focus-within{border-color:var(--violet);box-shadow:0 0 0 3px rgba(91,60,255,.11)}
+.pf-pane .hint{padding:0 14px 12px;font-family:var(--mono);font-size:11.5px;color:var(--ink-3)}
+.pf-pane .hint.over{color:var(--red)}
 
-  /* ── proof: side-by-side voice match ── */
-  .pf-grid{display:grid;gap:14px;margin-bottom:16px}
-  .pf-pane{background:var(--card);border:1px solid var(--line-2);border-radius:var(--radius);overflow:hidden}
-  .pf-pane-top{display:flex;align-items:center;justify-content:space-between;gap:10px;
-    padding:11px 14px;border-bottom:1px solid var(--line);background:var(--paper-2)}
-  .pf-pane-top .lbl{font-family:var(--mono);font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-2)}
-  .pf-pane-top .lbl b{color:var(--violet);font-weight:400;margin-right:7px}
-  .pf-pane textarea{width:100%;display:block;background:transparent;border:0;resize:vertical;
-    padding:15px 14px;font-family:var(--sans);font-size:15px;line-height:1.6;color:var(--ink);min-height:132px}
-  .pf-pane textarea:focus{outline:0}
-  .pf-pane:focus-within{border-color:var(--violet);box-shadow:0 0 0 3px rgba(91,60,255,.11)}
-  .pf-pane .hint{padding:0 14px 12px;font-family:var(--mono);font-size:11.5px;color:var(--ink-3)}
-  .pf-pane .hint.over{color:var(--red)}
+.pf-chips{display:flex;gap:7px;flex-wrap:wrap;align-items:center}
+.pf-chip{font-family:var(--mono);font-size:11px;padding:5px 10px;border-radius:7px;cursor:pointer;
+  border:1px solid var(--line-2);background:transparent;color:var(--ink-2);transition:.18s;min-height:30px}
+.pf-chip:hover{border-color:var(--ink);color:var(--ink)}
+.pf-chip.on{background:var(--ink);color:var(--paper);border-color:var(--ink)}
 
-  .pf-chips{display:flex;gap:7px;flex-wrap:wrap;align-items:center}
-  .pf-chip{font-family:var(--mono);font-size:11px;padding:5px 10px;border-radius:7px;cursor:pointer;
-    border:1px solid var(--line-2);background:transparent;color:var(--ink-2);transition:.18s;min-height:30px}
-  .pf-chip:hover{border-color:var(--ink);color:var(--ink)}
-  .pf-chip.on{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.pf-bar{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:26px}
+.pf-runs{font-family:var(--mono);font-size:12px;color:var(--ink-3)}
+.pf-err{color:var(--red);font-size:13px;font-family:var(--mono);margin-bottom:14px;min-height:1px}
 
-  .pf-bar{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:26px}
-  .pf-runs{font-family:var(--mono);font-size:12px;color:var(--ink-3)}
-  .pf-err{color:var(--red);font-size:13px;font-family:var(--mono);margin-bottom:14px;min-height:1px}
+.pf-out{display:grid;gap:14px}
+.pf-col{border-radius:var(--radius);padding:18px 17px 20px;border:1px solid var(--line-2);background:var(--card)}
+.pf-col.win{border-color:var(--violet);border-width:1.5px;box-shadow:0 24px 44px -38px rgba(91,60,255,.6)}
+.pf-col .tag{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--ink-3);display:flex;align-items:center;gap:8px;margin-bottom:13px}
+.pf-col.win .tag{color:var(--violet)}
+.pf-col .tag::after{content:"";flex:1;height:1px;background:var(--line)}
+.pf-col .body{font-size:15.5px;line-height:1.62;color:var(--ink-2);white-space:pre-wrap}
+.pf-col.win .body{color:var(--ink)}
+.pf-col.win .body .mk{background:linear-gradient(transparent 62%,var(--hi) 62%);
+  -webkit-box-decoration-break:clone;box-decoration-break:clone;padding:0 1px}
+.pf-col.empty .body{color:var(--ink-3);font-family:var(--mono);font-size:13px}
+.pf-col.loading .body{opacity:.4}
 
-  .pf-out{display:grid;gap:14px}
-  .pf-col{border-radius:var(--radius);padding:18px 17px 20px;border:1px solid var(--line-2);background:var(--card)}
-  .pf-col.win{border-color:var(--violet);border-width:1.5px;box-shadow:0 24px 44px -38px rgba(91,60,255,.6)}
-  .pf-col .tag{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;
-    color:var(--ink-3);display:flex;align-items:center;gap:8px;margin-bottom:13px}
-  .pf-col.win .tag{color:var(--violet)}
-  .pf-col .tag::after{content:"";flex:1;height:1px;background:var(--line)}
-  .pf-col .body{font-size:15.5px;line-height:1.62;color:var(--ink-2);white-space:pre-wrap}
-  .pf-col.win .body{color:var(--ink)}
-  .pf-col.win .body .mk{background:linear-gradient(transparent 62%,var(--hi) 62%);
-    -webkit-box-decoration-break:clone;box-decoration-break:clone;padding:0 1px}
-  .pf-col.empty .body{color:var(--ink-3);font-family:var(--mono);font-size:13px}
-  .pf-col.loading .body{opacity:.4}
+.pf-note{margin-top:18px;font-family:var(--mono);font-size:12.5px;color:var(--ink-2);line-height:1.6}
+.pf-note a{color:var(--violet);text-decoration:underline;text-underline-offset:2px}
 
-  .pf-note{margin-top:18px;font-family:var(--mono);font-size:12.5px;color:var(--ink-2);line-height:1.6}
-  .pf-note a{color:var(--violet);text-decoration:underline;text-underline-offset:2px}
+/* ── science ── */
+.sci{display:grid;gap:26px;margin-top:16px}
+.sci p{margin:0 0 15px;color:var(--ink-2);font-size:16px;line-height:1.68;max-width:62ch}
+.sci p:last-child{margin-bottom:0}
+.sci strong{color:var(--ink);font-weight:600}
+.sci .term{font-family:var(--mono);font-size:.9em;color:var(--violet);background:rgba(91,60,255,.07);
+  padding:1px 6px;border-radius:5px}
+.sci .aside{font-family:var(--disp);font-weight:500;font-size:clamp(19px,4.6vw,25px);line-height:1.34;
+  color:var(--ink);letter-spacing:-.01em;border-left:2px solid var(--hi);padding-left:18px;margin:26px 0}
 
-  /* ── science ── */
-  .sci{display:grid;gap:26px;margin-top:16px}
-  .sci p{margin:0 0 15px;color:var(--ink-2);font-size:16px;line-height:1.68;max-width:62ch}
-  .sci p:last-child{margin-bottom:0}
-  .sci strong{color:var(--ink);font-weight:600}
-  .sci .term{font-family:var(--mono);font-size:.9em;color:var(--violet);background:rgba(91,60,255,.07);
-    padding:1px 6px;border-radius:5px}
-  .sci .aside{font-family:var(--disp);font-weight:500;font-size:clamp(19px,4.6vw,25px);line-height:1.34;
-    color:var(--ink);letter-spacing:-.01em;border-left:2px solid var(--hi);padding-left:18px;margin:26px 0}
+.sci-stats{display:grid;gap:11px;margin-top:26px}
+.sci-stat{border-top:2px solid var(--ink);padding:14px 0 2px}
+.sci-stat .k{font-family:var(--mono);font-size:11px;letter-spacing:.11em;text-transform:uppercase;color:var(--violet);margin-bottom:7px}
+.sci-stat .v{font-family:var(--disp);font-weight:600;font-size:17px;letter-spacing:-.01em;margin-bottom:5px}
+.sci-stat .d{font-size:14px;color:var(--ink-2);line-height:1.55}
 
-  .sci-stats{display:grid;gap:11px;margin-top:26px}
-  .sci-stat{border-top:2px solid var(--ink);padding:14px 0 2px}
-  .sci-stat .k{font-family:var(--mono);font-size:11px;letter-spacing:.11em;text-transform:uppercase;color:var(--violet);margin-bottom:7px}
-  .sci-stat .v{font-family:var(--disp);font-weight:600;font-size:17px;letter-spacing:-.01em;margin-bottom:5px}
-  .sci-stat .d{font-size:14px;color:var(--ink-2);line-height:1.55}
+.srcbox{background:var(--paper-2);border:1px solid var(--line-2);border-radius:var(--radius);
+  padding:19px 18px;margin-top:30px}
+.srcbox .hd{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--ink-3);margin-bottom:14px;display:flex;align-items:center;gap:9px}
+.srcbox .hd::after{content:"";flex:1;height:1px;background:var(--line-2)}
+.srcbox ol{margin:0;padding-left:20px;display:grid;gap:11px}
+.srcbox li{font-size:13.5px;line-height:1.55;color:var(--ink-2)}
+.srcbox li::marker{font-family:var(--mono);font-size:12px;color:var(--ink-3)}
+.srcbox cite{font-style:normal;color:var(--ink);font-weight:500}
+.srcbox a{color:var(--violet);text-decoration:underline;text-underline-offset:2px;word-break:break-word}
+.srcbox .fine{margin-top:15px;padding-top:13px;border-top:1px solid var(--line-2);
+  font-family:var(--mono);font-size:11.5px;color:var(--ink-3);line-height:1.6}
 
-  .srcbox{background:var(--paper-2);border:1px solid var(--line-2);border-radius:var(--radius);
-    padding:19px 18px;margin-top:30px}
-  .srcbox .hd{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;
-    color:var(--ink-3);margin-bottom:14px;display:flex;align-items:center;gap:9px}
-  .srcbox .hd::after{content:"";flex:1;height:1px;background:var(--line-2)}
-  .srcbox ol{margin:0;padding-left:20px;display:grid;gap:11px}
-  .srcbox li{font-size:13.5px;line-height:1.55;color:var(--ink-2)}
-  .srcbox li::marker{font-family:var(--mono);font-size:12px;color:var(--ink-3)}
-  .srcbox cite{font-style:normal;color:var(--ink);font-weight:500}
-  .srcbox a{color:var(--violet);text-decoration:underline;text-underline-offset:2px;word-break:break-word}
-  .srcbox .fine{margin-top:15px;padding-top:13px;border-top:1px solid var(--line-2);
-    font-family:var(--mono);font-size:11.5px;color:var(--ink-3);line-height:1.6}
+@media(min-width:820px){
+  .pf-grid{grid-template-columns:1fr 1fr}
+  .pf-out{grid-template-columns:1fr 1fr}
+  .sci-stats{grid-template-columns:repeat(3,1fr);gap:22px}
+  .sci{grid-template-columns:1fr}
+  .pf-col{padding:22px 21px 24px}
+}
+</style>
+<noscript><style>.rv{opacity:1!important;transform:none!important}</style></noscript>
+</head>
+<body>
 
-  @media(min-width:820px){
-    .pf-grid{grid-template-columns:1fr 1fr}
-    .pf-out{grid-template-columns:1fr 1fr}
-    .sci-stats{grid-template-columns:repeat(3,1fr);gap:22px}
-    .sci{grid-template-columns:1fr}
-    .pf-col{padding:22px 21px 24px}
-  }
+<div class="menu" id="menu" aria-hidden="true">
+  <div class="menu-top">
+    <a href="/" class="logo"><span class="mark">◈</span> EchoWrite</a>
+    <button class="menu-x" aria-label="Close menu" onclick="closeMenu()">×</button>
+  </div>
+  <div class="menu-links">
+    <a href="#how" onclick="closeMenu()">How it works</a>
+    <a href="#features" onclick="closeMenu()">Features</a>
+    <a href="#pricing" onclick="closeMenu()">Pricing</a>
+    <a href="#faq" onclick="closeMenu()">FAQ</a>
+  </div>
+  <a href="/app" class="btn btn-primary">Rewrite my first draft free →</a>
+</div>
 
+<nav>
+  <div class="wrap nav-in">
+    <a href="/" class="logo"><span class="mark">◈</span> EchoWrite</a>
+    <div class="nav-links">
+      <a href="#how">How it works</a>
+      <a href="#features">Features</a>
+      <a href="#pricing">Pricing</a>
+      <a href="#faq">FAQ</a>
+    </div>
+    <a href="/app" class="btn btn-primary nav-cta">Start free →</a>
+    <button class="burger" aria-label="Open menu" onclick="document.getElementById('menu').classList.add('open')">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
 
-<!-- ═══════════════════════════════════════════════════════════════════════
-     PASTE 2 of 3 — MARKUP
-     Goes directly after the ticker div (line 502), before <section id="how">.
-     Then renumber the kickers below it: how 01→02, features 02→03,
-     early users 03→04, pricing 04→05, faq 05→06.
-     ═══════════════════════════════════════════════════════════════════ -->
+<main>
 
+<!-- 00 HERO -->
+<header class="hero wrap">
+  <div class="hero-copy">
+    <div class="kicker"><span class="idx">00</span> The voice engine</div>
+    <h1>Sound like <span class="hl">you</span>. Not like everything else.</h1>
+    <p class="sub">Train EchoWrite on a few things you've actually written. Then turn any rough idea — or stiff AI draft — into copy in your rhythm, your phrasing, your voice.</p>
+    <div class="hero-cta">
+      <a href="/app" class="btn btn-primary">Rewrite my first draft free</a>
+      <a href="#demo" class="btn btn-outline">See it work ↓</a>
+    </div>
+    <div class="micro">15 free rewrites · no card required</div>
+  </div>
+
+  <!-- signature: marked-up manuscript -->
+  <div class="demo-wrap">
+    <div class="tryme" id="tryme" aria-hidden="true">
+      <svg viewBox="0 0 280 175">
+        <path class="a1" d="M172 78 C 176 26, 96 6, 52 30 C 22 46, 20 88, 44 110"/>
+        <path class="a2" d="M44 110 L 26 99 M44 110 L 55 91"/>
+        <text x="112" y="122" font-size="48" transform="rotate(-7 112 122)">TRY</text>
+        <text x="128" y="166" font-size="48" transform="rotate(-7 128 166)">ME</text>
+      </svg>
+    </div>
+    <div class="print rv" id="demo">
+    <div class="print-top"><b></b><b></b><b></b><span class="fn">your-voice.md</span></div>
+    <div class="print-body">
+      <div class="vtabs" id="vtabs"></div>
+      <div class="strike-row">
+        <s>In today's fast-paced landscape,</s> <span class="del">cut</span> <s>it is important to note that</s> <span class="del">cut</span>
+      </div>
+      <div class="out-line"><span id="typed"></span></div>
+      <div class="wave" id="wave"></div>
+      <div class="tryui" id="tryui" hidden>
+        <textarea id="tryInput" maxlength="1000" rows="3" placeholder="Write or paste a sentence you'd actually write…"></textarea>
+        <div class="try-bar">
+          <span class="try-count" id="tryCount">0 / 1,000</span>
+          <button class="btn btn-primary btn-sm" id="tryRun">Rewrite it →</button>
+        </div>
+        <div class="wave" id="tryWave" hidden></div>
+        <div class="try-out" id="tryOut" hidden></div>
+        <div class="try-cta" id="tryCta" hidden>That's a generic human voice. <a href="/app">Train it on <b>your</b> writing → it sounds like you →</a></div>
+        <div class="try-err" id="tryErr"></div>
+      </div>
+    </div>
+  </div>
+  </div>
+</header>
+
+<!-- AI-ism ticker -->
+<div class="ticker" aria-hidden="true"><div class="track" id="track"></div></div>
 <!-- 01 PROOF -->
 <section id="proof" class="wrap">
   <div class="sec-head rv">
@@ -613,218 +685,10 @@
   </div>
 </section>
 
-
-<!-- ═══════════════════════════════════════════════════════════════════════
-     PASTE 3 of 3 — JS
-     Goes at the end of the FIRST <script> block, just before its </script>
-     (line 814). Self-contained IIFE — nothing leaks into your existing scope.
-     ═══════════════════════════════════════════════════════════════════ -->
-
-  // ── proof demo: one draft, two rewrites ──
-  (function(){
-    const $ = (id) => document.getElementById(id);
-    const sampleEl = $('pfSample'), draftEl = $('pfDraft'), runEl = $('pfRun'),
-          errEl = $('pfErr'), runsEl = $('pfRuns'), noteEl = $('pfNote'),
-          ctrlEl = $('pfControl'), voiceEl = $('pfVoiced'), chipsEl = $('pfChips');
-    if(!sampleEl) return;
-
-    const esc = (s) => s.replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
-
-    // One-click samples, so nobody has to paste to see the effect. Deliberately
-    // three very different rhythms — if they all came out similar the demo would
-    // be proving the opposite of what we want.
-    const SAMPLES = [
-      { name:'Clipped',
-        text:"Shipped the new pricing page last night. Took four hours, most of it arguing with myself about the middle tier. It's live. It's fine. I'll rewrite it in a month like I always do.\n\nTwo things I got wrong. The annual toggle was buried. And nobody read the third bullet, ever." },
-      { name:'Rambling',
-        text:"I've been thinking about this for a while now — probably longer than it deserves, honestly — and I keep coming back to the same thing, which is that most of the advice out there assumes you already have an audience, and if you don't (and I didn't, for about two years) then almost none of it actually applies to your situation in any useful way." },
-      { name:'Formal',
-        text:"Following the quarterly review, we have identified three areas requiring attention. The first concerns onboarding completion, which has declined by a margin that warrants investigation. The second relates to support response times. The third is documentation coverage, which remains incomplete in several modules." },
-    ];
-
-    SAMPLES.forEach((s,i)=>{
-      const b=document.createElement('button');
-      b.className='pf-chip'; b.type='button'; b.textContent=s.name;
-      b.onclick=()=>{
-        sampleEl.value = s.text;
-        [...chipsEl.children].forEach((c,j)=>c.classList.toggle('on', i===j));
-        count(sampleEl, $('pfSampleCount'), 1200);
-        if(!draftEl.value.trim()){
-          draftEl.value = "we are excited to announce that our new feature is now available. it leverages cutting edge technology to deliver a seamless experience for all users.";
-          count(draftEl, $('pfDraftCount'), 600);
-        }
-      };
-      chipsEl.appendChild(b);
-    });
-
-    function count(el, out, max){
-      const n = el.value.length;
-      out.textContent = n.toLocaleString() + ' / ' + max.toLocaleString();
-      out.classList.toggle('over', n >= max);
-    }
-    sampleEl.addEventListener('input', ()=>{
-      count(sampleEl, $('pfSampleCount'), 1200);
-      [...chipsEl.children].forEach(c=>c.classList.remove('on'));
-    });
-    draftEl.addEventListener('input', ()=>count(draftEl, $('pfDraftCount'), 600));
-
-    function paint(el, text, mark){
-      el.classList.remove('empty','loading');
-      el.querySelector('.body').innerHTML = mark
-        ? '<span class="mk">' + esc(text) + '</span>'
-        : esc(text);
-    }
-
-    let busy = false;
-    async function run(){
-      if(busy) return;
-      const sample = sampleEl.value.trim(), draft = draftEl.value.trim();
-      errEl.textContent = '';
-
-      if(sample.length < 120){
-        errEl.textContent = 'Paste a bit more of your writing — about two sentences.';
-        sampleEl.focus(); return;
-      }
-      if(!draft){ errEl.textContent = 'Add a draft to rewrite.'; draftEl.focus(); return; }
-
-      busy = true;
-      runEl.disabled = true; runEl.textContent = 'Rewriting…';
-      [ctrlEl, voiceEl].forEach(c=>{ c.classList.add('loading'); c.classList.remove('empty'); });
-      ctrlEl.querySelector('.body').textContent = 'Working…';
-      voiceEl.querySelector('.body').textContent = 'Reading your style…';
-      noteEl.hidden = true;
-
-      try{
-        const r = await fetch('/api/demo', {
-          method:'POST',
-          headers:{'content-type':'application/json'},
-          body: JSON.stringify({ sample, draft })
-        });
-        const d = await r.json().catch(()=>({}));
-
-        if(r.status === 429 || d.gated){
-          errEl.innerHTML = esc(d.error||'') + ' <a href="/app" style="color:var(--violet)">Create one →</a>';
-          [ctrlEl, voiceEl].forEach(c=>c.classList.remove('loading'));
-          return;
-        }
-        if(!r.ok){
-          errEl.textContent = d.error || 'Something went wrong — try again.';
-          [ctrlEl, voiceEl].forEach(c=>c.classList.remove('loading'));
-          return;
-        }
-
-        paint(ctrlEl,  d.control || '', false);
-        paint(voiceEl, d.voiced  || '', true);
-        noteEl.hidden = false;
-
-        if(typeof d.remaining === 'number'){
-          runsEl.textContent = d.remaining > 0
-            ? d.remaining + ' free run' + (d.remaining===1?'':'s') + ' left today'
-            : 'That was your last free run';
-        }
-      }catch(e){
-        errEl.textContent = 'Network hiccup — try again.';
-        [ctrlEl, voiceEl].forEach(c=>c.classList.remove('loading'));
-      }finally{
-        busy = false;
-        runEl.disabled = false; runEl.textContent = 'Rewrite it both ways →';
-      }
-    }
-
-    runEl.addEventListener('click', run);
-  })();
-</style>
-<noscript><style>.rv{opacity:1!important;transform:none!important}</style></noscript>
-</head>
-<body>
-
-<div class="menu" id="menu" aria-hidden="true">
-  <div class="menu-top">
-    <a href="/" class="logo"><span class="mark">◈</span> EchoWrite</a>
-    <button class="menu-x" aria-label="Close menu" onclick="closeMenu()">×</button>
-  </div>
-  <div class="menu-links">
-    <a href="#how" onclick="closeMenu()">How it works</a>
-    <a href="#features" onclick="closeMenu()">Features</a>
-    <a href="#pricing" onclick="closeMenu()">Pricing</a>
-    <a href="#faq" onclick="closeMenu()">FAQ</a>
-  </div>
-  <a href="/app" class="btn btn-primary">Rewrite my first draft free →</a>
-</div>
-
-<nav>
-  <div class="wrap nav-in">
-    <a href="/" class="logo"><span class="mark">◈</span> EchoWrite</a>
-    <div class="nav-links">
-      <a href="#how">How it works</a>
-      <a href="#features">Features</a>
-      <a href="#pricing">Pricing</a>
-      <a href="#faq">FAQ</a>
-    </div>
-    <a href="/app" class="btn btn-primary nav-cta">Start free →</a>
-    <button class="burger" aria-label="Open menu" onclick="document.getElementById('menu').classList.add('open')">
-      <span></span><span></span><span></span>
-    </button>
-  </div>
-</nav>
-
-<main>
-
-<!-- 00 HERO -->
-<header class="hero wrap">
-  <div class="hero-copy">
-    <div class="kicker"><span class="idx">00</span> The voice engine</div>
-    <h1>Sound like <span class="hl">you</span>. Not like everything else.</h1>
-    <p class="sub">Train EchoWrite on a few things you've actually written. Then turn any rough idea — or stiff AI draft — into copy in your rhythm, your phrasing, your voice.</p>
-    <div class="hero-cta">
-      <a href="/app" class="btn btn-primary">Rewrite my first draft free</a>
-      <a href="#demo" class="btn btn-outline">See it work ↓</a>
-    </div>
-    <div class="micro">15 free rewrites · no card required</div>
-  </div>
-
-  <!-- signature: marked-up manuscript -->
-  <div class="demo-wrap">
-    <div class="tryme" id="tryme" aria-hidden="true">
-      <svg viewBox="0 0 280 175">
-        <path class="a1" d="M172 78 C 176 26, 96 6, 52 30 C 22 46, 20 88, 44 110"/>
-        <path class="a2" d="M44 110 L 26 99 M44 110 L 55 91"/>
-        <text x="112" y="122" font-size="48" transform="rotate(-7 112 122)">TRY</text>
-        <text x="128" y="166" font-size="48" transform="rotate(-7 128 166)">ME</text>
-      </svg>
-    </div>
-    <div class="print rv" id="demo">
-    <div class="print-top"><b></b><b></b><b></b><span class="fn">your-voice.md</span></div>
-    <div class="print-body">
-      <div class="vtabs" id="vtabs"></div>
-      <div class="strike-row">
-        <s>In today's fast-paced landscape,</s> <span class="del">cut</span> <s>it is important to note that</s> <span class="del">cut</span>
-      </div>
-      <div class="out-line"><span id="typed"></span></div>
-      <div class="wave" id="wave"></div>
-      <div class="tryui" id="tryui" hidden>
-        <textarea id="tryInput" maxlength="1000" rows="3" placeholder="Write or paste a sentence you'd actually write…"></textarea>
-        <div class="try-bar">
-          <span class="try-count" id="tryCount">0 / 1,000</span>
-          <button class="btn btn-primary btn-sm" id="tryRun">Rewrite it →</button>
-        </div>
-        <div class="wave" id="tryWave" hidden></div>
-        <div class="try-out" id="tryOut" hidden></div>
-        <div class="try-cta" id="tryCta" hidden>That's a generic human voice. <a href="/app">Train it on <b>your</b> writing → it sounds like you →</a></div>
-        <div class="try-err" id="tryErr"></div>
-      </div>
-    </div>
-  </div>
-  </div>
-</header>
-
-<!-- AI-ism ticker -->
-<div class="ticker" aria-hidden="true"><div class="track" id="track"></div></div>
-
-<!-- 01 HOW -->
+<!-- 03 HOW -->
 <section id="how" class="wrap">
   <div class="sec-head rv">
-    <div class="kicker"><span class="idx">01</span> How it works</div>
+    <div class="kicker"><span class="idx">03</span> How it works</div>
     <h2>Three steps. About ten seconds.</h2>
     <p class="lead">No prompt engineering. No wrestling with tone every time. Set your voice once, reuse it forever.</p>
   </div>
@@ -835,10 +699,10 @@
   </div>
 </section>
 
-<!-- 02 FEATURES -->
+<!-- 04 FEATURES -->
 <section id="features" class="wrap">
   <div class="sec-head rv">
-    <div class="kicker"><span class="idx">02</span> What's inside</div>
+    <div class="kicker"><span class="idx">04</span> What's inside</div>
     <h2>Not a humanizer. A voice engine.</h2>
     <p class="lead">Most AI tools flatten everything into the same "casual" mush. EchoWrite learns your specific voice and holds it across everything you publish.</p>
   </div>
@@ -886,10 +750,10 @@
   </div>
 </section>
 
-<!-- 03 PROOF -->
+<!-- 05 PROOF -->
 <section class="wrap">
   <div class="sec-head rv">
-    <div class="kicker"><span class="idx">03</span> Early users</div>
+    <div class="kicker"><span class="idx">05</span> Early users</div>
     <h2>People stopped sounding like a model.</h2>
   </div>
   <div class="quotes">
@@ -908,10 +772,10 @@
   </div>
 </section>
 
-<!-- 04 PRICING -->
+<!-- 06 PRICING -->
 <section id="pricing" class="wrap">
   <div class="sec-head rv">
-    <div class="kicker"><span class="idx">04</span> Pricing</div>
+    <div class="kicker"><span class="idx">06</span> Pricing</div>
     <h2>Simple, flexible pricing.</h2>
     <p class="lead">Start free. Move up when you're writing every day — or pay once and keep it for life.</p>
   </div>
@@ -975,10 +839,10 @@
   </div>
 </section>
 
-<!-- 05 FAQ -->
+<!-- 07 FAQ -->
 <section id="faq" class="wrap">
   <div class="sec-head rv">
-    <div class="kicker"><span class="idx">05</span> Questions</div>
+    <div class="kicker"><span class="idx">07</span> Questions</div>
     <h2>Good to know.</h2>
   </div>
   <div class="faq">
@@ -1131,6 +995,119 @@
     }
   }
   if(tRun) tRun.addEventListener('click',(e)=>{ e.stopPropagation(); runTry(); });
+// ── proof demo: one draft, two rewrites ──
+(function(){
+  const $ = (id) => document.getElementById(id);
+  const sampleEl = $('pfSample'), draftEl = $('pfDraft'), runEl = $('pfRun'),
+        errEl = $('pfErr'), runsEl = $('pfRuns'), noteEl = $('pfNote'),
+        ctrlEl = $('pfControl'), voiceEl = $('pfVoiced'), chipsEl = $('pfChips');
+  if(!sampleEl) return;
+
+  const esc = (s) => s.replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+
+  // One-click samples, so nobody has to paste to see the effect. Deliberately
+  // three very different rhythms — if they all came out similar the demo would
+  // be proving the opposite of what we want.
+  const SAMPLES = [
+    { name:'Clipped',
+      text:"Shipped the new pricing page last night. Took four hours, most of it arguing with myself about the middle tier. It's live. It's fine. I'll rewrite it in a month like I always do.\n\nTwo things I got wrong. The annual toggle was buried. And nobody read the third bullet, ever." },
+    { name:'Rambling',
+      text:"I've been thinking about this for a while now — probably longer than it deserves, honestly — and I keep coming back to the same thing, which is that most of the advice out there assumes you already have an audience, and if you don't (and I didn't, for about two years) then almost none of it actually applies to your situation in any useful way." },
+    { name:'Formal',
+      text:"Following the quarterly review, we have identified three areas requiring attention. The first concerns onboarding completion, which has declined by a margin that warrants investigation. The second relates to support response times. The third is documentation coverage, which remains incomplete in several modules." },
+  ];
+
+  SAMPLES.forEach((s,i)=>{
+    const b=document.createElement('button');
+    b.className='pf-chip'; b.type='button'; b.textContent=s.name;
+    b.onclick=()=>{
+      sampleEl.value = s.text;
+      [...chipsEl.children].forEach((c,j)=>c.classList.toggle('on', i===j));
+      count(sampleEl, $('pfSampleCount'), 1200);
+      if(!draftEl.value.trim()){
+        draftEl.value = "we are excited to announce that our new feature is now available. it leverages cutting edge technology to deliver a seamless experience for all users.";
+        count(draftEl, $('pfDraftCount'), 600);
+      }
+    };
+    chipsEl.appendChild(b);
+  });
+
+  function count(el, out, max){
+    const n = el.value.length;
+    out.textContent = n.toLocaleString() + ' / ' + max.toLocaleString();
+    out.classList.toggle('over', n >= max);
+  }
+  sampleEl.addEventListener('input', ()=>{
+    count(sampleEl, $('pfSampleCount'), 1200);
+    [...chipsEl.children].forEach(c=>c.classList.remove('on'));
+  });
+  draftEl.addEventListener('input', ()=>count(draftEl, $('pfDraftCount'), 600));
+
+  function paint(el, text, mark){
+    el.classList.remove('empty','loading');
+    el.querySelector('.body').innerHTML = mark
+      ? '<span class="mk">' + esc(text) + '</span>'
+      : esc(text);
+  }
+
+  let busy = false;
+  async function run(){
+    if(busy) return;
+    const sample = sampleEl.value.trim(), draft = draftEl.value.trim();
+    errEl.textContent = '';
+
+    if(sample.length < 120){
+      errEl.textContent = 'Paste a bit more of your writing — about two sentences.';
+      sampleEl.focus(); return;
+    }
+    if(!draft){ errEl.textContent = 'Add a draft to rewrite.'; draftEl.focus(); return; }
+
+    busy = true;
+    runEl.disabled = true; runEl.textContent = 'Rewriting…';
+    [ctrlEl, voiceEl].forEach(c=>{ c.classList.add('loading'); c.classList.remove('empty'); });
+    ctrlEl.querySelector('.body').textContent = 'Working…';
+    voiceEl.querySelector('.body').textContent = 'Reading your style…';
+    noteEl.hidden = true;
+
+    try{
+      const r = await fetch('/api/demo', {
+        method:'POST',
+        headers:{'content-type':'application/json'},
+        body: JSON.stringify({ sample, draft })
+      });
+      const d = await r.json().catch(()=>({}));
+
+      if(r.status === 429 || d.gated){
+        errEl.innerHTML = esc(d.error||'') + ' <a href="/app" style="color:var(--violet)">Create one →</a>';
+        [ctrlEl, voiceEl].forEach(c=>c.classList.remove('loading'));
+        return;
+      }
+      if(!r.ok){
+        errEl.textContent = d.error || 'Something went wrong — try again.';
+        [ctrlEl, voiceEl].forEach(c=>c.classList.remove('loading'));
+        return;
+      }
+
+      paint(ctrlEl,  d.control || '', false);
+      paint(voiceEl, d.voiced  || '', true);
+      noteEl.hidden = false;
+
+      if(typeof d.remaining === 'number'){
+        runsEl.textContent = d.remaining > 0
+          ? d.remaining + ' free run' + (d.remaining===1?'':'s') + ' left today'
+          : 'That was your last free run';
+      }
+    }catch(e){
+      errEl.textContent = 'Network hiccup — try again.';
+      [ctrlEl, voiceEl].forEach(c=>c.classList.remove('loading'));
+    }finally{
+      busy = false;
+      runEl.disabled = false; runEl.textContent = 'Rewrite it both ways →';
+    }
+  }
+
+  runEl.addEventListener('click', run);
+})();
 </script>
 <script>
   // Pricing buttons: if the visitor already has a session, skip the /app hop and
