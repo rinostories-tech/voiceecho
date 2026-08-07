@@ -109,7 +109,7 @@ export async function onRequestPost(context) {
   } else if (libraryStyle && LIBRARY[libraryStyle]) {
     voiceProfile = LIBRARY[libraryStyle]; voiceName = libraryStyle;
   } else if (samples.trim().length >= 40) {
-    voiceProfile = `Match the tone, rhythm and register of these samples exactly:\n${samples}`;
+    voiceProfile = `voiceProfile = fingerprintProfile(samples);`;
     voiceName = "quick";
   } else {
     return json({ error: "Pick a voice or a library style." }, 400);
