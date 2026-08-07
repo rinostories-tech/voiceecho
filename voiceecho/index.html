@@ -413,6 +413,326 @@
     .tryme{width:124px}
     .try-bar .btn-sm{flex:1}
   }
+<!-- ═══════════════════════════════════════════════════════════════════════
+     PASTE 1 of 3 — CSS
+     Goes inside the existing <style> block, just before its closing </style>
+     (line 416). Uses only tokens already in :root — no new colours.
+     ═══════════════════════════════════════════════════════════════════ -->
+
+  /* ── proof: side-by-side voice match ── */
+  .pf-grid{display:grid;gap:14px;margin-bottom:16px}
+  .pf-pane{background:var(--card);border:1px solid var(--line-2);border-radius:var(--radius);overflow:hidden}
+  .pf-pane-top{display:flex;align-items:center;justify-content:space-between;gap:10px;
+    padding:11px 14px;border-bottom:1px solid var(--line);background:var(--paper-2)}
+  .pf-pane-top .lbl{font-family:var(--mono);font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-2)}
+  .pf-pane-top .lbl b{color:var(--violet);font-weight:400;margin-right:7px}
+  .pf-pane textarea{width:100%;display:block;background:transparent;border:0;resize:vertical;
+    padding:15px 14px;font-family:var(--sans);font-size:15px;line-height:1.6;color:var(--ink);min-height:132px}
+  .pf-pane textarea:focus{outline:0}
+  .pf-pane:focus-within{border-color:var(--violet);box-shadow:0 0 0 3px rgba(91,60,255,.11)}
+  .pf-pane .hint{padding:0 14px 12px;font-family:var(--mono);font-size:11.5px;color:var(--ink-3)}
+  .pf-pane .hint.over{color:var(--red)}
+
+  .pf-chips{display:flex;gap:7px;flex-wrap:wrap;align-items:center}
+  .pf-chip{font-family:var(--mono);font-size:11px;padding:5px 10px;border-radius:7px;cursor:pointer;
+    border:1px solid var(--line-2);background:transparent;color:var(--ink-2);transition:.18s;min-height:30px}
+  .pf-chip:hover{border-color:var(--ink);color:var(--ink)}
+  .pf-chip.on{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+
+  .pf-bar{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:26px}
+  .pf-runs{font-family:var(--mono);font-size:12px;color:var(--ink-3)}
+  .pf-err{color:var(--red);font-size:13px;font-family:var(--mono);margin-bottom:14px;min-height:1px}
+
+  .pf-out{display:grid;gap:14px}
+  .pf-col{border-radius:var(--radius);padding:18px 17px 20px;border:1px solid var(--line-2);background:var(--card)}
+  .pf-col.win{border-color:var(--violet);border-width:1.5px;box-shadow:0 24px 44px -38px rgba(91,60,255,.6)}
+  .pf-col .tag{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;
+    color:var(--ink-3);display:flex;align-items:center;gap:8px;margin-bottom:13px}
+  .pf-col.win .tag{color:var(--violet)}
+  .pf-col .tag::after{content:"";flex:1;height:1px;background:var(--line)}
+  .pf-col .body{font-size:15.5px;line-height:1.62;color:var(--ink-2);white-space:pre-wrap}
+  .pf-col.win .body{color:var(--ink)}
+  .pf-col.win .body .mk{background:linear-gradient(transparent 62%,var(--hi) 62%);
+    -webkit-box-decoration-break:clone;box-decoration-break:clone;padding:0 1px}
+  .pf-col.empty .body{color:var(--ink-3);font-family:var(--mono);font-size:13px}
+  .pf-col.loading .body{opacity:.4}
+
+  .pf-note{margin-top:18px;font-family:var(--mono);font-size:12.5px;color:var(--ink-2);line-height:1.6}
+  .pf-note a{color:var(--violet);text-decoration:underline;text-underline-offset:2px}
+
+  /* ── science ── */
+  .sci{display:grid;gap:26px;margin-top:16px}
+  .sci p{margin:0 0 15px;color:var(--ink-2);font-size:16px;line-height:1.68;max-width:62ch}
+  .sci p:last-child{margin-bottom:0}
+  .sci strong{color:var(--ink);font-weight:600}
+  .sci .term{font-family:var(--mono);font-size:.9em;color:var(--violet);background:rgba(91,60,255,.07);
+    padding:1px 6px;border-radius:5px}
+  .sci .aside{font-family:var(--disp);font-weight:500;font-size:clamp(19px,4.6vw,25px);line-height:1.34;
+    color:var(--ink);letter-spacing:-.01em;border-left:2px solid var(--hi);padding-left:18px;margin:26px 0}
+
+  .sci-stats{display:grid;gap:11px;margin-top:26px}
+  .sci-stat{border-top:2px solid var(--ink);padding:14px 0 2px}
+  .sci-stat .k{font-family:var(--mono);font-size:11px;letter-spacing:.11em;text-transform:uppercase;color:var(--violet);margin-bottom:7px}
+  .sci-stat .v{font-family:var(--disp);font-weight:600;font-size:17px;letter-spacing:-.01em;margin-bottom:5px}
+  .sci-stat .d{font-size:14px;color:var(--ink-2);line-height:1.55}
+
+  .srcbox{background:var(--paper-2);border:1px solid var(--line-2);border-radius:var(--radius);
+    padding:19px 18px;margin-top:30px}
+  .srcbox .hd{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--ink-3);margin-bottom:14px;display:flex;align-items:center;gap:9px}
+  .srcbox .hd::after{content:"";flex:1;height:1px;background:var(--line-2)}
+  .srcbox ol{margin:0;padding-left:20px;display:grid;gap:11px}
+  .srcbox li{font-size:13.5px;line-height:1.55;color:var(--ink-2)}
+  .srcbox li::marker{font-family:var(--mono);font-size:12px;color:var(--ink-3)}
+  .srcbox cite{font-style:normal;color:var(--ink);font-weight:500}
+  .srcbox a{color:var(--violet);text-decoration:underline;text-underline-offset:2px;word-break:break-word}
+  .srcbox .fine{margin-top:15px;padding-top:13px;border-top:1px solid var(--line-2);
+    font-family:var(--mono);font-size:11.5px;color:var(--ink-3);line-height:1.6}
+
+  @media(min-width:820px){
+    .pf-grid{grid-template-columns:1fr 1fr}
+    .pf-out{grid-template-columns:1fr 1fr}
+    .sci-stats{grid-template-columns:repeat(3,1fr);gap:22px}
+    .sci{grid-template-columns:1fr}
+    .pf-col{padding:22px 21px 24px}
+  }
+
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     PASTE 2 of 3 — MARKUP
+     Goes directly after the ticker div (line 502), before <section id="how">.
+     Then renumber the kickers below it: how 01→02, features 02→03,
+     early users 03→04, pricing 04→05, faq 05→06.
+     ═══════════════════════════════════════════════════════════════════ -->
+
+<!-- 01 PROOF -->
+<section id="proof" class="wrap">
+  <div class="sec-head rv">
+    <div class="kicker"><span class="idx">01</span> The proof</div>
+    <h2>Same draft. Two rewrites.</h2>
+    <p class="lead">One is what any AI gives you. The other is fingerprinted to a paragraph you wrote. Run it on your own writing — the gap is the whole product.</p>
+  </div>
+
+  <div class="rv">
+    <div class="pf-grid">
+      <div class="pf-pane">
+        <div class="pf-pane-top">
+          <span class="lbl"><b>A</b> Something you wrote</span>
+          <div class="pf-chips" id="pfChips"></div>
+        </div>
+        <textarea id="pfSample" maxlength="1200" rows="5"
+          placeholder="Paste a paragraph you've actually written — an old email, a Slack message, a caption. Two sentences is enough."></textarea>
+        <div class="hint" id="pfSampleCount">0 / 1,200</div>
+      </div>
+
+      <div class="pf-pane">
+        <div class="pf-pane-top"><span class="lbl"><b>B</b> What you want to say</span></div>
+        <textarea id="pfDraft" maxlength="600" rows="5"
+          placeholder="Rough notes, a bullet list, or a stiff AI draft. Whatever's fastest to get out of your head."></textarea>
+        <div class="hint" id="pfDraftCount">0 / 600</div>
+      </div>
+    </div>
+
+    <div class="pf-bar">
+      <button class="btn btn-primary" id="pfRun">Rewrite it both ways →</button>
+      <span class="pf-runs" id="pfRuns">3 free runs · no account needed</span>
+    </div>
+
+    <div class="pf-err" id="pfErr"></div>
+
+    <div class="pf-out">
+      <div class="pf-col empty" id="pfControl">
+        <div class="tag">Any AI</div>
+        <div class="body">Clean. Correct. Sounds like a press release.</div>
+      </div>
+      <div class="pf-col win empty" id="pfVoiced">
+        <div class="tag">In your voice</div>
+        <div class="body">Your rhythm, your punctuation, your tics.</div>
+      </div>
+    </div>
+
+    <div class="pf-note" id="pfNote" hidden>
+      Read them again. The left one is <em>better writing</em> — and it isn't yours.
+      <a href="/app">Save this voice and keep going, free →</a>
+    </div>
+  </div>
+</section>
+
+<!-- 02 SCIENCE -->
+<section id="science" class="wrap">
+  <div class="sec-head rv">
+    <div class="kicker"><span class="idx">02</span> Why it works</div>
+    <h2>Style is a measurable thing.</h2>
+  </div>
+
+  <div class="sci rv">
+    <div>
+      <p>A language model picks the most probable next word. Then it does it again. Researchers score the result on two axes: <span class="term">perplexity</span>, how predictable each word is, and <span class="term">burstiness</span>, how much that predictability swings across a document. <strong>AI text scores low on both</strong> — models apply the same rule at every step, so the rhythm comes out flat.<sup>1,2</sup></p>
+
+      <p>Yours doesn't. You write a nine-word sentence. Then a thirty-four-word one that runs on because you got attached to a subclause halfway through and couldn't bring yourself to cut it. Then three words. That variance is not a defect. It's the signal.</p>
+
+      <p class="aside">The tell was never a vocabulary list. It's the flatness.</p>
+
+      <p>Detectors try to catch AI on exactly this, and they're unreliable at it — they've flagged the U.S. Constitution as machine-written, and they systematically over-flag non-native English speakers, whose prose is often steady and plain for reasons that have nothing to do with a model.<sup>3,4</sup> <strong>So EchoWrite isn't in the business of beating a checker.</strong> A score that fires on the Constitution is not a standard worth optimising against.</p>
+
+      <p>But the measurement underneath is real, and it's old. In 1964 two statisticians settled a 175-year-old argument over twelve disputed Federalist Papers — not by reading them, but by counting words like <em>upon</em>, <em>whilst</em> and <em>while</em>.<sup>5</sup> Function words. The ones nobody chooses on purpose. That work founded stylometry, and the finding has held for sixty years: the most identifying thing about your writing is the part you aren't thinking about.<sup>6</sup></p>
+
+      <p>Which is why pasting a paragraph works, and why a tone dropdown never will. <strong>"Punchy" is a setting. You are a distribution.</strong></p>
+
+      <div class="sci-stats">
+        <div class="sci-stat">
+          <div class="k">Signal 01</div>
+          <div class="v">Function words</div>
+          <div class="d">The, of, but, just, actually. Unconscious, consistent across topics, and the single strongest authorship marker in the literature.</div>
+        </div>
+        <div class="sci-stat">
+          <div class="k">Signal 02</div>
+          <div class="v">Sentence variance</div>
+          <div class="d">Not average length — the spread. How hard you swing between your shortest sentence and your longest.</div>
+        </div>
+        <div class="sci-stat">
+          <div class="k">Signal 03</div>
+          <div class="v">Punctuation habits</div>
+          <div class="d">Your em-dash rate, whether you use semicolons, where you put commas you don't strictly need.</div>
+        </div>
+      </div>
+
+      <div class="srcbox">
+        <div class="hd">Sources</div>
+        <ol>
+          <li><cite>GPTZero</cite> — Perplexity and burstiness in AI detection. Models select the next word by a fixed rule, producing consistently low burstiness; humans vary their construction across a document. <a href="https://gptzero.me/news/perplexity-and-burstiness-what-is-it/">gptzero.me</a></li>
+          <li><cite>Metric37</cite> — How AI detection works. Detectors output a probability estimate from these two statistical properties, not a fact. <a href="https://metric37.com/blog/how-ai-detection-works">metric37.com</a></li>
+          <li><cite>Gonzaga University Libraries</cite> — AI Detectors, faculty guide. Documents false positives on the Bible and the U.S. Constitution, and why formal human writing scores machine-like. <a href="https://researchguides.gonzaga.edu/GenerativeAIforFaculty/AIDetectors">researchguides.gonzaga.edu</a></li>
+          <li><cite>Pangram Labs</cite> — Why perplexity and burstiness fail to detect AI, including the measured bias against non-native English speakers. <a href="https://www.pangram.com/blog/why-perplexity-and-burstiness-fail-to-detect-ai">pangram.com</a></li>
+          <li><cite>Mosteller &amp; Wallace (1964)</cite> — <em>Inference and Disputed Authorship: The Federalist.</em> The founding demonstration that function-word frequencies reliably attribute authorship.</li>
+          <li><cite>Segarra, Eisen &amp; Ribeiro</cite> — Authorship Attribution through Function Word Adjacency Networks. Modern confirmation that function words and punctuation carry a stable stylometric fingerprint. <a href="https://arxiv.org/pdf/1406.4469">arxiv.org/abs/1406.4469</a></li>
+        </ol>
+        <div class="fine">EchoWrite matches how you write. It makes no claim about detector scores, and shouldn't be used to misrepresent authorship where that matters.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     PASTE 3 of 3 — JS
+     Goes at the end of the FIRST <script> block, just before its </script>
+     (line 814). Self-contained IIFE — nothing leaks into your existing scope.
+     ═══════════════════════════════════════════════════════════════════ -->
+
+  // ── proof demo: one draft, two rewrites ──
+  (function(){
+    const $ = (id) => document.getElementById(id);
+    const sampleEl = $('pfSample'), draftEl = $('pfDraft'), runEl = $('pfRun'),
+          errEl = $('pfErr'), runsEl = $('pfRuns'), noteEl = $('pfNote'),
+          ctrlEl = $('pfControl'), voiceEl = $('pfVoiced'), chipsEl = $('pfChips');
+    if(!sampleEl) return;
+
+    const esc = (s) => s.replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+
+    // One-click samples, so nobody has to paste to see the effect. Deliberately
+    // three very different rhythms — if they all came out similar the demo would
+    // be proving the opposite of what we want.
+    const SAMPLES = [
+      { name:'Clipped',
+        text:"Shipped the new pricing page last night. Took four hours, most of it arguing with myself about the middle tier. It's live. It's fine. I'll rewrite it in a month like I always do.\n\nTwo things I got wrong. The annual toggle was buried. And nobody read the third bullet, ever." },
+      { name:'Rambling',
+        text:"I've been thinking about this for a while now — probably longer than it deserves, honestly — and I keep coming back to the same thing, which is that most of the advice out there assumes you already have an audience, and if you don't (and I didn't, for about two years) then almost none of it actually applies to your situation in any useful way." },
+      { name:'Formal',
+        text:"Following the quarterly review, we have identified three areas requiring attention. The first concerns onboarding completion, which has declined by a margin that warrants investigation. The second relates to support response times. The third is documentation coverage, which remains incomplete in several modules." },
+    ];
+
+    SAMPLES.forEach((s,i)=>{
+      const b=document.createElement('button');
+      b.className='pf-chip'; b.type='button'; b.textContent=s.name;
+      b.onclick=()=>{
+        sampleEl.value = s.text;
+        [...chipsEl.children].forEach((c,j)=>c.classList.toggle('on', i===j));
+        count(sampleEl, $('pfSampleCount'), 1200);
+        if(!draftEl.value.trim()){
+          draftEl.value = "we are excited to announce that our new feature is now available. it leverages cutting edge technology to deliver a seamless experience for all users.";
+          count(draftEl, $('pfDraftCount'), 600);
+        }
+      };
+      chipsEl.appendChild(b);
+    });
+
+    function count(el, out, max){
+      const n = el.value.length;
+      out.textContent = n.toLocaleString() + ' / ' + max.toLocaleString();
+      out.classList.toggle('over', n >= max);
+    }
+    sampleEl.addEventListener('input', ()=>{
+      count(sampleEl, $('pfSampleCount'), 1200);
+      [...chipsEl.children].forEach(c=>c.classList.remove('on'));
+    });
+    draftEl.addEventListener('input', ()=>count(draftEl, $('pfDraftCount'), 600));
+
+    function paint(el, text, mark){
+      el.classList.remove('empty','loading');
+      el.querySelector('.body').innerHTML = mark
+        ? '<span class="mk">' + esc(text) + '</span>'
+        : esc(text);
+    }
+
+    let busy = false;
+    async function run(){
+      if(busy) return;
+      const sample = sampleEl.value.trim(), draft = draftEl.value.trim();
+      errEl.textContent = '';
+
+      if(sample.length < 120){
+        errEl.textContent = 'Paste a bit more of your writing — about two sentences.';
+        sampleEl.focus(); return;
+      }
+      if(!draft){ errEl.textContent = 'Add a draft to rewrite.'; draftEl.focus(); return; }
+
+      busy = true;
+      runEl.disabled = true; runEl.textContent = 'Rewriting…';
+      [ctrlEl, voiceEl].forEach(c=>{ c.classList.add('loading'); c.classList.remove('empty'); });
+      ctrlEl.querySelector('.body').textContent = 'Working…';
+      voiceEl.querySelector('.body').textContent = 'Reading your style…';
+      noteEl.hidden = true;
+
+      try{
+        const r = await fetch('/api/demo', {
+          method:'POST',
+          headers:{'content-type':'application/json'},
+          body: JSON.stringify({ sample, draft })
+        });
+        const d = await r.json().catch(()=>({}));
+
+        if(r.status === 429 || d.gated){
+          errEl.innerHTML = esc(d.error||'') + ' <a href="/app" style="color:var(--violet)">Create one →</a>';
+          [ctrlEl, voiceEl].forEach(c=>c.classList.remove('loading'));
+          return;
+        }
+        if(!r.ok){
+          errEl.textContent = d.error || 'Something went wrong — try again.';
+          [ctrlEl, voiceEl].forEach(c=>c.classList.remove('loading'));
+          return;
+        }
+
+        paint(ctrlEl,  d.control || '', false);
+        paint(voiceEl, d.voiced  || '', true);
+        noteEl.hidden = false;
+
+        if(typeof d.remaining === 'number'){
+          runsEl.textContent = d.remaining > 0
+            ? d.remaining + ' free run' + (d.remaining===1?'':'s') + ' left today'
+            : 'That was your last free run';
+        }
+      }catch(e){
+        errEl.textContent = 'Network hiccup — try again.';
+        [ctrlEl, voiceEl].forEach(c=>c.classList.remove('loading'));
+      }finally{
+        busy = false;
+        runEl.disabled = false; runEl.textContent = 'Rewrite it both ways →';
+      }
+    }
+
+    runEl.addEventListener('click', run);
+  })();
 </style>
 <noscript><style>.rv{opacity:1!important;transform:none!important}</style></noscript>
 </head>
