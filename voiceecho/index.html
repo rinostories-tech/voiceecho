@@ -490,6 +490,34 @@
   .sci{grid-template-columns:1fr}
   .pf-col{padding:22px 21px 24px}
 }
+
+  /* ── centered reading column: science + faq only ── */
+  #science .sec-head,#faq .sec-head{text-align:center}
+  #science .kicker,#faq .kicker{justify-content:center}
+  #science .sec-head h2,#faq .sec-head h2{max-width:none;margin-left:auto;margin-right:auto}
+  #science .sci{max-width:66ch;margin-left:auto;margin-right:auto;display:block}
+  #science .sci p{max-width:none}
+  #faq .faq{margin-left:auto;margin-right:auto}
+  #science .aside{text-align:center;border-left:0;padding-left:0;padding-top:20px;
+    border-top:2px solid var(--hi);display:inline-block;width:100%}
+  .sci-bridge{margin-top:30px!important;padding-top:22px;border-top:1px solid var(--line-2);
+    font-family:var(--disp);font-weight:500;font-size:clamp(17px,4.2vw,21px)!important;
+    line-height:1.42!important;color:var(--ink)!important;letter-spacing:-.01em;text-align:center}
+
+  /* ── source box, collapsed by default ── */
+  details.srcbox{padding:0;overflow:hidden}
+  details.srcbox > summary{list-style:none;cursor:pointer;padding:15px 18px;
+    font-family:var(--mono);font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--ink-3);display:flex;align-items:center;justify-content:space-between;gap:10px;
+    transition:color .18s;min-height:44px}
+  details.srcbox > summary::-webkit-details-marker{display:none}
+  details.srcbox > summary::after{content:"+";font-size:15px;color:var(--violet);transition:transform .25s}
+  details.srcbox[open] > summary::after{content:"\2212"}
+  details.srcbox > summary:hover{color:var(--ink)}
+  details.srcbox[open] > summary{border-bottom:1px solid var(--line-2)}
+  details.srcbox ol{padding:17px 18px 0 38px}
+  details.srcbox .fine{margin:15px 18px 17px;padding-top:13px}
+  details.srcbox[open] ol{animation:drop .3s cubic-bezier(.2,.8,.2,1)}
 </style>
 <noscript><style>.rv{opacity:1!important;transform:none!important}</style></noscript>
 </head>
@@ -630,65 +658,10 @@
   </div>
 </section>
 
-<!-- 02 SCIENCE -->
-<section id="science" class="wrap">
-  <div class="sec-head rv">
-    <div class="kicker"><span class="idx">02</span> Why it works</div>
-    <h2>Style is a measurable thing.</h2>
-  </div>
-
-  <div class="sci rv">
-    <div>
-      <p>A language model picks the most probable next word. Then it does it again. Researchers score the result on two axes: <span class="term">perplexity</span>, how predictable each word is, and <span class="term">burstiness</span>, how much that predictability swings across a document. <strong>AI text scores low on both</strong> — models apply the same rule at every step, so the rhythm comes out flat.<sup>1,2</sup></p>
-
-      <p>Yours doesn't. You write a nine-word sentence. Then a thirty-four-word one that runs on because you got attached to a subclause halfway through and couldn't bring yourself to cut it. Then three words. That variance is not a defect. It's the signal.</p>
-
-      <p class="aside">The tell was never a vocabulary list. It's the flatness.</p>
-
-      <p>Detectors try to catch AI on exactly this, and they're unreliable at it — they've flagged the U.S. Constitution as machine-written, and they systematically over-flag non-native English speakers, whose prose is often steady and plain for reasons that have nothing to do with a model.<sup>3,4</sup> <strong>So EchoWrite isn't in the business of beating a checker.</strong> A score that fires on the Constitution is not a standard worth optimising against.</p>
-
-      <p>But the measurement underneath is real, and it's old. In 1964 two statisticians settled a 175-year-old argument over twelve disputed Federalist Papers — not by reading them, but by counting words like <em>upon</em>, <em>whilst</em> and <em>while</em>.<sup>5</sup> Function words. The ones nobody chooses on purpose. That work founded stylometry, and the finding has held for sixty years: the most identifying thing about your writing is the part you aren't thinking about.<sup>6</sup></p>
-
-      <p>Which is why pasting a paragraph works, and why a tone dropdown never will. <strong>"Punchy" is a setting. You are a distribution.</strong></p>
-
-      <div class="sci-stats">
-        <div class="sci-stat">
-          <div class="k">Signal 01</div>
-          <div class="v">Function words</div>
-          <div class="d">The, of, but, just, actually. Unconscious, consistent across topics, and the single strongest authorship marker in the literature.</div>
-        </div>
-        <div class="sci-stat">
-          <div class="k">Signal 02</div>
-          <div class="v">Sentence variance</div>
-          <div class="d">Not average length — the spread. How hard you swing between your shortest sentence and your longest.</div>
-        </div>
-        <div class="sci-stat">
-          <div class="k">Signal 03</div>
-          <div class="v">Punctuation habits</div>
-          <div class="d">Your em-dash rate, whether you use semicolons, where you put commas you don't strictly need.</div>
-        </div>
-      </div>
-
-      <div class="srcbox">
-        <div class="hd">Sources</div>
-        <ol>
-          <li><cite>GPTZero</cite> — Perplexity and burstiness in AI detection. Models select the next word by a fixed rule, producing consistently low burstiness; humans vary their construction across a document. <a href="https://gptzero.me/news/perplexity-and-burstiness-what-is-it/">gptzero.me</a></li>
-          <li><cite>Metric37</cite> — How AI detection works. Detectors output a probability estimate from these two statistical properties, not a fact. <a href="https://metric37.com/blog/how-ai-detection-works">metric37.com</a></li>
-          <li><cite>Gonzaga University Libraries</cite> — AI Detectors, faculty guide. Documents false positives on the Bible and the U.S. Constitution, and why formal human writing scores machine-like. <a href="https://researchguides.gonzaga.edu/GenerativeAIforFaculty/AIDetectors">researchguides.gonzaga.edu</a></li>
-          <li><cite>Pangram Labs</cite> — Why perplexity and burstiness fail to detect AI, including the measured bias against non-native English speakers. <a href="https://www.pangram.com/blog/why-perplexity-and-burstiness-fail-to-detect-ai">pangram.com</a></li>
-          <li><cite>Mosteller &amp; Wallace (1964)</cite> — <em>Inference and Disputed Authorship: The Federalist.</em> The founding demonstration that function-word frequencies reliably attribute authorship.</li>
-          <li><cite>Segarra, Eisen &amp; Ribeiro</cite> — Authorship Attribution through Function Word Adjacency Networks. Modern confirmation that function words and punctuation carry a stable stylometric fingerprint. <a href="https://arxiv.org/pdf/1406.4469">arxiv.org/abs/1406.4469</a></li>
-        </ol>
-        <div class="fine">EchoWrite matches how you write. It makes no claim about detector scores, and shouldn't be used to misrepresent authorship where that matters.</div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- 03 HOW -->
+<!-- 02 HOW -->
 <section id="how" class="wrap">
   <div class="sec-head rv">
-    <div class="kicker"><span class="idx">03</span> How it works</div>
+    <div class="kicker"><span class="idx">02</span> How it works</div>
     <h2>Three steps. About ten seconds.</h2>
     <p class="lead">No prompt engineering. No wrestling with tone every time. Set your voice once, reuse it forever.</p>
   </div>
@@ -699,10 +672,10 @@
   </div>
 </section>
 
-<!-- 04 FEATURES -->
+<!-- 03 FEATURES -->
 <section id="features" class="wrap">
   <div class="sec-head rv">
-    <div class="kicker"><span class="idx">04</span> What's inside</div>
+    <div class="kicker"><span class="idx">03</span> What's inside</div>
     <h2>Not a humanizer. A voice engine.</h2>
     <p class="lead">Most AI tools flatten everything into the same "casual" mush. EchoWrite learns your specific voice and holds it across everything you publish.</p>
   </div>
@@ -753,7 +726,7 @@
 <!-- 05 PROOF -->
 <section class="wrap">
   <div class="sec-head rv">
-    <div class="kicker"><span class="idx">05</span> Early users</div>
+    <div class="kicker"><span class="idx">04</span> Early users</div>
     <h2>People stopped sounding like a model.</h2>
   </div>
   <div class="quotes">
@@ -769,6 +742,59 @@
       <p>Our brand voice used to live in one person's head. Now the whole team ships copy that sounds on-brand.</p>
       <div class="who"><div class="av">JR</div><div><b>Jake R.</b><span>Head of Marketing</span></div></div>
     </div>
+  </div>
+</section>
+
+<!-- 05 SCIENCE -->
+<section id="science" class="wrap">
+  <div class="sec-head rv">
+    <div class="kicker"><span class="idx">05</span> Why it works</div>
+    <h2>Style is a measurable thing.</h2>
+  </div>
+
+  <div class="sci rv">
+    <p>A language model picks the most probable next word. Then it does it again. Researchers score the result on two axes: <span class="term">perplexity</span>, how predictable each word is, and <span class="term">burstiness</span>, how much that predictability swings across a document. <strong>AI text scores low on both.</strong> The same rule at every step, so the rhythm comes out flat.<sup>1,2</sup></p>
+
+    <p>Yours doesn't. You write a nine-word sentence. Then a thirty-four-word one that runs on because you got attached to a subclause halfway through and couldn't bring yourself to cut it. Then three words. That variance isn't a defect — it's the signal.</p>
+
+    <p class="aside">The tell was never a vocabulary list. It's the flatness.</p>
+
+    <p>Detectors chase this and they're bad at it. They've flagged the U.S. Constitution as machine-written.<sup>3,4</sup> So we're not in the business of beating a checker — a score that fires on the Constitution isn't a standard worth optimising against. But the measurement underneath is real, and old. In 1964 two statisticians ended a 175-year argument over twelve disputed Federalist Papers by counting words like <em>upon</em> and <em>whilst</em>.<sup>5</sup> Function words. The ones nobody picks on purpose. Sixty years on, the finding holds: <strong>the most identifying thing about your writing is the part you aren't thinking about.</strong><sup>6</sup></p>
+
+    <p>Which is why pasting a paragraph works and a tone dropdown never will. <strong>"Punchy" is a setting. You are a distribution.</strong></p>
+
+    <div class="sci-stats">
+      <div class="sci-stat">
+        <div class="k">Signal 01</div>
+        <div class="v">Function words</div>
+        <div class="d">The, of, but, just, actually. Unconscious, consistent across topics, and the strongest authorship marker in the literature.</div>
+      </div>
+      <div class="sci-stat">
+        <div class="k">Signal 02</div>
+        <div class="v">Sentence variance</div>
+        <div class="d">Not average length — the spread. How hard you swing between your shortest sentence and your longest.</div>
+      </div>
+      <div class="sci-stat">
+        <div class="k">Signal 03</div>
+        <div class="v">Punctuation habits</div>
+        <div class="d">Your em-dash rate, whether you use semicolons, where you put commas you don't strictly need.</div>
+      </div>
+    </div>
+
+    <details class="srcbox">
+      <summary>Sources &amp; further reading</summary>
+      <ol>
+        <li><cite>GPTZero</cite> — Perplexity and burstiness in AI detection. Models select the next word by a fixed rule, producing consistently low burstiness; humans vary their construction across a document. <a href="https://gptzero.me/news/perplexity-and-burstiness-what-is-it/" rel="nofollow noopener" target="_blank">gptzero.me</a></li>
+        <li><cite>Metric37</cite> — How AI detection works. Detectors output a probability estimate from these two statistical properties, not a fact. <a href="https://metric37.com/blog/how-ai-detection-works" rel="nofollow noopener" target="_blank">metric37.com</a></li>
+        <li><cite>Gonzaga University Libraries</cite> — AI Detectors, faculty guide. Documents false positives on the Bible and the U.S. Constitution, and why formal human writing scores machine-like. <a href="https://researchguides.gonzaga.edu/GenerativeAIforFaculty/AIDetectors" rel="nofollow noopener" target="_blank">researchguides.gonzaga.edu</a></li>
+        <li><cite>Pangram Labs</cite> — Why perplexity and burstiness fail to detect AI, including the measured bias against non-native English speakers. <a href="https://www.pangram.com/blog/why-perplexity-and-burstiness-fail-to-detect-ai" rel="nofollow noopener" target="_blank">pangram.com</a></li>
+        <li><cite>Mosteller &amp; Wallace (1964)</cite> — <em>Inference and Disputed Authorship: The Federalist.</em> The founding demonstration that function-word frequencies reliably attribute authorship.</li>
+        <li><cite>Segarra, Eisen &amp; Ribeiro</cite> — Authorship Attribution through Function Word Adjacency Networks. Modern confirmation that function words and punctuation carry a stable stylometric fingerprint. <a href="https://arxiv.org/pdf/1406.4469" rel="nofollow noopener" target="_blank">arxiv.org/abs/1406.4469</a></li>
+      </ol>
+      <div class="fine">EchoWrite matches how you write. It makes no claim about detector scores, and shouldn't be used to misrepresent authorship where that matters.</div>
+    </details>
+
+    <p class="sci-bridge">That fingerprint is the thing you're buying. Not a rewrite button — a saved measurement of how you write, that you can point at anything.</p>
   </div>
 </section>
 
