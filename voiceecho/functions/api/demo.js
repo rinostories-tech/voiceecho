@@ -10,24 +10,40 @@
 // ./_prompt.js — the same module /api/rewrite uses. They must not drift: a demo
 // that beats the app is a refund, and an app that beats the demo undersells.
 //
-// Rate limited to DAILY_RUNS per IP per day via KV. The old endpoint was an
-// unauthenticated proxy to our Anthropic key with no quota at all; a 200-char
-// cap limits cost per call, not calls per second. The cap also does the real
-// job — it forces the signup.
+// RATE LIMITING — requires a KV namespace bound as DEMO_KV (dashboard → project →
+// Settings → Bindings, Production AND Preview, then redeploy).
 //
-// Requires a KV namespace bound as DEMO_KV (dashboard → project → Settings →
-// Bindings). Fails OPEN if the binding is missing, so verify it after deploying.
+//   paired mode : DAILY_RUNS per IP per day, then the signup wall.
+//                 FAILS CLOSED. If the binding is missing or KV errors, visitors
+//                 get the wall instead of a free rewrite. A broken binding should
+//                 cost us signups-that-convert-later, never an uncapped API bill.
+//                 (This endpoint previously failed open, which meant the wall
+//                 never fired for anyone. Don't reintroduce that.)
+//
+//   hero mode   : HERO_RUNS per IP per day — an abuse ceiling, not a funnel gate.
+//                 FAILS OPEN, deliberately: the teaser is the first thing a
+//                 visitor touches and a dead button on the hero is worse than the
+//                 residual cost risk. The MAX_DRAFT cap plus the monthly spend
+//                 limit on the Anthropic key are the backstop there.
 
 import { CONTROL_SYSTEM, buildSystem, fingerprintProfile, callModel, looksLikeRefusal }
   from "./_prompt.js";
 
-const DAILY_RUNS = 3;      // per IP, then the wall
+const DAILY_RUNS = 3;      // paired runs per IP, then the wall
+const HERO_RUNS  = 20;     // teaser runs per IP — won't touch a real visitor
 const MAX_SAMPLE = 1200;   // ~200 words of their writing — plenty for a fingerprint
 const MAX_DRAFT  = 600;    // ~100 words in
 const MIN_SAMPLE = 120;    // below this there's no signal and the demo looks broken
+const KV_TTL     = 172800; // 48h covers any timezone
 
 const json = (obj, status = 200) =>
   new Response(JSON.stringify(obj), { status, headers: { "content-type": "application/json" } });
+
+// Single wall response, used for quota-reached AND for any KV failure.
+const wall = (msg) => json({ gated: true, error: msg }, 429);
+
+const WALL_QUOTA   = "That's your three free runs. Make an account to keep going — it's free, no card.";
+const WALL_NO_KV   = "Make a free account to run the proof demo — it's free, no card.";
 
 // The hero teaser has no sample to work from, so it gets a described voice
 // rather than a fingerprint. Same rule set, same assembly path.
@@ -51,25 +67,42 @@ export async function onRequestPost(context) {
     }, 400);
   }
 
-  // ---- rate limit, before we spend anything ----
-  // Only the paired mode is metered: the hero teaser is top-of-funnel and cheap.
   const ip  = request.headers.get("CF-Connecting-IP") || "anon";
   const day = new Date().toISOString().slice(0, 10);
   const key = `demo:${day}:${ip}`;
   let used = 0;
 
-  if (paired && env.DEMO_KV) {
-    used = parseInt(await env.DEMO_KV.get(key), 10) || 0;
-    if (used >= DAILY_RUNS) {
-      return json({
-        gated: true,
-        error: "That's your three free runs. Make an account to keep going — it's free, no card.",
-      }, 429);
+  // ---- rate limit, before we spend anything ----
+  if (paired) {
+    // No binding → wall. Never a free rewrite.
+    if (!env.DEMO_KV) return wall(WALL_NO_KV);
+
+    try {
+      used = parseInt(await env.DEMO_KV.get(key), 10) || 0;
+    } catch {
+      return wall(WALL_NO_KV);           // KV unreachable → wall, not a freebie
     }
+
+    if (used >= DAILY_RUNS) return wall(WALL_QUOTA);
   }
 
   try {
     if (!paired) {
+      // Hero teaser: cheap abuse ceiling. Counts attempts, not successes — a
+      // script hammering us shouldn't get free retries off failed calls.
+      const heroKey = `hero:${day}:${ip}`;
+      if (env.DEMO_KV) {
+        try {
+          const heroUsed = parseInt(await env.DEMO_KV.get(heroKey), 10) || 0;
+          if (heroUsed >= HERO_RUNS) {
+            return json({ error: "Try again tomorrow, or make a free account." }, 429);
+          }
+          await env.DEMO_KV.put(heroKey, String(heroUsed + 1), { expirationTtl: KV_TTL });
+        } catch {
+          // Fail open — see header note. Don't kill the hero over a KV blip.
+        }
+      }
+
       const output = await callModel(env, {
         system: buildSystem(HUMAN_PROFILE),
         draft,
@@ -91,9 +124,12 @@ export async function onRequestPost(context) {
       return json({ error: "Couldn't rewrite that one — try different text. This run didn't count." }, 409);
     }
 
-    if (env.DEMO_KV) {
-      await env.DEMO_KV.put(key, String(used + 1), { expirationTtl: 172800 }); // 48h covers any TZ
-    }
+    // Only a successful paired run is metered. A write failure here can't be
+    // allowed to 500 a rewrite the visitor already paid latency for — worst
+    // case they get one extra run, which is the right way round to be wrong.
+    try {
+      await env.DEMO_KV.put(key, String(used + 1), { expirationTtl: KV_TTL });
+    } catch { /* counted next time */ }
 
     const remaining = Math.max(0, DAILY_RUNS - (used + 1));
     return json({ control, voiced, remaining, nextIsWall: remaining === 0 });
