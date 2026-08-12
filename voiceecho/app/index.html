@@ -445,6 +445,88 @@ textarea:focus{outline:none;border-color:var(--ink-3);background:var(--surface)}
   .pbadge{display:none}          /* the gradient button carries the plan story */
 }
 
+/* ═════════ HISTORY SEARCH ═════════ */
+.hsearch{position:relative;margin-bottom:12px}
+.hsearch input{width:100%;background:var(--bg);border:1px solid var(--line);
+  border-radius:999px;padding:9px 32px 9px 34px;font-family:var(--sans);font-size:13px;
+  color:var(--ink);transition:.15s}
+.hsearch input::placeholder{color:var(--ink-3)}
+.hsearch input:focus{outline:none;border-color:var(--ink-3);background:var(--surface)}
+.hsearch .mag{position:absolute;left:12px;top:50%;transform:translateY(-50%);width:13px;
+  height:13px;color:var(--ink-3);pointer-events:none}
+.hsearch .clr{position:absolute;right:9px;top:50%;transform:translateY(-50%);width:20px;
+  height:20px;border:0;background:none;color:var(--ink-3);cursor:pointer;display:none;
+  padding:0;line-height:0;border-radius:999px}
+.hsearch .clr.on{display:grid;place-items:center}
+.hsearch .clr:hover{color:var(--ink)}
+.hitem mark{background:var(--accent-soft);color:var(--ink);border-radius:3px;padding:0 1px}
+
+/* ═════════ EMPTY STATE — points at the real next action ═════════ */
+.first-run{border:1px dashed var(--line-2);border-radius:var(--r-sm);padding:22px 20px;
+  text-align:center;background:var(--bg)}
+.first-run .t{font-family:var(--disp);font-size:17px;font-weight:400;letter-spacing:-.022em;
+  margin-bottom:7px}
+.first-run p{font-size:13px;color:var(--ink-3);line-height:1.55;margin:0 0 16px}
+.first-run .btn{width:100%;max-width:260px}
+
+/* draft restore notice */
+.restored{display:none;align-items:center;gap:9px;font-family:var(--mono);font-size:10.5px;
+  letter-spacing:.04em;color:var(--ink-3);margin-top:8px}
+.restored.on{display:flex}
+.restored button{background:none;border:0;font-family:inherit;font-size:10.5px;color:var(--ink-2);
+  cursor:pointer;text-decoration:underline;padding:0}
+
+/* run hint when the draft is over the plan's cap */
+.run-note{font-size:12.5px;color:var(--accent);margin-top:9px;line-height:1.5;display:none}
+.run-note.on{display:block}
+.run-note b{cursor:pointer;font-weight:500;text-decoration:underline}
+.kbd{font-family:var(--mono);font-size:10px;border:1px solid currentColor;border-radius:4px;
+  padding:1px 4px;opacity:.55;margin-left:2px}
+
+/* ═════════ TUTORIAL ═════════ */
+.tut-back{position:fixed;inset:0;z-index:100;display:none;
+  background:rgba(6,5,3,.62);-webkit-backdrop-filter:blur(2px);backdrop-filter:blur(2px)}
+.tut-back.on{display:block}
+/* the spotlight: a huge spread shadow punches the page through the hole */
+.tut-hole{position:absolute;border-radius:14px;pointer-events:none;
+  box-shadow:0 0 0 9999px rgba(6,5,3,.62),0 0 0 2px var(--accent) inset;
+  transition:top .4s var(--ease),left .4s var(--ease),width .4s var(--ease),height .4s var(--ease)}
+.tut-back.on{background:transparent;-webkit-backdrop-filter:none;backdrop-filter:none}
+.tut-card{position:absolute;z-index:102;width:min(320px,calc(100vw - 32px));
+  background:var(--surface);border:1px solid var(--line-2);border-radius:var(--r);
+  padding:20px;box-shadow:var(--shadow-lg);
+  transition:top .4s var(--ease),left .4s var(--ease)}
+.tut-card .step{font-family:var(--mono);font-size:9.5px;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--ink-3);margin-bottom:9px}
+.tut-card h4{font-family:var(--disp);font-size:19px;font-weight:400;letter-spacing:-.028em;
+  margin:0 0 8px}
+.tut-card p{font-size:13.5px;color:var(--ink-2);line-height:1.58;margin:0 0 18px}
+.tut-nav{display:flex;align-items:center;gap:8px}
+.tut-dots{display:flex;gap:5px;margin-right:auto}
+.tut-dots i{width:6px;height:6px;border-radius:999px;background:var(--line-2);display:block;
+  transition:.25s}
+.tut-dots i.on{background:var(--accent);width:16px;border-radius:999px}
+.tut-btn{font-family:var(--sans);font-size:13px;font-weight:500;padding:8px 15px;
+  border-radius:999px;border:1px solid var(--line-2);background:transparent;color:var(--ink);
+  cursor:pointer;transition:.15s}
+.tut-btn:hover{border-color:var(--ink-3);background:var(--bg-2)}
+.tut-btn.go{background:var(--btn-bg);color:var(--btn-fg);border-color:transparent}
+.tut-btn.go:hover{background:var(--btn-hover)}
+.tut-skip{position:absolute;top:16px;right:16px;background:none;border:0;font-family:var(--mono);
+  font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);cursor:pointer;
+  padding:4px}
+.tut-skip:hover{color:var(--ink)}
+/* the arrow */
+.tut-card::before{content:"";position:absolute;width:12px;height:12px;background:var(--surface);
+  border:1px solid var(--line-2);transform:rotate(45deg)}
+.tut-card[data-dir="up"]::before{top:-7px;left:var(--ax,32px);border-right:0;border-bottom:0}
+.tut-card[data-dir="down"]::before{bottom:-7px;left:var(--ax,32px);border-left:0;border-top:0}
+.tut-card[data-dir="left"]::before{left:-7px;top:var(--ay,28px);border-right:0;border-top:0}
+.tut-card[data-dir="right"]::before{right:-7px;top:var(--ay,28px);border-left:0;border-bottom:0}
+@media (prefers-reduced-motion:reduce){
+  .tut-hole,.tut-card{transition:none}
+}
+
 /* ═════════ AUTH — the one screen that looks like the homepage ═════════ */
 .auth-wrap{position:relative;z-index:2;min-height:100dvh;display:none;align-items:center;
   justify-content:center;padding:22px;overflow:hidden;isolation:isolate}
@@ -644,6 +726,7 @@ textarea:focus{outline:none;border-color:var(--ink-3);background:var(--surface)}
             </select>
           </div>
           <a href="/">Homepage</a>
+          <button id="tourBtn">Show me around</button>
           <button id="buyBtn">Upgrade plan</button>
           <button id="signout">Sign out</button>
         </div>
@@ -693,6 +776,11 @@ textarea:focus{outline:none;border-color:var(--ink-3);background:var(--surface)}
       <div class="run-row">
         <button class="btn btn-primary" id="run">Rewrite in my voice</button>
       </div>
+      <div class="run-note" id="runNote"></div>
+      <div class="restored" id="restored">
+        <span>Restored your unsaved draft</span>
+        <button type="button" id="restoreClear">clear</button>
+      </div>
       <div class="err" id="err"></div>
 
       <div class="out" id="outBlock">
@@ -727,17 +815,40 @@ textarea:focus{outline:none;border-color:var(--ink-3);background:var(--surface)}
     <!-- RIGHT -->
     <section class="panel panel-history" data-p="history">
       <div class="panel-title"><span>Recent</span><span class="mono" id="histCount"></span></div>
+      <div class="hsearch" id="hsearchWrap" style="display:none">
+        <svg class="mag" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+        <input id="histSearch" type="search" placeholder="Search rewrites…" autocomplete="off" aria-label="Search rewrites">
+        <button class="clr" id="histClear" type="button" aria-label="Clear search">
+          <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+        </button>
+      </div>
       <div id="historyList"><div class="empty">Your rewrites will show up here.</div></div>
       <div id="histLock"></div>
     </section>
   </div>
 </div>
 
+<!-- ══════════════ TUTORIAL ══════════════ -->
+<div class="tut-back" id="tutBack" role="dialog" aria-modal="true" aria-labelledby="tutTitle">
+  <div class="tut-hole" id="tutHole"></div>
+  <div class="tut-card" id="tutCard" data-dir="up">
+    <button class="tut-skip" id="tutSkip">Skip</button>
+    <div class="step" id="tutStep">Step 1 of 4</div>
+    <h4 id="tutTitle">Title</h4>
+    <p id="tutBody">Body</p>
+    <div class="tut-nav">
+      <div class="tut-dots" id="tutDots"></div>
+      <button class="tut-btn" id="tutPrev">Back</button>
+      <button class="tut-btn go" id="tutNext">Next</button>
+    </div>
+  </div>
+</div>
+
 <!-- ══════════════ TRAIN VOICE ══════════════ -->
 <div class="overlay" id="trainOverlay">
   <div class="modal">
-    <h3>Train a new voice</h3>
-    <p>Paste 2–3 things you've actually written. EchoWrite builds a private fingerprint of how you sound — you only do this once.</p>
+    <h3 id="trainTitle">Train a new voice</h3>
+    <p id="trainIntro">Paste 2–3 things you've actually written. EchoWrite builds a private fingerprint of how you sound — you only do this once.</p>
     <label for="vName">Name this voice</label>
     <input id="vName" class="field" type="text" placeholder="e.g. My brand, Client · Atlas, Newsletter">
     <label for="vSamples">Your writing samples</label>
@@ -996,22 +1107,90 @@ textarea:focus{outline:none;border-color:var(--ink-3);background:var(--surface)}
   function clearVariance(){ $("vcompare").classList.remove("show"); }
 
   // placeholder: a faint ridgeline instead of an emoji
-  const PLACEHOLDER = `<div class="ph">
-    <svg viewBox="0 0 240 76" fill="none" aria-hidden="true">
+  const RIDGE_SVG = `<svg viewBox="0 0 240 76" fill="none" aria-hidden="true">
       <path d="M0 76 L0 52 L18 30 L34 60 L50 18 L66 66 L82 38 L98 8 L114 56 L130 26 L146 62 L162 34 L178 14 L194 58 L210 30 L226 48 L240 22 L240 76 Z"
             fill="currentColor" opacity=".18"/>
       <path d="M0 52 L18 30 L34 60 L50 18 L66 66 L82 38 L98 8 L114 56 L130 26 L146 62 L162 34 L178 14 L194 58 L210 30 L226 48 L240 22"
             stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>
-    </svg>
-    Your rewrite will appear here.
-  </div>`;
+    </svg>`;
+  const PLACEHOLDER = `<div class="ph">${RIDGE_SVG}Your rewrite will appear here.</div>`;
+  // Shown instead when the account has no voice yet — a placeholder that implies
+  // readiness is a lie when there's nothing to rewrite *with*.
+  const FIRST_RUN = `<div class="first-run">
+      <div class="t">Train your first voice</div>
+      <p>Paste two or three things you've actually written. It takes about a minute, and you only do it once.</p>
+      <button class="btn btn-primary" data-train>Train a voice</button>
+    </div>`;
+
+  // Output pane shows the first-run prompt while there are no voices and nothing
+  // has been generated this session.
+  let hasOutput = false;
+  function renderOutputIdle(){
+    if(hasOutput) return;
+    $("output").innerHTML = (voices.length === 0) ? FIRST_RUN : PLACEHOLDER;
+  }
+
+  // ══════════════════════ DRAFT AUTOSAVE ══════════════════════
+  // Losing a draft to a refresh or a stray back-swipe is the fastest way to lose
+  // a user. Local only — the server never sees an unsent draft.
+  const DRAFT_KEY = "ew_draft";
+  let draftTimer = null;
+  function saveDraft(){
+    try{
+      const v = $("draft").value;
+      if(v.trim()) localStorage.setItem(DRAFT_KEY, v);
+      else localStorage.removeItem(DRAFT_KEY);
+    }catch(e){}
+  }
+  function clearDraft(){
+    try{ localStorage.removeItem(DRAFT_KEY); }catch(e){}
+    $("restored").classList.remove("on");
+  }
+  function restoreDraft(){
+    let v="";
+    try{ v = localStorage.getItem(DRAFT_KEY) || ""; }catch(e){}
+    if(!v.trim() || $("draft").value.trim()) return;
+    $("draft").value = v;
+    $("restored").classList.add("on");
+    renderChars();
+  }
+
+  // ══════════════════════ DEMO HANDOFF ══════════════════════
+  // The homepage stashes the sample someone pasted into the public demo. Picking
+  // it up here turns signup into "finish the thing you started" rather than
+  // "here's an empty workspace, good luck".
+  const DEMO_KEY = "ew_demo";
+  function takeDemoHandoff(){
+    let raw=null;
+    try{ raw = sessionStorage.getItem(DEMO_KEY); }catch(e){ return false; }
+    if(!raw) return false;
+    try{ sessionStorage.removeItem(DEMO_KEY); }catch(e){}
+
+    let d;
+    try{ d = JSON.parse(raw); }catch(e){ return false; }
+    const sample = (d && d.sample || "").trim();
+    if(sample.length < 60) return false;
+    // stale handoffs are worse than none — a sample from last week is confusing
+    if(d.at && (Date.now() - d.at) > 1000*60*60*6) return false;
+    // no free slot to put it in
+    if(voices.length >= plan().voices) return false;
+
+    $("vSamples").value = sample;
+    $("vName").value = "My voice";
+    $("trainTitle").textContent = "We kept the writing you pasted";
+    $("trainIntro").textContent =
+      "This is the sample from the demo. Give it a name and it's saved to your account — you can point it at any draft from here.";
+    $("trainOverlay").classList.add("show");
+    setTimeout(()=>{ $("vName").focus(); $("vName").select(); }, 260);
+    return true;
+  }
 
   // ────────────────────────── AUTH BOOT ──────────────────────────
   async function boot(){
     renderThemeList();
     drawRidges();
     setTheme(themeNow());
-    $("output").innerHTML = PLACEHOLDER;
+    renderOutputIdle();
     // Capture purchase intent passed from the landing page (?plan=pro).
     // Stash it so it survives the OAuth round-trip, then clean the URL.
     try{
@@ -1039,6 +1218,15 @@ textarea:focus{outline:none;border-color:var(--ink-3);background:var(--surface)}
     await loadProfile();
     renderChannels(); renderLength(); renderLibrary(); render();
     await Promise.all([loadVoices(), loadHistory()]);
+    restoreDraft();
+
+    // Order matters. A demo handoff is the most specific intent, so it wins; the
+    // tutorial waits until the modal is done rather than fighting it for the
+    // screen. Neither should collide with a checkout redirect.
+    const claimed = takeDemoHandoff();
+    if(!claimed && !tourSeen() && voices.length===0){
+      setTimeout(startTour, 700);
+    }
     handlePendingIntent();
   }
 
@@ -1161,6 +1349,7 @@ textarea:focus{outline:none;border-color:var(--ink-3);background:var(--surface)}
     $("trainBtn").disabled = atCap;
     $("voiceLock").innerHTML = atCap
       ? `<div class="locked-note">You've filled all ${cap} voice slot${cap>1?'s':''} on ${plan().label}. <b data-up>Upgrade for more →</b></div>` : "";
+    renderOutputIdle();
   }
 
   // ────────────────────────── LIBRARY / CHANNELS ──────────────────────────
@@ -1224,23 +1413,47 @@ textarea:focus{outline:none;border-color:var(--ink-3);background:var(--surface)}
     }catch(e){ history=[]; }
     renderHistory();
   }
-  const histRow = (h)=>{
+  const histRow = (h, q)=>{
     const label = h.voice_name||h.style||'voice';
     // colour-tag by the voice that produced it, matching the voice list
     const v = voices.find(x=>x.name===h.voice_name);
     const c = v ? voiceColour(v.id) : voiceColour(label);
     return `<div class="hitem" data-hid="${h.id}" style="--vc:${c}">
-      <div class="hh"><span class="hd"></span><span class="hv">${escapeHtml(label)}</span><span class="ht">${timeAgo(h.created_at)}</span></div>
-      <div class="hp">${escapeHtml(h.output||h.draft||'')}</div>
+      <div class="hh"><span class="hd"></span><span class="hv">${mark(label,q)}</span><span class="ht">${timeAgo(h.created_at)}</span></div>
+      <div class="hp">${mark(h.output||h.draft||'', q)}</div>
     </div>`;
   };
+  // highlight the matched term without ever injecting raw user text
+  function mark(text, q){
+    const safe = escapeHtml(text);
+    if(!q) return safe;
+    const needle = escapeHtml(q).replace(/[.*+?^${}()|[\]\\]/g,"\\$&");
+    return safe.replace(new RegExp(needle,"gi"), m=>`<mark>${m}</mark>`);
+  }
+  let histQuery = "";
   function renderHistory(){
     const depth = plan().historyDepth;
-    const shown = history.slice(0, depth);
-    $("histCount").textContent = history.length ? `${shown.length}` : "";
+    const all = history.slice(0, depth);
+    const q = histQuery.trim().toLowerCase();
+    const shown = q
+      ? all.filter(h => ((h.voice_name||"")+" "+(h.style||"")+" "+(h.output||"")+" "+(h.draft||""))
+          .toLowerCase().includes(q))
+      : all;
+
+    // the search box only earns its space once there's enough to search
+    $("hsearchWrap").style.display = (all.length >= 5 || q) ? "block" : "none";
+    $("histClear").classList.toggle("on", !!q);
+    $("histCount").textContent = q
+      ? `${shown.length}/${all.length}`
+      : (history.length ? `${all.length}` : "");
+
     const list=$("historyList");
-    if(!shown.length){ list.innerHTML = `<div class="empty">Your rewrites will show up here — click any one to re-open it.</div>`; }
-    else{ list.innerHTML = shown.map(histRow).join(''); }
+    if(!shown.length){
+      list.innerHTML = q
+        ? `<div class="empty">Nothing matches “${escapeHtml(histQuery.trim())}”.</div>`
+        : `<div class="empty">Your rewrites will show up here — click any one to re-open it.</div>`;
+    }
+    else{ list.innerHTML = shown.map(h=>histRow(h,q)).join(''); }
     // history depth nudge for free
     $("histLock").innerHTML = (history.length>depth && depth<50)
       ? `<div class="locked-note">${plan().label} keeps your last ${depth}. <b data-up>Upgrade to keep everything →</b></div>` : "";
@@ -1252,7 +1465,7 @@ textarea:focus{outline:none;border-color:var(--ink-3);background:var(--surface)}
       else{
         ri.innerHTML = `<div class="ri-head"><span class="t">Recent</span>${
             shown.length>3 ? `<button class="all" data-gorecent>See all →</button>` : ``
-          }</div>` + shown.slice(0,3).map(histRow).join('');
+          }</div>` + shown.slice(0,3).map(h=>histRow(h,q)).join('');
       }
     }
   }
@@ -1274,12 +1487,36 @@ textarea:focus{outline:none;border-color:var(--ink-3);background:var(--surface)}
   function renderChars(){
     const el=$("charcount"); if(!el) return;
     const cap=plan().chars, n=$("draft").value.length;
-    if(cap===Infinity){ el.classList.remove("over"); el.textContent = n ? `${n.toLocaleString()} characters · no limit` : ""; return; }
-    const over = n>cap;
-    el.classList.toggle("over", over);
-    el.innerHTML = over
-      ? `${n.toLocaleString()} / ${cap.toLocaleString()} — over your ${plan().label} limit. <b data-up>Upgrade →</b>`
-      : `${n.toLocaleString()} / ${cap.toLocaleString()}`;
+    if(cap===Infinity){ el.classList.remove("over"); el.textContent = n ? `${n.toLocaleString()} characters · no limit` : ""; }
+    else{
+      const over = n>cap;
+      el.classList.toggle("over", over);
+      el.innerHTML = over
+        ? `${n.toLocaleString()} / ${cap.toLocaleString()} — over your ${plan().label} limit. <b data-up>Upgrade →</b>`
+        : `${n.toLocaleString()} / ${cap.toLocaleString()}`;
+    }
+    gateRun();
+  }
+
+  // Say why the button won't work BEFORE it's pressed. Allowing a click and then
+  // answering it with an upsell modal is a small betrayal; the button should
+  // simply be off, with the reason next to it.
+  function gateRun(){
+    const btn=$("run"), note=$("runNote");
+    if(!btn || rewriteCtrl) return;             // mid-run the button is "cancel"
+    const cap = plan().chars, n = $("draft").value.length;
+    const over = cap!==Infinity && n>cap;
+    const outOfQuota = usage.limit<100000 && usage.used>=usage.limit;
+
+    let msg = "";
+    if(outOfQuota){
+      msg = `You've used all ${usage.limit.toLocaleString()} rewrites this month. <b data-up>See plans →</b>`;
+    }else if(over){
+      msg = `This draft is ${(n-cap).toLocaleString()} characters over your ${plan().label} limit. Trim it, or <b data-up>upgrade for longer drafts →</b>`;
+    }
+    btn.disabled = !!msg;
+    note.innerHTML = msg;
+    note.classList.toggle("on", !!msg);
   }
 
   // ────────────────────────── SELECTION ──────────────────────────
@@ -1335,8 +1572,10 @@ textarea:focus{outline:none;border-color:var(--ink-3);background:var(--surface)}
       if(!data.output) throw new Error("Empty response from the model.");
 
       $("output").textContent=data.output;
+      hasOutput=true;
       $("outTools").style.display="flex";
       renderVariance();
+      clearDraft();                 // it's saved to history now; stop shadowing it
       if(typeof data.used==="number"){ usage.used=data.used; usage.limit=data.limit||usage.limit; render(); }
       if(typeof data.scrubbed==="number" && data.scrubbed>0 && plan().label!=="Free"){
         $("scrubbed").style.display="flex";
@@ -1347,7 +1586,7 @@ textarea:focus{outline:none;border-color:var(--ink-3);background:var(--surface)}
       if(e.name==="AbortError"){ $("output").innerHTML=`<div class="ph">Cancelled — no rewrite used.</div>`; }
       else{ $("err").textContent=e.message||"Rewrite failed — try again."; }
     }
-    finally{ rewriteCtrl=null; btn.disabled=false; btn.classList.remove("cancelling"); btn.textContent="Rewrite in my voice"; $("wave").classList.remove("go"); }
+    finally{ rewriteCtrl=null; btn.disabled=false; btn.classList.remove("cancelling"); btn.textContent="Rewrite in my voice"; $("wave").classList.remove("go"); gateRun(); }
   }
 
   // ────────────────────────── TRAIN VOICE ──────────────────────────
@@ -1368,12 +1607,20 @@ textarea:focus{outline:none;border-color:var(--ink-3);background:var(--surface)}
       closeTrain(); $("vName").value=""; $("vSamples").value="";
       await loadVoices();
       if(data.id) selectVoice(data.id);
+      // first voice ever → now the tour has something to point at
+      if(!tourSeen() && voices.length===1) setTimeout(startTour, 500);
     }catch(e){ $("trainErr").textContent=e.message||"Couldn't build the voice — try again."; }
     finally{ btn.disabled=false; btn.textContent="Build my voice"; }
   }
 
   // ────────────────────────── MODALS ──────────────────────────
-  const openTrain =()=>{ if($("trainBtn").disabled){ openUpgrade("voices"); return; } $("trainOverlay").classList.add("show"); };
+  const openTrain =()=>{
+    if($("trainBtn").disabled){ openUpgrade("voices"); return; }
+    // the demo handoff rewords these — put them back for a normal open
+    $("trainTitle").textContent = "Train a new voice";
+    $("trainIntro").textContent = "Paste 2–3 things you've actually written. EchoWrite builds a private fingerprint of how you sound — you only do this once.";
+    $("trainOverlay").classList.add("show");
+  };
   const closeTrain=()=>$("trainOverlay").classList.remove("show");
   function openUpgrade(reason){
     if(reason==="out"){ $("upTitle").textContent="You're out of rewrites this month"; $("upBody").textContent="Upgrade to keep rewriting. Prices are per week, billed monthly."; }
@@ -1436,6 +1683,113 @@ textarea:focus{outline:none;border-color:var(--ink-3);background:var(--surface)}
     }
   }
 
+  // ══════════════════════ TUTORIAL ══════════════════════
+  // Coach marks over the real UI — a spotlight cutout plus a card with an arrow.
+  // On mobile the panels are tabbed, so each step also drives the tab switcher.
+  const TOUR_KEY = "ew_tour_v1";
+  const TOUR = [
+    { sel:".panel-voices", tab:"voices", dir:"right",
+      title:"Your voices live here",
+      body:"Train a voice from a few things you've written, and it's saved for good. Below that sits a library of ready-made tones if you want a starting point." },
+    { sel:"#draft", tab:"editor", dir:"up",
+      title:"Paste anything here",
+      body:"Rough notes, a bullet list, or a stiff AI draft. It doesn't need to be tidy — that's the whole point." },
+    { sel:"#run", tab:"editor", dir:"up",
+      title:"One click, and it's yours",
+      body:"Pick a voice, hit rewrite, and it comes back in your rhythm with the model-speak stripped out. ⌘/Ctrl + Enter works too." },
+    { sel:".panel-history", tab:"history", dir:"left",
+      title:"Nothing gets lost",
+      body:"Every rewrite is saved and colour-tagged by the voice that made it. Click any one to re-open it in the editor." },
+  ];
+  let tourAt = -1;
+
+  const tourSeen = ()=>{ try{ return !!localStorage.getItem(TOUR_KEY); }catch(e){ return false; } };
+  const markTourSeen = ()=>{ try{ localStorage.setItem(TOUR_KEY,"1"); }catch(e){} };
+
+  function endTour(){
+    tourAt = -1;
+    $("tutBack").classList.remove("on");
+    markTourSeen();
+    removeEventListener("resize", placeTour);
+    removeEventListener("scroll", placeTour, true);
+  }
+
+  function placeTour(){
+    const s = TOUR[tourAt]; if(!s) return;
+    const el = document.querySelector(s.sel); if(!el) return endTour();
+    const r = el.getBoundingClientRect();
+    const pad = 8;
+    const hole = $("tutHole"), card = $("tutCard");
+
+    hole.style.top    = (r.top - pad) + "px";
+    hole.style.left   = (r.left - pad) + "px";
+    hole.style.width  = (r.width + pad*2) + "px";
+    hole.style.height = (r.height + pad*2) + "px";
+
+    // Place the card beside the target where there's room, else below it.
+    const cw = card.offsetWidth, ch = card.offsetHeight, gap = 16;
+    const vw = innerWidth, vh = innerHeight;
+    let dir = s.dir, top, left;
+
+    if(dir==="right" && r.right + gap + cw > vw - 12) dir = "up";
+    if(dir==="left"  && r.left - gap - cw < 12)       dir = "up";
+
+    if(dir==="right"){ left = r.right + gap; top = Math.max(12, r.top); }
+    else if(dir==="left"){ left = r.left - gap - cw; top = Math.max(12, r.top); }
+    else { // up = card sits below the target, arrow points up at it
+      left = Math.min(Math.max(12, r.left), vw - cw - 12);
+      top  = r.bottom + gap;
+      if(top + ch > vh - 12){ top = Math.max(12, r.top - gap - ch); dir = "down"; }
+    }
+    top = Math.min(Math.max(12, top), Math.max(12, vh - ch - 12));
+
+    card.dataset.dir = dir;
+    card.style.top = top + "px";
+    card.style.left = left + "px";
+    // point the arrow at the middle of the target, clamped inside the card
+    if(dir==="up" || dir==="down"){
+      card.style.setProperty("--ax", Math.min(Math.max(18, r.left + r.width/2 - left - 6), cw - 30) + "px");
+    }else{
+      card.style.setProperty("--ay", Math.min(Math.max(18, r.top + r.height/2 - top - 6), ch - 30) + "px");
+    }
+  }
+
+  function showTourStep(i){
+    if(i < 0 || i >= TOUR.length) return endTour();
+    tourAt = i;
+    const s = TOUR[i];
+
+    if(isMobile() && s.tab){
+      const t = document.querySelector(`.mtab[data-p="${s.tab}"]`);
+      if(t && !t.classList.contains("on")) t.click();
+    }
+    $("tutStep").textContent = `Step ${i+1} of ${TOUR.length}`;
+    $("tutTitle").textContent = s.title;
+    $("tutBody").textContent = s.body;
+    $("tutPrev").style.visibility = i===0 ? "hidden" : "visible";
+    $("tutNext").textContent = i===TOUR.length-1 ? "Got it" : "Next";
+    $("tutDots").innerHTML = TOUR.map((_,j)=>`<i class="${j===i?'on':''}"></i>`).join("");
+
+    const el = document.querySelector(s.sel);
+    if(el) el.scrollIntoView({behavior:"smooth", block:"center"});
+    // let the scroll/tab settle before measuring
+    setTimeout(placeTour, isMobile() ? 320 : 220);
+  }
+
+  function startTour(){
+    $("acctMenu").classList.remove("open");
+    $("tutBack").classList.add("on");
+    showTourStep(0);
+    addEventListener("resize", placeTour);
+    addEventListener("scroll", placeTour, true);
+  }
+
+  $("tutNext").onclick = ()=>{ tourAt===TOUR.length-1 ? endTour() : showTourStep(tourAt+1); };
+  $("tutPrev").onclick = ()=>showTourStep(tourAt-1);
+  $("tutSkip").onclick = endTour;
+  $("tourBtn").onclick = startTour;
+  $("tutBack").addEventListener("click",(e)=>{ if(e.target.id==="tutBack") endTour(); });
+
   // ────────────────────────── EVENTS ──────────────────────────
   // voice list (select / edit / delete)
   $("voiceList").addEventListener("click",async(e)=>{
@@ -1467,6 +1821,7 @@ textarea:focus{outline:none;border-color:var(--ink-3);background:var(--surface)}
   function openHistoryItem(hid){
     const h=history.find(x=>x.id===hid); if(!h) return;
     $("draft").value=h.draft||""; $("output").textContent=h.output||""; $("outTools").style.display="flex";
+    hasOutput=true;
     const v=voices.find(x=>x.name===h.voice_name); if(v) selectVoice(v.id);
     renderChars(); renderVariance();
     document.querySelector('.mtab[data-p="editor"]')?.click();
@@ -1494,8 +1849,29 @@ textarea:focus{outline:none;border-color:var(--ink-3);background:var(--surface)}
     el.addEventListener("focus",()=>{ if(!plan().channels){ el.blur(); openUpgrade("length"); } });
   });
   $("run").onclick=doRewrite;
-  $("draft").addEventListener("input", renderChars);
+  $("draft").addEventListener("input", ()=>{
+    renderChars();
+    $("restored").classList.remove("on");
+    clearTimeout(draftTimer);
+    draftTimer = setTimeout(saveDraft, 400);   // debounce; this fires on every keystroke
+  });
+  // last chance to persist if they close the tab mid-sentence
+  addEventListener("visibilitychange", ()=>{ if(document.hidden) saveDraft(); });
+  addEventListener("pagehide", saveDraft);
+  $("restoreClear").onclick=()=>{ $("draft").value=""; clearDraft(); renderChars(); };
   $("regen").onclick=doRewrite;
+
+  // ⌘/Ctrl + Enter to rewrite — anyone using this daily will try it in week one
+  $("draft").addEventListener("keydown",(e)=>{
+    if((e.metaKey||e.ctrlKey) && e.key==="Enter"){ e.preventDefault(); if(!$("run").disabled) doRewrite(); }
+  });
+
+  // history search
+  $("histSearch").addEventListener("input",(e)=>{ histQuery=e.target.value; renderHistory(); });
+  $("histClear").onclick=()=>{ $("histSearch").value=""; histQuery=""; renderHistory(); $("histSearch").focus(); };
+
+  // the first-run card's button lives inside re-rendered HTML, so delegate
+  document.body.addEventListener("click",(e)=>{ if(e.target.closest("[data-train]")) openTrain(); });
   $("activeVoiceBar").onclick=(e)=>{ if(e.target.closest("#clearVoice")) return; if(isMobile()) goVoices(); };
   $("clearVoice").onclick=(e)=>{ e.stopPropagation(); if(isMobile()){ goVoices(); return; } active=null; renderVoices(); renderLibrary(); render(); };
   $("copyBtn").onclick=()=>{
@@ -1521,6 +1897,7 @@ textarea:focus{outline:none;border-color:var(--ink-3);background:var(--surface)}
   });
   document.addEventListener("keydown",(e)=>{
     if(e.key!=="Escape") return;
+    if(tourAt>=0){ endTour(); return; }
     $("acctMenu").classList.remove("open"); $("themeMenu").classList.remove("open");
     ["trainOverlay","editOverlay","overlay"].forEach(id=>$(id).classList.remove("show"));
   });
