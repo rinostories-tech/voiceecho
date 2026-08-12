@@ -80,6 +80,7 @@
     {"@type":"Question","name":"Is my writing kept private?","acceptedAnswer":{"@type":"Answer","text":"Your voice profiles are tied to your account so you can reuse them, and are not shared with other users."}},
     {"@type":"Question","name":"What counts as one rewrite?","acceptedAnswer":{"@type":"Answer","text":"One rewrite of one draft counts as one. Re-running the same draft in a different voice counts as another."}},
     {"@type":"Question","name":"Can I keep separate voices?","acceptedAnswer":{"@type":"Answer","text":"Yes. Keep one voice for your personal brand, one per client, and one for your newsletter, then switch between them."}},
+    {"@type":"Question","name":"Can I get a refund?","acceptedAnswer":{"@type":"Answer","text":"Yes — 14 days, no questions asked, on your first purchase of any paid plan. Email us and we'll refund it in full."}},
     {"@type":"Question","name":"Can I cancel anytime?","acceptedAnswer":{"@type":"Answer","text":"Anytime, from your account. You keep full access until the end of the period you have already paid for."}}
   ]
 }
@@ -169,6 +170,7 @@ section{padding:104px 0}
   .rv{opacity:1;transform:none;filter:none;transition:none}
   .track{animation:none!important}
   .bars i{transition:none!important}
+  .tier.pop::before{animation:none!important}
 }
 
 /* ═════════ BUTTONS ═════════ */
@@ -329,7 +331,7 @@ nav.solid .btn-ghost:hover{background:#2e2a20}
   background:linear-gradient(180deg,var(--sky-7) 0%,var(--paper) 26%)}
 .res-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
 .res{border:1px solid var(--line);border-radius:var(--r);padding:24px;background:var(--card);
-  min-height:180px;transition:border-color .3s,box-shadow .3s}
+  min-height:180px;transition:border-color .3s,box-shadow .3s;position:relative}
 .res.win{border-color:rgba(207,46,30,.26);box-shadow:0 22px 56px -34px rgba(207,46,30,.55)}
 .res .tag{font-family:var(--mono);font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;
   color:var(--ink-3);margin-bottom:14px;display:flex;align-items:center;gap:10px}
@@ -339,6 +341,32 @@ nav.solid .btn-ghost:hover{background:#2e2a20}
 .res.empty .body,.res.loading .body{color:var(--ink-3);font-style:italic;white-space:normal}
 .res.dull .body{color:var(--ink-2)}
 .mk{background:linear-gradient(transparent 62%,rgba(221,242,74,.65) 62%)}
+.res-copy{position:absolute;top:18px;right:18px;font-family:var(--mono);font-size:9.5px;
+  letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);background:transparent;
+  border:1px solid var(--line-2);border-radius:999px;padding:5px 10px;cursor:pointer;
+  opacity:0;transition:.18s}
+.res:hover .res-copy,.res-copy:focus{opacity:1}
+.res-copy:hover{border-color:var(--ink-3);color:var(--ink)}
+
+/* the ask, after the proof — this is the highest-intent moment on the page */
+.claim{display:none;margin-top:28px;border:1px solid var(--line-2);border-radius:var(--r);
+  background:var(--card);padding:26px 28px;align-items:center;gap:26px;
+  box-shadow:0 22px 56px -38px rgba(20,18,12,.5);position:relative;overflow:hidden}
+.claim.show{display:flex;animation:rise .8s var(--ease) both}
+.claim::after{content:"";position:absolute;right:0;top:0;width:280px;height:280px;
+  border-radius:999px;transform:translate(38%,-46%);pointer-events:none;
+  background:radial-gradient(circle,rgba(91,60,255,.16),transparent 68%)}
+.claim-txt{flex:1;min-width:0;position:relative;z-index:2}
+.claim-txt .k{font-family:var(--mono);font-size:9.5px;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--v-atlas);margin-bottom:9px;
+  display:flex;align-items:center;gap:7px}
+.claim-txt .k::before{content:"";width:5px;height:5px;border-radius:999px;background:var(--v-atlas)}
+.claim-txt h3{font-family:var(--disp);font-size:21px;font-weight:400;letter-spacing:-.028em;
+  margin-bottom:7px}
+.claim-txt p{margin:0;font-size:14px;color:var(--ink-2);line-height:1.55}
+.claim-go{position:relative;z-index:2;text-align:center;flex:0 0 auto}
+.claim-go .fine{font-family:var(--mono);font-size:10px;color:var(--ink-3);margin:10px 0 0}
+
 .res-note{text-align:center;margin-top:28px;font-size:14.5px;color:var(--ink-2)}
 .res-note a{font-weight:500;color:var(--ink);border-bottom:1px solid var(--line-2);padding-bottom:1px}
 .res-note a:hover{border-color:var(--ink)}
@@ -429,6 +457,28 @@ nav.solid .btn-ghost:hover{background:#2e2a20}
   border-radius:var(--r-sm);background:var(--paper);padding:10px 13px}
 .fprint i{flex:1;border-radius:1px}
 
+/* ═════════ COMPARISON ═════════ */
+.cmp{border:1px solid var(--line);border-radius:var(--r);overflow:hidden;background:var(--card)}
+.cmp table{width:100%;border-collapse:collapse}
+.cmp th,.cmp td{padding:16px 18px;text-align:left;border-bottom:1px solid var(--line);
+  font-size:14px;vertical-align:middle}
+.cmp tr:last-child th,.cmp tr:last-child td{border-bottom:0}
+.cmp thead th{font-family:var(--mono);font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--ink-3);font-weight:500;background:var(--paper-2);padding-top:14px;padding-bottom:14px}
+.cmp thead th.us{color:var(--ink)}
+.cmp tbody th{font-weight:400;color:var(--ink-2);font-size:14px;width:34%}
+.cmp td{text-align:center;color:var(--ink-3);font-size:13px;width:22%}
+.cmp col.us,.cmp td.us{background:var(--paper-tint)}
+.cmp thead th.us{background:#ece6fb}
+.cmp td.us{color:var(--ink);font-weight:500}
+.cmp .yes,.cmp .no,.cmp .part{display:inline-flex;width:20px;height:20px;border-radius:999px;
+  align-items:center;justify-content:center;font-size:11px;line-height:1}
+.cmp .yes{background:rgba(31,138,112,.14);color:var(--v-atlas)}
+.cmp .no{background:rgba(207,46,30,.1);color:var(--red)}
+.cmp .part{background:rgba(232,145,60,.16);color:#b06a1c}
+.cmp-note{font-family:var(--mono);font-size:10.5px;color:var(--ink-3);text-align:center;
+  margin-top:18px;letter-spacing:.03em}
+
 /* ═════════ SCIENCE ═════════ */
 .sci{max-width:640px;margin:0 auto}
 .sci p{font-family:var(--serif);font-size:18.5px;line-height:1.68;margin:0 0 24px;
@@ -438,6 +488,8 @@ nav.solid .btn-ghost:hover{background:#2e2a20}
 .sci .term{font-family:var(--mono);font-size:14.5px;border-bottom:1px solid var(--red);
   padding-bottom:1px}
 .sci sup{font-family:var(--mono);font-size:9.5px;color:var(--ink-3);vertical-align:super;line-height:0}
+.sci sup a{border-bottom:0}
+.sci sup a:hover{color:var(--red)}
 .pull{font-family:var(--disp);font-size:clamp(22px,3vw,29px);line-height:1.3;letter-spacing:-.03em;
   margin:40px 0;padding-left:24px;border-left:2px solid var(--red)}
 .signals{margin:44px 0;border-top:1px solid var(--line)}
@@ -454,9 +506,13 @@ nav.solid .btn-ghost:hover{background:#2e2a20}
 .srcbox summary::-webkit-details-marker{display:none}
 .srcbox summary::after{content:"+";float:right;font-size:14px;line-height:1}
 .srcbox[open] summary::after{content:"–"}
-.srcbox ol{margin:0;padding:0 18px 14px 36px;font-size:12.5px;color:var(--ink-2);line-height:1.62}
-.srcbox li{margin-bottom:9px}
-.srcbox a{border-bottom:1px solid var(--line-2)}
+.srcbox ol{margin:0;padding:4px 20px 16px 38px;font-size:12.5px;color:var(--ink-2);line-height:1.62}
+.srcbox li{margin-bottom:12px}
+.srcbox li:last-child{margin-bottom:0}
+.srcbox li:target{background:rgba(221,242,74,.3);border-radius:5px}
+.srcbox cite{font-style:normal;font-weight:500;color:var(--ink)}
+.srcbox a{border-bottom:1px solid var(--line-2);word-break:break-word}
+.srcbox a:hover{border-color:var(--ink-3)}
 .srcbox .fine{padding:13px 18px;border-top:1px solid var(--line);font-size:11.5px;
   color:var(--ink-3);line-height:1.55}
 .sci-bridge{font-family:var(--sans)!important;font-size:15px!important;color:var(--ink-2)!important;
@@ -473,12 +529,27 @@ nav.solid .btn-ghost:hover{background:#2e2a20}
 .bt-opt .save{font-family:var(--mono);font-size:9.5px;letter-spacing:.05em;opacity:.85}
 .switch{position:absolute;opacity:0;pointer-events:none;width:0;height:0}
 
-.tiers{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.tiers{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;align-items:stretch}
 .tier{background:var(--card);border:1px solid var(--line);border-top-width:3px;
   border-radius:var(--r);padding:28px 22px;display:flex;flex-direction:column;position:relative}
-.tier.pop{box-shadow:0 26px 62px -36px rgba(20,18,12,.45)}
+
+/* Pro — a horizon running along the border. Same gradient as the hero sky,
+   drifting slowly, so the recommended plan is lit rather than just shadowed. */
+.tier.pop{border:0;padding:0;background:transparent;box-shadow:0 26px 62px -34px rgba(91,60,255,.5)}
+.tier.pop::before{content:"";position:absolute;inset:0;border-radius:var(--r);padding:2px;
+  background:linear-gradient(115deg,var(--sky-2),var(--sky-3),var(--sky-4),var(--sky-5),
+    var(--sky-6),var(--sky-5),var(--sky-4),var(--sky-3),var(--sky-2));
+  background-size:280% 100%;
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
+  -webkit-mask-composite:xor;mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
+  mask-composite:exclude;animation:horizon 9s linear infinite;pointer-events:none}
+@keyframes horizon{to{background-position:280% 0}}
+.tier.pop .tier-in{background:var(--card);border-radius:calc(var(--r) - 2px);margin:2px;
+  padding:26px 20px;display:flex;flex-direction:column;flex:1;position:relative;z-index:2}
+
 .tier .tag{position:absolute;top:26px;right:22px;font-family:var(--mono);font-size:9px;
   letter-spacing:.13em;text-transform:uppercase;color:var(--red)}
+.tier.pop .tag{top:24px;right:20px}
 .tier .nm{font-family:var(--mono);font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;
   color:var(--ink-3);margin-bottom:18px}
 .tier .amt{font-family:var(--disp);font-size:34px;letter-spacing:-.035em;line-height:1;
@@ -493,7 +564,13 @@ nav.solid .btn-ghost:hover{background:#2e2a20}
 .tier li{font-size:13.5px;color:var(--ink-2);padding:6px 0 6px 17px;position:relative;line-height:1.48}
 .tier li::before{content:"";position:absolute;left:0;top:13px;width:6px;height:1px;background:var(--ink-3)}
 .tier .btn{width:100%}
-.fineprint{text-align:center;margin:24px auto 0;font-family:var(--mono);font-size:10.5px;
+
+.guarantee{display:flex;align-items:center;justify-content:center;gap:12px;margin:26px auto 0;
+  padding:15px 22px;border:1px solid var(--line);border-radius:999px;background:var(--card);
+  max-width:640px;font-size:13.5px;color:var(--ink-2);text-align:left}
+.guarantee svg{width:17px;height:17px;flex:0 0 auto;color:var(--v-atlas)}
+.guarantee b{color:var(--ink);font-weight:500}
+.fineprint{text-align:center;margin:18px auto 0;font-family:var(--mono);font-size:10.5px;
   letter-spacing:.04em;color:var(--ink-3)}
 
 .life{margin-top:18px;background:var(--ink);color:var(--paper);border-radius:var(--r);
@@ -521,7 +598,7 @@ nav.solid .btn-ghost:hover{background:#2e2a20}
   margin:12px 0 0;letter-spacing:.05em}
 
 /* ═════════ FAQ ═════════ */
-.faq{max-width:780px;border-top:1px solid var(--line)}
+.faq{max-width:780px;margin:0 auto;border-top:1px solid var(--line)}
 .faq details{border-bottom:1px solid var(--line)}
 .faq summary{list-style:none;cursor:pointer;padding:22px 40px 22px 0;position:relative;
   font-family:var(--disp);font-size:17.5px;font-weight:400;letter-spacing:-.02em}
@@ -530,7 +607,7 @@ nav.solid .btn-ghost:hover{background:#2e2a20}
   color:var(--ink-3);font-family:var(--sans);font-weight:300;
   transition:transform .28s var(--ease)}
 .faq details[open] summary::after{transform:rotate(45deg)}
-.faq p{margin:0 0 24px;font-size:14.5px;color:var(--ink-2);line-height:1.64;max-width:64ch}
+.faq p{margin:0 0 24px;font-size:14.5px;color:var(--ink-2);line-height:1.64}
 .faq a{border-bottom:1px solid var(--line-2)}
 
 /* ═════════ FINAL ═════════ */
@@ -579,6 +656,10 @@ footer a:hover{color:#fff}
   .result{padding:72px 0 80px}
   .res-grid{grid-template-columns:1fr}
   .res{min-height:0;padding:20px}
+  .res-copy{opacity:1}
+  .claim{flex-direction:column;align-items:stretch;text-align:center;padding:24px 20px;gap:20px}
+  .claim-txt .k{justify-content:center}
+  .claim-go .btn{width:100%}
   .steps{grid-template-columns:1fr}
   .step{padding:24px 0;border-left:0;border-top:1px solid var(--line)}
   .step:first-child{border-top:0;padding-top:0}
@@ -596,7 +677,20 @@ footer a:hover{color:#fff}
   .signal{grid-template-columns:1fr;gap:8px}
   .signal .k{padding-top:0}
   .sci p{font-size:17px}
+  .cmp{border:0;background:transparent;overflow:visible}
+  .cmp table,.cmp tbody,.cmp tr,.cmp th,.cmp td{display:block;width:auto}
+  .cmp thead{display:none}
+  .cmp tbody tr{border:1px solid var(--line);border-radius:var(--r-sm);background:var(--card);
+    margin-bottom:10px;padding:14px 16px}
+  .cmp tbody th{width:auto;padding:0 0 12px;border-bottom:1px solid var(--line);color:var(--ink);
+    font-size:14.5px}
+  .cmp td{width:auto;text-align:left;padding:9px 0 0;display:flex;align-items:center;gap:10px;
+    background:none!important}
+  .cmp td::before{content:attr(data-c);font-family:var(--mono);font-size:9.5px;letter-spacing:.12em;
+    text-transform:uppercase;color:var(--ink-3);flex:1}
+  .cmp td.us::before{color:var(--ink)}
   .tiers{grid-template-columns:1fr}
+  .guarantee{flex-direction:column;text-align:center;border-radius:var(--r);gap:9px}
   .life ul{grid-template-columns:1fr}
   .final{padding:96px 0 170px}
   .hzlabel{display:none}
@@ -622,6 +716,7 @@ footer a:hover{color:#fff}
   <div class="menu-links">
     <a href="#how" onclick="closeMenu()">How it works</a>
     <a href="#voices" onclick="closeMenu()">Voices</a>
+    <a href="#compare" onclick="closeMenu()">Compare</a>
     <a href="#pricing" onclick="closeMenu()">Pricing</a>
     <a href="#faq" onclick="closeMenu()">FAQ</a>
   </div>
@@ -636,7 +731,7 @@ footer a:hover{color:#fff}
     </a>
     <div class="nav-links">
       <a href="#how">How it works</a>
-      <a href="#voices">Voices</a>
+      <a href="#compare">Compare</a>
       <a href="#pricing">Pricing</a>
       <a href="#faq">FAQ</a>
     </div>
@@ -744,13 +839,26 @@ footer a:hover{color:#fff}
       </div>
       <div class="res win empty" id="pfVoiced">
         <div class="tag">In your voice</div>
+        <button class="res-copy" id="pfCopy" type="button" hidden>Copy</button>
         <div class="body">Your rhythm, your punctuation, your tics.</div>
+      </div>
+    </div>
+
+    <!-- The ask. Appears only once they've seen their own voice come back. -->
+    <div class="claim" id="pfClaim">
+      <div class="claim-txt">
+        <div class="k">Your voice is fingerprinted</div>
+        <h3>Save it and point it at anything.</h3>
+        <p>We'll carry the writing you just pasted straight into your account — name it once and reuse it on every draft from here.</p>
+      </div>
+      <div class="claim-go">
+        <a href="/app?from=demo" class="btn btn-primary" id="pfClaimBtn">Save this voice — free</a>
+        <p class="fine">no card &middot; 15 rewrites included</p>
       </div>
     </div>
 
     <p class="res-note" id="pfNote" hidden>
       Read them again. The left one is <em>better writing</em> &mdash; and it isn't yours.
-      <a href="/app">Save this voice and keep going, free &rarr;</a>
     </p>
   </div>
 </div>
@@ -888,8 +996,66 @@ footer a:hover{color:#fff}
   </div>
 </section>
 
+<!-- ═════════════ COMPARISON ═════════════ -->
+<section id="compare">
+  <div class="wrap">
+    <div class="sec-head mid rv">
+      <div class="eyebrow">Why not just use ChatGPT</div>
+      <h2>You already have a writer. You don't have your voice.</h2>
+      <p class="lead">A general model writes well in <em>a</em> voice. A humanizer flattens everything into the same loose register. Neither one is yours, and neither one remembers.</p>
+    </div>
+
+    <div class="cmp rv">
+      <table>
+        <colgroup><col><col><col><col class="us"></colgroup>
+        <thead>
+          <tr>
+            <th scope="col"></th>
+            <th scope="col">ChatGPT &amp; co.</th>
+            <th scope="col">AI humanizers</th>
+            <th scope="col" class="us">EchoWrite</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th scope="row">Learns <em>your</em> specific voice</th>
+            <td data-c="ChatGPT"><span class="no" aria-label="No">✕</span></td>
+            <td data-c="Humanizers"><span class="no" aria-label="No">✕</span></td>
+            <td class="us" data-c="EchoWrite"><span class="yes" aria-label="Yes">✓</span></td>
+          </tr>
+          <tr>
+            <th scope="row">Reusable across every draft</th>
+            <td data-c="ChatGPT"><span class="part" aria-label="Partly">~</span></td>
+            <td data-c="Humanizers"><span class="no" aria-label="No">✕</span></td>
+            <td class="us" data-c="EchoWrite"><span class="yes" aria-label="Yes">✓</span></td>
+          </tr>
+          <tr>
+            <th scope="row">Keeps your facts and numbers</th>
+            <td data-c="ChatGPT"><span class="part" aria-label="Partly">~</span></td>
+            <td data-c="Humanizers"><span class="no" aria-label="No">✕</span></td>
+            <td class="us" data-c="EchoWrite"><span class="yes" aria-label="Yes">✓</span></td>
+          </tr>
+          <tr>
+            <th scope="row">Separate voice per client or brand</th>
+            <td data-c="ChatGPT"><span class="no" aria-label="No">✕</span></td>
+            <td data-c="Humanizers"><span class="no" aria-label="No">✕</span></td>
+            <td class="us" data-c="EchoWrite"><span class="yes" aria-label="Yes">✓</span></td>
+          </tr>
+          <tr>
+            <th scope="row">No prompt writing, ever</th>
+            <td data-c="ChatGPT"><span class="no" aria-label="No">✕</span></td>
+            <td data-c="Humanizers"><span class="yes" aria-label="Yes">✓</span></td>
+            <td class="us" data-c="EchoWrite"><span class="yes" aria-label="Yes">✓</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="cmp-note rv">✓ yes &middot; ~ possible, but you rebuild it every time &middot; ✕ no</p>
+  </div>
+</section>
+
 <!-- ═════════════ SCIENCE ═════════════ -->
-<section id="science">
+<section id="science" class="band">
   <div class="wrap">
     <div class="sec-head mid rv">
       <div class="eyebrow">Why it works</div>
@@ -897,11 +1063,13 @@ footer a:hover{color:#fff}
     </div>
 
     <div class="sci rv">
-      <p>Researchers score generated text on two axes: <span class="term">perplexity</span>, how predictable each word is, and <span class="term">burstiness</span>, how much that predictability swings across a document. <strong>AI text scores low on both.</strong><sup>1,2</sup></p>
+      <p>Detectors score generated text on two axes: <span class="term">perplexity</span>, how predictable each word is, and <span class="term">burstiness</span>, how much that predictability swings from sentence to sentence — measured, literally, as the standard deviation of the per-sentence scores.<sup><a href="#s1">1</a></sup> <strong>AI text scores low on both.</strong></p>
 
-      <p>Detectors chase this and they're bad at it. They've flagged the U.S. Constitution as machine-written.<sup>3</sup> So we're not in the business of beating a checker — a score that fires on the Constitution isn't a standard worth optimising against.</p>
+      <p>Detectors were built on this, and they're bad at it. They've flagged the U.S. Constitution as machine-written.<sup><a href="#s2">2</a></sup> So we're not in the business of beating a checker — a score that fires on the Constitution isn't a standard worth optimising against, and the biggest ones have since moved to other methods anyway.<sup><a href="#s3">3</a></sup></p>
 
-      <p>But the measurement underneath is real, and old. In 1964 two statisticians ended a 175-year argument over twelve disputed Federalist Papers by counting words like <em>upon</em> and <em>whilst</em>.<sup>4</sup> Function words. The ones nobody picks on purpose. Sixty years on, the finding holds: <strong>the most identifying thing about your writing is the part you aren't thinking about.</strong></p>
+      <p>But the measurement underneath is real. Stanford researchers showed that model-written text sits in a measurably different region of a language model's probability landscape than human writing does — the signal exists whether or not any product detects it reliably.<sup><a href="#s4">4</a></sup></p>
+
+      <p>And it's old. In 1964 two statisticians ended a 175-year argument over the disputed Federalist Papers by counting words like <em>upon</em> and <em>whilst</em> — excluding topic words entirely, using only articles, pronouns, prepositions and conjunctions.<sup><a href="#s5">5</a></sup> Function words. The ones nobody picks on purpose. Sixty years on, the finding holds: <strong>the most identifying thing about your writing is the part you aren't thinking about.</strong></p>
 
       <div class="pull">"Punchy" is a setting.<br>You are a distribution.</div>
 
@@ -934,7 +1102,11 @@ footer a:hover{color:#fff}
       <details class="srcbox">
         <summary>Sources &amp; further reading</summary>
         <ol>
-          <li><cite>Segarra, Eisen &amp; Ribeiro</cite> — Authorship Attribution through Function Word Adjacency Networks. Modern confirmation that function words and punctuation carry a stable stylometric fingerprint. <a href="https://arxiv.org/pdf/1406.4469" rel="nofollow noopener" target="_blank">arxiv.org/abs/1406.4469</a></li>
+          <li id="s1"><cite>Chen, Kang, Zhai, Li, Guo &amp; Liu (2023)</cite> — On the Generalization of Training-based ChatGPT Detection Methods. Sets out how perplexity and burstiness are actually computed, burstiness being the standard deviation of per-sentence perplexity. <a href="https://arxiv.org/pdf/2310.01307" rel="nofollow noopener" target="_blank">arxiv.org/abs/2310.01307</a></li>
+          <li id="s2"><cite>Benj Edwards, Ars Technica (2023)</cite> — Why AI detectors think the US Constitution was written by AI. The false-positive problem, explained with the creator of GPTZero. <a href="https://arstechnica.com/information-technology/2023/07/why-ai-detectors-think-the-us-constitution-was-written-by-ai/" rel="nofollow noopener" target="_blank">arstechnica.com</a></li>
+          <li id="s3"><cite>GPTZero (2023)</cite> — What is perplexity &amp; burstiness for AI detection? Their own note that they moved off these metrics in autumn 2023 in favour of a deep-learning architecture. <a href="https://gptzero.me/news/perplexity-and-burstiness-what-is-it/" rel="nofollow noopener" target="_blank">gptzero.me</a></li>
+          <li id="s4"><cite>Mitchell, Lee, Khazatsky, Manning &amp; Finn (2023)</cite> — DetectGPT: Zero-Shot Machine-Generated Text Detection using Probability Curvature. Model-written text occupies negative-curvature regions of the log-probability function; the underlying statistical difference is real. <a href="https://arxiv.org/abs/2301.11305" rel="nofollow noopener" target="_blank">arxiv.org/abs/2301.11305</a></li>
+          <li id="s5"><cite>Mosteller &amp; Wallace (1964)</cite> — Inference and Disputed Authorship: The Federalist. The founding work of stylometry: contextual words excluded, authorship settled on function words alone. <a href="https://press.uchicago.edu/ucp/books/book/distributed/I/bo5667096.html" rel="nofollow noopener" target="_blank">press.uchicago.edu</a></li>
         </ol>
         <div class="fine">EchoWrite matches how you write. It makes no claim about detector scores, and shouldn't be used to misrepresent authorship where that matters.</div>
       </details>
@@ -945,7 +1117,7 @@ footer a:hover{color:#fff}
 </section>
 
 <!-- ═════════════ PRICING ═════════════ -->
-<section id="pricing" class="band">
+<section id="pricing">
   <div class="wrap">
     <div class="sec-head mid rv">
       <div class="eyebrow">Pricing</div>
@@ -955,9 +1127,9 @@ footer a:hover{color:#fff}
 
     <div class="toggle rv" role="group" aria-label="Billing period">
       <div class="toggle-in">
-        <button type="button" class="bt-opt on" data-cycle="monthly">Monthly</button>
-        <input type="checkbox" class="switch" id="cycleToggle" aria-label="Switch to annual billing">
-        <button type="button" class="bt-opt" data-cycle="annual">Annual <span class="save">2 months free</span></button>
+        <button type="button" class="bt-opt" data-cycle="monthly">Monthly</button>
+        <input type="checkbox" class="switch" id="cycleToggle" checked aria-label="Switch to annual billing">
+        <button type="button" class="bt-opt on" data-cycle="annual">Annual <span class="save">2 months free</span></button>
       </div>
     </div>
 
@@ -980,15 +1152,17 @@ footer a:hover{color:#fff}
         <a href="/app?plan=starter" data-plan="starter" data-base="starter" class="btn btn-outline">Choose Starter</a>
       </div>
 
-      <div class="tier pop" style="border-top-color:var(--v-brand)"
+      <div class="tier pop"
         data-m-price="$19.99" data-m-per="/mo" data-m-bill="billed monthly · ~$4.99/week"
         data-a-price="$16.67" data-a-per="/mo" data-a-bill="billed annually · $199.99/yr" data-a-save="$39.89/yr">
-        <div class="tag">Most popular</div>
-        <div class="nm">Pro</div>
-        <div class="amt">$19.99<span class="per">/mo</span></div>
-        <div class="bill">billed monthly · ~$4.99/week</div>
-        <ul><li>8,000-character rewrites</li><li>~600 rewrites / mo</li><li>10 saved voices</li><li>Full voice library</li><li>Length control</li><li>Multi-channel + priority</li></ul>
-        <a href="/app?plan=pro" data-plan="pro" data-base="pro" class="btn btn-primary">Choose Pro</a>
+        <div class="tier-in">
+          <div class="tag">Most popular</div>
+          <div class="nm">Pro</div>
+          <div class="amt">$19.99<span class="per">/mo</span></div>
+          <div class="bill">billed monthly · ~$4.99/week</div>
+          <ul><li>8,000-character rewrites</li><li>~600 rewrites / mo</li><li>10 saved voices</li><li>Full voice library</li><li>Length control</li><li>Multi-channel + priority</li></ul>
+          <a href="/app?plan=pro" data-plan="pro" data-base="pro" class="btn btn-primary">Choose Pro</a>
+        </div>
       </div>
 
       <div class="tier" style="border-top-color:var(--v-cold)"
@@ -1002,11 +1176,17 @@ footer a:hover{color:#fff}
       </div>
     </div>
 
+    <div class="guarantee rv">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M12 3l7.5 3v5.4c0 4.4-3 8.2-7.5 9.6-4.5-1.4-7.5-5.2-7.5-9.6V6L12 3Z"/><path d="M9 12l2 2 4-4"/>
+      </svg>
+      <span><b>14 days, no questions asked.</b> First purchase of any paid plan — email us and we'll refund it in full.</span>
+    </div>
     <p class="fineprint">Cancel anytime &middot; no card needed to start &middot; keep access to the end of your paid period</p>
 
     <div class="life rv">
       <div class="life-info">
-        <div class="life-badge">Founding price — first 100 members</div>
+        <div class="life-badge">Founding price — while we're early</div>
         <div class="nm">Lifetime</div>
         <h3>Pay once. Yours forever.</h3>
         <div class="amt">$240<span class="per"> billed once</span></div>
@@ -1018,16 +1198,16 @@ footer a:hover{color:#fff}
       </div>
       <div class="life-buy">
         <a href="/app?plan=lifetime" data-plan="lifetime" class="btn btn-light">Get Lifetime</a>
-        <p class="fine">Price rises after the first 100</p>
+        <p class="fine">≈ 12 months of Pro, paid once</p>
       </div>
     </div>
   </div>
 </section>
 
 <!-- ═════════════ FAQ ═════════════ -->
-<section id="faq">
+<section id="faq" class="band">
   <div class="wrap">
-    <div class="sec-head rv">
+    <div class="sec-head mid rv">
       <div class="eyebrow">Questions</div>
       <h2>Good to know.</h2>
     </div>
@@ -1036,6 +1216,7 @@ footer a:hover{color:#fff}
       <details><summary>Is my writing kept private?</summary><p>Your voice profiles are yours. They're stored to your account so you can reuse them, and aren't shared with other users.</p></details>
       <details><summary>What counts as one rewrite?</summary><p>One rewrite of one draft counts as one. Re-running the same draft in a different voice counts as another. Your monthly allowance resets at the start of each billing month.</p></details>
       <details><summary>Can I keep separate voices?</summary><p>Yes — that's the point. Keep one for your personal brand, one per client, one for the company newsletter, and switch between them.</p></details>
+      <details><summary>How is this different from ChatGPT?</summary><p>ChatGPT writes well, but in its voice — and you rebuild the instructions every session. EchoWrite measures how <em>you</em> write, saves that as a reusable profile, and applies it to any draft in one click. See the <a href="#compare">comparison above</a>.</p></details>
       <details><summary>Can I get a refund?</summary><p>Yes — 14 days, no questions asked, on your first purchase of any paid plan. Email us and we'll refund it in full. Full detail on the <a href="/refunds">refunds page</a>.</p></details>
       <details><summary>What does Lifetime include?</summary><p>Everything in Studio, unlimited saved voices, the highest rewrite limits, and every feature we ship from here — paid once, no renewal.</p></details>
       <details><summary>Can I cancel anytime?</summary><p>Anytime, from your account — no email required. You keep full access until the end of the period you've already paid for, and you're not billed again.</p></details>
@@ -1242,11 +1423,13 @@ function heat(t){
   var sampleEl=$('pfSample'), draftEl=$('pfDraft'), runEl=$('pfRun'),
       errEl=$('pfErr'), runsEl=$('pfRuns'), noteEl=$('pfNote'),
       ctrlEl=$('pfControl'), voiceEl=$('pfVoiced'), chipsEl=$('pfChips'),
-      waveEl=$('pfWave');
+      waveEl=$('pfWave'), claimEl=$('pfClaim'), claimBtn=$('pfClaimBtn'),
+      copyEl=$('pfCopy');
   if(!sampleEl) return;
 
   var IDLE_CONTROL='Clean. Correct. Sounds like a press release.';
   var IDLE_VOICED ='Your rhythm, your punctuation, your tics.';
+  var STASH='ew_demo';   // survives the trip to /app
 
   function esc(s){ return s.replace(/[&<>]/g,function(c){
     return {'&':'&amp;','<':'&lt;','>':'&gt;'}[c];
@@ -1317,6 +1500,18 @@ function heat(t){
     });
     ctrlEl.querySelector('.body').textContent=IDLE_CONTROL;
     voiceEl.querySelector('.body').textContent=IDLE_VOICED;
+    copyEl.hidden=true;
+  }
+
+  /* Carry the fingerprinted sample into the app, so signup finishes something
+     they already started instead of dropping them into an empty workspace.
+     sessionStorage, not localStorage: this is one journey, not a saved setting. */
+  function stash(sample, voiced){
+    try{
+      sessionStorage.setItem(STASH, JSON.stringify({
+        sample: sample, voiced: voiced, at: Date.now()
+      }));
+    }catch(e){}
   }
 
   var busy=false;
@@ -1344,7 +1539,7 @@ function heat(t){
     });
     ctrlEl.querySelector('.body').textContent='Working…';
     voiceEl.querySelector('.body').textContent='Reading your style…';
-    noteEl.hidden=true;
+    noteEl.hidden=true; claimEl.classList.remove('show'); copyEl.hidden=true;
 
     /* bring the answer into view while it generates */
     document.getElementById('result').scrollIntoView({behavior:'smooth',block:'start'});
@@ -1380,11 +1575,21 @@ function heat(t){
       paint(ctrlEl,  d.control || '', false);
       paint(voiceEl, d.voiced  || '', true);
       noteEl.hidden=false;
+      copyEl.hidden=false;
+
+      /* the ask, at the highest-intent moment on the page */
+      stash(sample, d.voiced || '');
+      claimEl.classList.add('show');
 
       if(typeof d.remaining==='number'){
         runsEl.textContent = d.remaining>0
           ? d.remaining+' free run'+(d.remaining===1?'':'s')+' left today'
           : 'That was your last free run';
+        /* out of runs → the CTA is now the only way forward, so say so */
+        if(d.remaining===0){
+          claimEl.querySelector('.claim-txt p').textContent =
+            "That was your last free run today — but we've kept the writing you pasted. Create a free account and your voice comes with you.";
+        }
       }
     })
     .catch(function(){
@@ -1399,6 +1604,19 @@ function heat(t){
   }
 
   runEl.addEventListener('click', run);
+
+  /* let them take one good rewrite away — reciprocity costs us nothing here */
+  copyEl.addEventListener('click', function(){
+    var t=voiceEl.querySelector('.body').textContent;
+    if(navigator.clipboard) navigator.clipboard.writeText(t);
+    copyEl.textContent='Copied';
+    setTimeout(function(){ copyEl.textContent='Copy'; },1400);
+  });
+
+  /* re-stash on the way out, in case they edited the sample after running */
+  claimBtn.addEventListener('click', function(){
+    stash(sampleEl.value.trim(), voiceEl.querySelector('.body').textContent);
+  });
 })();
 </script>
 
@@ -1443,7 +1661,9 @@ function heat(t){
   });
 })();
 
-/* Billing-cycle toggle: swap price / bill line / checkout target for the 3 paid tiers. */
+/* Billing-cycle toggle: swap price / bill line / checkout target for the 3 paid
+   tiers. Defaults to ANNUAL — the saving should be the first number they see,
+   with the monthly price struck through beside it. */
 (function(){
   const cyc=document.getElementById("cycleToggle");
   if(!cyc) return;
@@ -1469,6 +1689,7 @@ function heat(t){
   cyc.addEventListener("change",()=>apply(cyc.checked));
   optM.addEventListener("click",()=>{cyc.checked=false; apply(false);});
   optA.addEventListener("click",()=>{cyc.checked=true;  apply(true);});
+  apply(true);        // annual by default
 })();
 </script>
 </body>
