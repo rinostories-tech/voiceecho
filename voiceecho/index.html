@@ -93,8 +93,16 @@
 <style>
 :root{
   /* ── paper stock ── */
-  --paper:#faf8f2; --paper-2:#f3efe4; --paper-tint:#f4f1fa; --card:#fffdf8;
-  --ink:#14120c; --ink-2:#55514a; --ink-3:#8c8880;
+  --paper:#faf8f2; --paper-2:#f3efe4; --card:#fffdf8;
+  /* Band tint — swap this one line to change every tinted section.
+     Mauve-violet, not the cool pastel it was: red sits above green so the tint
+     carries the same yellow undertone as the paper, which is what stops the
+     warm/cool seam at every band edge.
+     warmer #f1eaf4 · deeper #e6dcee · peach blush #f7e5da */
+  --paper-tint:#ece4f0;
+  --paper-win:#f7f2f8;          /* compare winner column */
+  --line-tint:#e3dee9;          /* hairline for tinted bands — same value as --line, violet hue */
+  --ink:#14120c; --ink-2:#55514a; --ink-3:#6f6b63;
   --line:#e6e1d2; --line-2:#d5cfbc;
 
   /* ── brand, taken from the mark ── */
@@ -105,7 +113,7 @@
   --sky-4:#a05a9c; --sky-5:#e0836d; --sky-6:#fbd9a5; --sky-7:#ffeecb;
 
   /* ── receding ranges ── */
-  --far:#3a2f78; --mid:#241d47; --near:#14120c;
+  --far:#3a2f78; --mid:#241d47; --near:#171232;
 
   /* ── voice colour system ── */
   --v-brand:#cf2e1e; --v-news:#2b6cb8; --v-atlas:#1f8a70;
@@ -172,6 +180,7 @@ section{padding:104px 0}
   .bars i{transition:none!important}
   .tier.pop::before{animation:none!important}
   .wall-card,.wall-scrim,.wall-sun,.wall-stars circle,.wall-dots i{animation:none!important}
+  .tier-dots i,.tier-arrow{transition:none!important}
 }
 
 /* ═════════ BUTTONS ═════════ */
@@ -496,7 +505,8 @@ nav.solid .btn-ghost:hover{background:#2e2a20}
 .stat .d{font-size:12.5px;color:var(--ink-3);margin-top:9px;line-height:1.5}
 
 /* ═════════ TINTED BAND ═════════ */
-.band{background:var(--paper-tint);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.band{background:var(--paper-tint);
+  border-top:1px solid var(--line-tint);border-bottom:1px solid var(--line-tint)}
 
 /* ═════════ STEPS ═════════ */
 .steps{display:grid;grid-template-columns:repeat(3,1fr)}
@@ -550,8 +560,8 @@ nav.solid .btn-ghost:hover{background:#2e2a20}
 .cmp thead th.us{color:var(--ink)}
 .cmp tbody th{font-weight:400;color:var(--ink-2);font-size:14px;width:34%}
 .cmp td{text-align:center;color:var(--ink-3);font-size:13px;width:22%}
-.cmp col.us,.cmp td.us{background:var(--paper-tint)}
-.cmp thead th.us{background:#ece6fb}
+.cmp col.us,.cmp td.us{background:var(--paper-win)}
+.cmp thead th.us{background:#ece4f0}
 .cmp td.us{color:var(--ink);font-weight:500}
 .cmp .yes,.cmp .no,.cmp .part{display:inline-flex;width:20px;height:20px;border-radius:999px;
   align-items:center;justify-content:center;font-size:11px;line-height:1}
@@ -612,6 +622,7 @@ nav.solid .btn-ghost:hover{background:#2e2a20}
 .switch{position:absolute;opacity:0;pointer-events:none;width:0;height:0}
 
 .tiers{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;align-items:stretch}
+.tier-nav{display:none}
 .tier{background:var(--card);border:1px solid var(--line);border-top-width:3px;
   border-radius:var(--r);padding:28px 22px;display:flex;flex-direction:column;position:relative}
 
@@ -730,7 +741,18 @@ footer a:hover{color:#fff}
   .sheet{border-radius:14px 14px 0 0}
   .sheet-body{padding:18px 16px 34px}
   .sheet-top .fn{display:none}
-  .pf-grid{grid-template-columns:1fr;gap:16px}
+  .pf-grid{grid-template-columns:1fr;gap:0;overflow:hidden;
+    border:1px solid var(--line);border-radius:var(--r-sm);background:var(--paper)}
+  .pane{position:relative;gap:0}
+  .pane+.pane{border-top:1px solid var(--line)}
+  .pane-top{min-height:0;padding:10px 12px 2px;gap:8px}
+  .pf-chip{font-size:9.5px;padding:3px 9px}
+  .sheet textarea{border:0;border-radius:0;background:transparent;resize:none;
+    overflow:hidden;min-height:100px;padding:2px 12px 24px}
+  .sheet textarea:focus{background:transparent}
+  .sheet textarea.bad{box-shadow:inset 3px 0 0 var(--red)}
+  .hint{position:absolute;right:12px;bottom:7px;pointer-events:none}
+  .hero-cta .btn-ghost{display:none}
   .pf-bar{gap:10px}
   .pf-bar .btn{width:100%}
   .pf-runs{width:100%;text-align:center}
@@ -759,24 +781,46 @@ footer a:hover{color:#fff}
   .signal{grid-template-columns:1fr;gap:8px}
   .signal .k{padding-top:0}
   .sci p{font-size:17px}
-  .cmp{border:0;background:transparent;overflow:visible}
-  .cmp table,.cmp tbody,.cmp tr,.cmp th,.cmp td{display:block;width:auto}
-  .cmp thead{display:none}
-  .cmp tbody tr{border:1px solid var(--line);border-radius:var(--r-sm);background:var(--card);
-    margin-bottom:10px;padding:14px 16px}
-  .cmp tbody th{width:auto;padding:0 0 12px;border-bottom:1px solid var(--line);color:var(--ink);
-    font-size:14.5px}
-  .cmp td{width:auto;text-align:left;padding:9px 0 0;display:flex;align-items:center;gap:10px;
-    background:none!important}
-  .cmp td::before{content:attr(data-c);font-family:var(--mono);font-size:9.5px;letter-spacing:.12em;
-    text-transform:uppercase;color:var(--ink-3);flex:1}
-  .cmp td.us::before{color:var(--ink)}
-  .tiers{grid-template-columns:1fr}
+  .cmp table{table-layout:fixed}
+  .cmp th,.cmp td{padding:16px 8px;font-size:12.5px;line-height:1.5}
+  .cmp thead th{font-size:9px;letter-spacing:.08em;padding:14px 6px;line-height:1.6;
+    text-align:center;word-break:break-word}
+  .cmp thead th:first-child,.cmp tbody th{width:37%}
+  .cmp thead th:not(:first-child),.cmp td{width:21%}
+  .cmp tbody th{padding-left:2px;padding-right:14px;letter-spacing:.008em}
+  .cmp td{padding-left:0;padding-right:0}
+  .cmp .yes,.cmp .no,.cmp .part{width:22px;height:22px;font-size:11px}
+  .cmp-note{line-height:1.9;margin-top:22px}
+  /* Horizontal rail. overflow-y stays visible-by-default so a vertical swipe
+     over the cards still scrolls the page — never trap the reader sideways.
+     overscroll-behavior-x stops a swipe past the end triggering back-navigation. */
+  .tiers{display:flex;gap:12px;overflow-x:auto;overflow-y:hidden;
+    overscroll-behavior-x:contain;
+    scroll-snap-type:x proximity;-webkit-overflow-scrolling:touch;
+    padding:6px 0 26px;scrollbar-width:none}
+  .tiers::-webkit-scrollbar{display:none}
+  .tier{flex:0 0 84%;scroll-snap-align:start}
+  .tier-nav{display:flex;align-items:center;justify-content:center;gap:18px;margin-top:-4px}
+  .tier-arrow{width:38px;height:38px;flex:0 0 auto;padding:0;cursor:pointer;
+    display:grid;place-items:center;border-radius:999px;
+    border:1px solid var(--line-2);background:var(--card);color:var(--ink);
+    font-family:var(--sans);font-size:19px;line-height:1;
+    transition:opacity .2s var(--ease),border-color .2s,background .2s}
+  .tier-arrow:hover{border-color:var(--ink-3);background:var(--paper-2)}
+  .tier-arrow[disabled]{opacity:.28;cursor:default;pointer-events:none}
+  .tier-dots{display:flex;gap:7px}
+  .tier-dots i{width:6px;height:6px;border-radius:999px;background:var(--line-2);
+    transition:background .25s var(--ease),transform .25s var(--ease)}
+  .tier-dots i.on{background:var(--ink);transform:scale(1.2)}
   .guarantee{flex-direction:column;text-align:center;border-radius:var(--r);gap:9px}
   .life ul{grid-template-columns:1fr}
   .final{padding:96px 0 170px}
   .hzlabel{display:none}
   .foot-in{justify-content:center;text-align:center;flex-direction:column;gap:14px}
+}
+@media (min-width:421px) and (max-width:760px){
+  .voice:nth-child(5):last-child{grid-column:1/-1;width:calc(50% - 7px);
+    margin-left:auto;margin-right:auto}
 }
 @media (max-width:420px){
   .voices{grid-template-columns:1fr}
@@ -1093,8 +1137,8 @@ footer a:hover{color:#fff}
         <thead>
           <tr>
             <th scope="col"></th>
-            <th scope="col">ChatGPT &amp; co.</th>
-            <th scope="col">AI humanizers</th>
+            <th scope="col">ChatGPT</th>
+            <th scope="col">Humanizers</th>
             <th scope="col" class="us">EchoWrite</th>
           </tr>
         </thead>
@@ -1230,7 +1274,7 @@ footer a:hover{color:#fff}
         <div class="nm">Starter</div>
         <div class="amt">$11.99<span class="per">/mo</span></div>
         <div class="bill">billed monthly · ~$2.99/week</div>
-        <ul><li>3,000-character rewrites</li><li>~200 rewrites / mo</li><li>3 saved voices</li><li>Rewrite history</li><li>AI-ism scrubber</li></ul>
+        <ul><li>3,000-character rewrites</li><li>~200 rewrites / mo</li><li>3 saved voices</li><li>Everything in Free</li><li>Rewrite history + AI-ism scrubber</li></ul>
         <a href="/app?plan=starter" data-plan="starter" data-base="starter" class="btn btn-outline">Choose Starter</a>
       </div>
 
@@ -1242,7 +1286,7 @@ footer a:hover{color:#fff}
           <div class="nm">Pro</div>
           <div class="amt">$19.99<span class="per">/mo</span></div>
           <div class="bill">billed monthly · ~$4.99/week</div>
-          <ul><li>8,000-character rewrites</li><li>~600 rewrites / mo</li><li>10 saved voices</li><li>Full voice library</li><li>Length control</li><li>Multi-channel + priority</li></ul>
+          <ul><li>8,000-character rewrites</li><li>~600 rewrites / mo</li><li>10 saved voices</li><li>Everything in Starter</li><li>Full library, length control, priority</li></ul>
           <a href="/app?plan=pro" data-plan="pro" data-base="pro" class="btn btn-primary">Choose Pro</a>
         </div>
       </div>
@@ -1258,6 +1302,12 @@ footer a:hover{color:#fff}
       </div>
     </div>
 
+    <div class="tier-nav">
+      <button class="tier-arrow" id="tierPrev" type="button" aria-label="Previous plan">&lsaquo;</button>
+      <div class="tier-dots" id="tierDots" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+      <button class="tier-arrow" id="tierNext" type="button" aria-label="Next plan">&rsaquo;</button>
+    </div>
+
     <div class="guarantee rv">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
         <path d="M12 3l7.5 3v5.4c0 4.4-3 8.2-7.5 9.6-4.5-1.4-7.5-5.2-7.5-9.6V6L12 3Z"/><path d="M9 12l2 2 4-4"/>
@@ -1268,19 +1318,17 @@ footer a:hover{color:#fff}
 
     <div class="life rv">
       <div class="life-info">
-        <div class="life-badge">Founding price — while we're early</div>
         <div class="nm">Lifetime</div>
         <h3>Pay once. Yours forever.</h3>
         <div class="amt">$240<span class="per"> billed once</span></div>
         <ul>
           <li>Unlimited length</li><li>Everything in Studio</li>
           <li>Unlimited saved voices</li><li>Highest rewrite limits</li>
-          <li>Every future feature</li><li>Founding-member badge</li>
+          <li>Every future feature</li><li>No renewal, ever</li>
         </ul>
       </div>
       <div class="life-buy">
         <a href="/app?plan=lifetime" data-plan="lifetime" class="btn btn-light">Get Lifetime</a>
-        <p class="fine">≈ 12 months of Pro, paid once</p>
       </div>
     </div>
   </div>
@@ -1662,6 +1710,7 @@ function heat(t){
         draftEl.value="We are thrilled to announce that our new feature is now live. It leverages cutting-edge technology to deliver a seamless, robust experience that we believe will unlock significant value for all users.";
         count(draftEl,$('pfDraftCount'),600);
       }
+      window.ewGrow&&window.ewGrow();
     };
     chipsEl.appendChild(b);
   });
@@ -1895,6 +1944,110 @@ function heat(t){
   optM.addEventListener("click",()=>{cyc.checked=false; apply(false);});
   optA.addEventListener("click",()=>{cyc.checked=true;  apply(true);});
   apply(true);        // annual by default
+})();
+</script>
+
+<script>
+/* ─── mobile: fields grow with the content instead of scrolling ───
+   Desktop keeps rows=5 and the native resize handle; this only engages
+   under 760px, and hands the height back on the way out. */
+(function(){
+  var mq=matchMedia('(max-width:760px)');
+  var els=[document.getElementById('pfSample'),document.getElementById('pfDraft')]
+          .filter(Boolean);
+  if(!els.length) return;
+
+  function grow(el){
+    if(!mq.matches){ el.style.height=''; return; }
+    el.style.height='auto';
+    el.style.height=el.scrollHeight+'px';
+  }
+  function all(){
+    els.forEach(function(el){
+      el.rows = mq.matches ? 3 : 5;
+      grow(el);
+    });
+  }
+
+  els.forEach(function(el){
+    el.addEventListener('input',function(){ grow(el); });
+  });
+  if(mq.addEventListener) mq.addEventListener('change',all);
+  else if(mq.addListener) mq.addListener(all);
+  addEventListener('resize',function(){ els.forEach(grow); },{passive:true});
+
+  window.ewGrow=all;   /* the demo script calls this after setting values itself */
+  all();
+})();
+
+/* ─── mobile: pricing rail — arrows, dots, and a nudge to the recommended plan ─── */
+(function(){
+  var rail=document.querySelector('.tiers'),
+      dots=document.getElementById('tierDots'),
+      prev=document.getElementById('tierPrev'),
+      next=document.getElementById('tierNext');
+  if(!rail||!dots) return;
+
+  var mq=matchMedia('(max-width:760px)'),
+      cards=[].slice.call(rail.querySelectorAll('.tier')),
+      bits=[].slice.call(dots.querySelectorAll('i'));
+  if(!cards.length) return;
+
+  function soft(){ return rail.scrollTo && !matchMedia('(prefers-reduced-motion:reduce)').matches; }
+  function maxScroll(){ return rail.scrollWidth - rail.clientWidth; }
+
+  /* Nearest card to the viewport centre. Centre rather than left edge because
+     the last card can never reach the left edge — there isn't the scroll range. */
+  function current(){
+    var mid=rail.scrollLeft+rail.clientWidth/2, best=0, bd=Infinity;
+    cards.forEach(function(el,i){
+      var c=el.offsetLeft+el.offsetWidth/2, d=Math.abs(c-mid);
+      if(d<bd){ bd=d; best=i; }
+    });
+    return best;
+  }
+
+  function sync(){
+    var i=current(), x=rail.scrollLeft, m=maxScroll();
+    bits.forEach(function(b,n){ b.classList.toggle('on',n===i); });
+    if(prev) prev.disabled = x<=2;
+    if(next) next.disabled = x>=m-2;
+  }
+
+  function go(dir){
+    var i=Math.max(0,Math.min(cards.length-1,current()+dir));
+    var to=Math.min(maxScroll(), cards[i].offsetLeft-cards[0].offsetLeft);
+    if(soft()) rail.scrollTo({left:to,behavior:'smooth'});
+    else rail.scrollLeft=to;
+  }
+
+  if(prev) prev.addEventListener('click',function(){ go(-1); });
+  if(next) next.addEventListener('click',function(){ go(1); });
+
+  var raf=null;
+  rail.addEventListener('scroll',function(){
+    if(!raf) raf=requestAnimationFrame(function(){ sync(); raf=null; });
+  },{passive:true});
+  addEventListener('resize',sync,{passive:true});
+
+  /* Slide to Pro the first time pricing scrolls into view. Lands them on the
+     recommended plan, and — more usefully — shows the rail moves at all. */
+  var pro=rail.querySelector('.tier.pop'), nudged=false;
+  if(pro && 'IntersectionObserver' in window){
+    var io=new IntersectionObserver(function(es){
+      es.forEach(function(e){
+        if(!e.isIntersecting || nudged || !mq.matches) return;
+        nudged=true;
+        var to=Math.min(maxScroll(), pro.offsetLeft-cards[0].offsetLeft);
+        if(soft()) rail.scrollTo({left:to,behavior:'smooth'});
+        else rail.scrollLeft=to;
+        io.disconnect();
+      });
+    },{threshold:.35});
+    io.observe(rail);
+  }
+
+  sync();
 })();
 </script>
 </body>
