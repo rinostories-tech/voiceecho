@@ -17,7 +17,7 @@ import {
   FORMAT_REMINDER,
   looksLikeRefusal,
   USER_MSG,
-} from "../_prompt.js";
+} from "./_prompt.js";
 
 const ADMIN_EMAIL = "rinostories@gmail.com"; // may use overridePlan to test any tier
 
