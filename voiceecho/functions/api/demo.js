@@ -26,7 +26,7 @@
 //                 residual cost risk. The MAX_DRAFT cap plus the monthly spend
 //                 limit on the Anthropic key are the backstop there.
 
-import { CONTROL_SYSTEM, buildSystem, fingerprintProfile, callModel, looksLikeRefusal }
+import { CONTROL_SYSTEM, buildSystem, fingerprintProfile, buildReminders, callModel, looksLikeRefusal }
   from "./_prompt.js";
 
 const DAILY_RUNS = 3;      // paired runs per IP, then the wall
@@ -103,6 +103,8 @@ export async function onRequestPost(context) {
         }
       }
 
+      // A described voice, not a real writer: no sample to be faithful to, so
+      // the voice reminder doesn't apply and every punctuation tell is stripped.
       const output = await callModel(env, {
         system: buildSystem(HUMAN_PROFILE),
         draft,
@@ -115,9 +117,24 @@ export async function onRequestPost(context) {
     }
 
     // Both rewrites at once — one round trip of latency, not two.
+    // The control has no writer to be faithful to: no voice reminder, and every
+    // punctuation tell normalised. The voiced side gets both — the reminder so the
+    // voice survives to the point of generation, and the visitor's own sample so
+    // the punctuation policy is derived from their actual writing rather than
+    // imposed on it. If they use dashes, they keep them.
     const [control, voiced] = await Promise.all([
-      callModel(env, { system: CONTROL_SYSTEM, draft, signal: request.signal }),
-      callModel(env, { system: buildSystem(fingerprintProfile(sample)), draft, signal: request.signal }),
+      callModel(env, {
+        system: CONTROL_SYSTEM,
+        draft,
+        signal: request.signal,
+      }),
+      callModel(env, {
+        system: buildSystem(fingerprintProfile(sample)),
+        draft,
+        reminders: buildReminders({ hasVoice: true }),
+        voiceSamples: sample,
+        signal: request.signal,
+      }),
     ]);
 
     if (looksLikeRefusal(voiced) || looksLikeRefusal(control)) {
